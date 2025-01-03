@@ -55,7 +55,7 @@ export function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: string }
               <span className="flex items-center">
                 <User className="w-4 h-4 mr-1" />
                 {quiz.getAuthorUrl() ? (
-                  <a href={quiz.getAuthorUrl()} target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
+                  <a href={quiz.getAuthorUrl()} target="_blank" className="underline hover:text-primary">
                     {quiz.getAuthor()}
                   </a>
                 ) : (
@@ -64,7 +64,7 @@ export function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: string }
               </span>
               <span className="flex items-center break-all">
                 <File className="w-4 h-4 mr-1 flex-shrink-0" />
-                <a href={`https://github.com/jimatomo/dtsb-learning-place/blob/main/${quiz.getFilePath()}`} target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
+                <a href={`https://github.com/jimatomo/dtsb-learning-place/blob/main/${quiz.getFilePath()}`} target="_blank" className="underline hover:text-primary">
                   {quiz.getFilePath()}
                 </a>
               </span>
@@ -115,7 +115,7 @@ export function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: string }
             <AccordionContent>
               {quiz.getReferences().map((reference, index) => (
                 <div key={`accordion-${index}`} className="text-center">
-                  <a href={reference.url} target="_blank" rel="noopener noreferrer">
+                  <a href={reference.url} target="_blank">
                     {reference.title}
                   </a>
                 </div>
