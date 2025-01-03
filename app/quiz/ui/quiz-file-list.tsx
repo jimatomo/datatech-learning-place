@@ -1,17 +1,7 @@
 import Link from 'next/link'
 import { Folder, ScrollText, Calendar, User } from 'lucide-react'
 import { Badge } from "@/components/ui/badge"
-
-interface PathInfo {
-  path: string;
-  isEndpoint: boolean;
-  title: string;
-  tags: string[];
-  createdAt: Date | null;
-  updatedAt: Date | null;
-  author: string | null;
-}
-
+import { PathInfo } from '../lib/get-path-info'
 interface QuizFileListProps {
   pathInfos: PathInfo[];
   currentPath: string[];
@@ -33,15 +23,7 @@ export function QuizFileList({ pathInfos, currentPath }: QuizFileListProps) {
                 <div className="flex flex-wrap gap-1 max-h-12">
                   <p className="line-clamp-2">{pathInfo.title}</p>
                 </div>
-                <div className="flex flex-col gap-1">
-                  <div className="flex flex-row flex-wrap gap-1 max-h-12 truncate pb-1">
-                    {pathInfo.tags && pathInfo.tags.map((tag, index) => (
-                      <Badge key={index} variant="secondary" className="flex-shrink-0 text-xs">
-                        {tag.trim()}
-                      </Badge>
-                    ))}
-                  </div>
-                  <div className="flex flex-row items-center gap-2 text-xs text-muted-foreground">
+                <div className="flex flex-row items-center gap-2 text-xs text-muted-foreground">
                     {pathInfo.createdAt && (
                       <div className="flex flex-row items-center">
                         <Calendar className="w-3 h-3 mr-1" />
@@ -58,6 +40,14 @@ export function QuizFileList({ pathInfos, currentPath }: QuizFileListProps) {
                         <span>{pathInfo.author}</span>
                       </div>
                     )}
+                  </div>
+                <div className="flex flex-col gap-1">
+                  <div className="flex flex-row flex-wrap justify-end gap-1 max-h-12 pb-1 truncate">
+                    {pathInfo.tags && pathInfo.tags.map((tag, index) => (
+                      <Badge key={index} variant="secondary" className="flex-shrink-0 text-xs">
+                        {tag.trim()}
+                      </Badge>
+                    ))}
                   </div>
                 </div>
               </div>

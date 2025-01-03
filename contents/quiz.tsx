@@ -2,8 +2,8 @@ interface QuizParams {
   id: string; // クイズのID
   file_path: string; // クイズのファイルパス
   title: string; // クイズのタイトル
-  images: string[]; // クイズの画像のURL
-  question: string; // クイズの問題
+  question?: string; // クイズの問題（ただの文字列で問題ない場合はこちら）
+  question_jsx?: React.ReactNode; // クイズの問題（Reactコンポーネントを使用している場合はこちら）
   options: { [key: number]: string }; // クイズの選択肢（キー：選択肢の番号、値：選択肢の内容）
   answers: number[]; // クイズの正解（optionsのキー番号を指定）
   explanation: string; // クイズの解説
@@ -33,8 +33,8 @@ export class Quiz {
   getId = () => this.params.id;
   getFilePath = () => this.params.file_path;
   getTitle = () => this.params.title;
-  getImages = () => this.params.images;
   getQuestion = () => this.params.question;
+  getQuestionJsx = () => this.params.question_jsx;
   getOptions = () => this.params.options;
   getAnswers = () => this.params.answers;
   getExplanation = () => this.params.explanation;

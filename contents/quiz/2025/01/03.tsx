@@ -9,13 +9,12 @@ export default function QuizContent() {
     // author_url: "https://github.com/jimatomo",
     created_at: new Date("2025-01-03"),
     updated_at: new Date("2025-01-03"),
-    previous_quiz_id: "Q20250102",
-    next_quiz_id: "Q20250104",
+    // previous_quiz_id: "Q20250102",
+    // next_quiz_id: "Q20250104",
 
     // quiz
     title: "日本発のプログラミング言語は？",
-    tags: ["Programming", "Technology", "History"],
-    images: [],
+    tags: ["Programming", "Technology", "History", "Engineering"],
     question: "以下のプログラミング言語のうち、日本で開発されたものを選んでください。",
     options: { 
       0: "Ruby", 

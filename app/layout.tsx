@@ -45,14 +45,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                     <ModeToggle />
                   </div>
                 </div>
-                <div className="flex-1 overflow-auto w-full">
-                  <div className="w-full h-full px-6 py-2 flex flex-col xl:flex-row gap-4">
-                    <div className="w-full flex-1">{children}</div>
-                    {/* 広告などのコンテンツをここに配置 */}
-                    {/* 有料化する際に表示されないようにする処理を追加 */}
-                    <div className="w-full xl:flex-1 max-w-64">
-                      <h2 className="text-lg font-bold">広告枠</h2>
-                    </div>
+                <div className="px-6 py-2 flex flex-col xl:flex-row gap-4">
+                  <div className="w-full flex-1">{children}</div>
+                  {/* 広告などのコンテンツをここに配置 */}
+                  {/* 有料化する際に表示されないようにする処理を追加 */}
+                  <div className="w-full xl:flex-1 max-w-64 py-2">
+                    <h2 className="text-lg font-bold py-2">Sponsored by</h2>
+                    <p className="text-sm text-muted-foreground">そのうちスポンサーを募集します</p>
                   </div>
                 </div>
               </main>

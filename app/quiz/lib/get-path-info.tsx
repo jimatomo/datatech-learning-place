@@ -1,3 +1,13 @@
+export interface PathInfo {
+  path: string;
+  isEndpoint: boolean;
+  title: string;
+  tags: string[];
+  createdAt: Date | null;
+  updatedAt: Date | null;
+  author: string | null;
+}
+
 export async function getPathInfos(
   files: string[],
   id: string[] = [],

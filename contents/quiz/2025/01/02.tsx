@@ -5,7 +5,6 @@ export default function QuizContent() {
     id: generateQuizId(import.meta.url),
     file_path: generateFilePath(import.meta.url),
     title: "Which cities have served as the capital of Japan?",
-    images: [],
     question: "Which cities have served as Japan's capital throughout history? aaaaa aaaaaa aaa aaaaaaaa bbb bbbbbb bbbbb bbbb bbbb",
     options: { 0: "Tokyo", 1: "Kyoto", 2: "Osaka", 3: "Hiroshima dessssu sss aaa bbb ddd ss cccc aa　あいうえお。ちょっと眺めにしてみた時にどうなるの確認するために広くしています。" },
     answers: [0, 1],
@@ -15,12 +14,10 @@ export default function QuizContent() {
       { title: "Wikipedia Kyoto", url: "https://en.wikipedia.org/wiki/Kyoto" },
       { title: "Wikipedia Capital of Japan", url: "https://en.wikipedia.org/wiki/Capital_of_Japan" }
     ],
-    tags: ["Geography", "History", "Snowflake", "dbt"],
+    tags: ["Geography", "History", "Snowflake", "dbt", "Engineering"],
     created_at: new Date("2025-01-02"),
     updated_at: new Date("2025-01-02"),
     author: "jimatomo",
-    previous_quiz_id: "Q20250101",
-    next_quiz_id: "Q20250103"
   });
   return quiz;
 }

@@ -1,5 +1,8 @@
 import { Quiz, generateQuizId, generateFilePath } from "@/contents/quiz";
 
+// 簡単なHTMLを使用した問題の場合は以下のように記載できる
+const question = `以下の大規模言語モデル（LLM）に関する説明のうち、正しいものを選んでください`
+
 export default function QuizContent() {
   const quiz = new Quiz({
     // metadata
@@ -9,12 +12,12 @@ export default function QuizContent() {
     created_at: new Date("2025-01-04"),
     updated_at: new Date("2025-01-04"),
     previous_quiz_id: "Q20250103",
+    // next_quiz_id: "Q20250105",
 
     // quiz
     title: "大規模言語モデル（LLM）の特徴は？",
-    tags: ["AI", "Machine Learning", "LLM"],
-    images: [],
-    question: "以下の大規模言語モデル（LLM）に関する説明のうち、正しいものを選んでください。",
+    tags: ["AI", "Machine Learning", "LLM", "Engineering"],
+    question: question,
     options: { 
       0: "トランスフォーマーアーキテクチャを使用している", 
       1: "文脈を理解するために注意機構（Attention）を使用する", 

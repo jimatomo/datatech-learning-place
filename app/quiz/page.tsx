@@ -2,6 +2,7 @@ import path from 'path'
 import { getAllQuizFiles } from '@/app/quiz/lib/get-files'
 import { getPathInfos } from '@/app/quiz/lib/get-path-info'
 import { QuizFileList } from '@/app/quiz/ui/quiz-file-list'
+import QuizFileListTagFiltered from '@/app/quiz/ui/quiz-file-list-tag-filtered'
 
 export default async function QuizList() {
   // クイズディレクトリのパスを取得
@@ -12,11 +13,11 @@ export default async function QuizList() {
 
   // 全てのクイズのパス情報を取得
   const pathInfos = await getPathInfos(quizFiles)
+  const pathInfos_full_path = await getPathInfos(quizFiles, [], true)
 
   // 最新のクイズ(3つ分)を取得（作成日順に降順で並び替える）
-  const latestQuizPathInfos = quizFiles.slice(-3)
-  const latestPathInfos = await getPathInfos(latestQuizPathInfos, [], true)
-  latestPathInfos.sort((a, b) => {
+  const latestPathInfos_full_path = pathInfos_full_path.slice(-3)
+  latestPathInfos_full_path.sort((a, b) => {
     if (!a.createdAt || !b.createdAt) return 0;
     return b.createdAt.getTime() - a.createdAt.getTime()
   })
@@ -33,14 +34,25 @@ export default async function QuizList() {
         <h2 className="scroll-m-20 pt-5 pb-2 text-lg font-semibold tracking-tight">
           <p>最新のQuiz</p>
         </h2>
-        <QuizFileList pathInfos={latestPathInfos} currentPath={[]} />
+        <div className="px-2">
+          <QuizFileList pathInfos={latestPathInfos_full_path} currentPath={[]} />
+        </div>
       </div>
 
       <div>
         <h2 className="scroll-m-20 pt-5 pb-2 text-lg font-semibold tracking-tight">
           <p>Quiz一覧</p>
         </h2>
-        <QuizFileList pathInfos={unique_path_infos} currentPath={[]} />
+        <div className="px-2">
+          <QuizFileList pathInfos={unique_path_infos} currentPath={[]} />
+        </div>
+      </div>
+
+      <div>
+        <h2 className="scroll-m-20 pt-5 pb-2 text-lg font-semibold tracking-tight">
+          <p>タグ別Quiz一覧</p>
+        </h2>
+        <QuizFileListTagFiltered quizPathInfos={pathInfos_full_path} />
       </div>
     </div>
   )
