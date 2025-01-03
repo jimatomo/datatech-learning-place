@@ -1,0 +1,17 @@
+services:
+  dtsb-learning-place-dev:
+    container_name: dtsb_learning_place_dev
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    ports:
+      - '127.0.0.1:8080:8080' # Lambda Runtime Interface Emulator on port 8080
+      - '127.0.0.1:3001:3001' # Next.js on port (avoid 3000 and 9001)
+    volumes:
+      - ../:/workspace/app:cached
+      - ~/.ssh/:/home/vscode/.ssh:cached
+      - ~/.aws/:/home/vscode/.aws:cached
+    tty: true
+
+volumes:
+  dtsb-learning-place-dev:

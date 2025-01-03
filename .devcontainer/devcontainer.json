@@ -1,0 +1,33 @@
+{
+	"name": "dtsb-learning-place-dev",
+  "workspaceFolder": "/workspace/app",
+  "remoteUser": "node",
+	"dockerComposeFile": [
+		"./compose.yml"
+	],
+	"service": "dtsb-learning-place-dev",
+  "postCreateCommand": "npm install",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+				"dbaeumer.vscode-eslint", // ESLint
+				"esbenp.prettier-vscode", // Prettier
+        "oderwat.indent-rainbow",
+        "eamodio.gitlens",
+        "bradlc.vscode-tailwindcss"
+      ],
+      "settings": {
+        "editor.formatOnSave": false,
+
+        "workbench.colorCustomizations": {
+          "titleBar.activeBackground": "#8b007f6b", // タイトルバーの背景色
+          "titleBar.activeForeground": "#ffffff", // タイトルバーの文字色
+          "statusBar.background": "#8b007f6b", // ステータスバーの背景色
+          "statusBar.foreground": "#ffffff", // ステータスバーの文字色
+          "activityBar.background": "#8b007f6b", // アクティビティバーの背景色
+          "activityBar.foreground": "#ffffff" // アクティビティバーの文字色
+        }
+      }
+    }
+  }
+}
