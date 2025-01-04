@@ -2,9 +2,9 @@ import Link from "next/link"
 
 export default function Footer() {
   return (
-    <footer className="w-full border-t p-6">
-      <div className="flex flex-row items-center justify-between text-sm text-muted-foreground">
-        <p>Datatech Learning Place</p>
+    <footer className="w-full border-t px-6 py-3">
+      <div className="flex flex-col sm:flex-row items-center justify-between text-sm text-muted-foreground">
+        <p className="mb-4 sm:mb-0">Datatech Learning Place</p>
         <div className="flex items-center gap-2">
           <Link href="/global/contact" className="hover:underline">
             <p>お問い合わせ</p>

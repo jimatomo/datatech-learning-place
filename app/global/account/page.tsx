@@ -9,8 +9,8 @@ import {
 
 export default function AccountPage() {
   const user = {
-    name: "username",
-    email: "user@example.com",
+    name: "Anonymous User",
+    email: "anonymous@example.com",
     id: "1234567890",
   }
 

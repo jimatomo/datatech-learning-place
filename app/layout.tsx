@@ -11,6 +11,8 @@ import { AppSidebar } from "@/components/app-sidebar"
 import { ModeToggle } from "@/components/theme-mode-toggle"
 import { BreadcrumbCollapsed } from "@/components/app-breadcrumb"
 import Footer from "@/components/footer"
+import { Suspense } from "react"
+import Loading from "@/components/ui/loading"
 
 export const metadata: Metadata = {
   title: "Datatech Learning Place",
@@ -48,7 +50,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   </div>
                 </div>
                 <div className="px-6 py-2 flex flex-col xl:flex-row gap-4">
-                  <div className="w-full flex-1">{children}</div>
+                  <div className="w-full flex-1">
+                    <Suspense fallback={<Loading />}>
+                      {children}
+                    </Suspense>
+                  </div>
                   <div className="w-full xl:flex-1 max-w-64 py-2">
                     <h2 className="text-lg font-bold py-2">Sponsored by</h2>
                     <p className="text-sm text-muted-foreground">そのうちスポンサーを募集します</p>
