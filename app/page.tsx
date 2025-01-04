@@ -1,7 +1,7 @@
 export default function Home() {
   return (
     <div>
-      <h1 className="scroll-m-20 pb-2 text-xl font-extrabold tracking-tight">
+      <h1 className="scroll-m-20 pb-2 text-xl font-bold tracking-tight">
         Datatech Learning Place (alpha)
       </h1>
       <p>

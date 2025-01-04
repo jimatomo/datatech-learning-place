@@ -10,6 +10,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { AppSidebar } from "@/components/app-sidebar"
 import { ModeToggle } from "@/components/theme-mode-toggle"
 import { BreadcrumbCollapsed } from "@/components/app-breadcrumb"
+import Footer from "@/components/footer"
 
 export const metadata: Metadata = {
   title: "Datatech Learning Place",
@@ -34,7 +35,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         >
           <SidebarProvider defaultOpen={defaultOpen}>
             <AppSidebar />
-              <main className="flex flex-col h-screen w-screen">
+            <div className="flex flex-col min-h-screen w-screen">
+              <main className="flex-1">
                 <div className="flex items-center px-4 py-2 w-full">
                   <div className="flex items-center gap-2">
                     <SidebarTrigger className="w-10" />
@@ -47,14 +49,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 </div>
                 <div className="px-6 py-2 flex flex-col xl:flex-row gap-4">
                   <div className="w-full flex-1">{children}</div>
-                  {/* 広告などのコンテンツをここに配置 */}
-                  {/* 有料化する際に表示されないようにする処理を追加 */}
                   <div className="w-full xl:flex-1 max-w-64 py-2">
                     <h2 className="text-lg font-bold py-2">Sponsored by</h2>
                     <p className="text-sm text-muted-foreground">そのうちスポンサーを募集します</p>
                   </div>
                 </div>
               </main>
+              <Footer />
+            </div>
           </SidebarProvider>
         </ThemeProvider>
       </body>

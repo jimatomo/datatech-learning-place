@@ -1,20 +1,47 @@
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table"
+
 export default function AccountPage() {
-  
+  const user = {
+    name: "username",
+    email: "user@example.com",
+    id: "1234567890",
+  }
+
   return (
-    <div>
-      <h1>Account</h1>
-      <div className="flex flex-col gap-4">
-        <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2">
-          <div className="flex items-center">ユーザー名</div>
-          <div className="flex items-center">username</div>
-          
-          <div className="flex items-center">メールアドレス</div>
-          <div className="flex items-center">user@example.com</div>
-          
-          <div className="flex items-center">ユーザーID</div>
-          <div className="flex items-center">1234567890</div>
-        </div>
-      </div>
+    <div className="flex flex-col max-w-3xl mx-auto">
+      <h2 className="scroll-m-20 pb-2 text-lg font-bold">
+        ユーザ情報
+      </h2>
+      <Table className="break-all">
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-52">項目</TableHead>
+            <TableHead className="w-96">値</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow>
+            <TableCell>ユーザー名</TableCell>
+            <TableCell>{user.name}</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>メールアドレス</TableCell>
+            <TableCell>{user.email}</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>ユーザーID</TableCell>
+            <TableCell>{user.id}</TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
     </div>
   )
 }
+

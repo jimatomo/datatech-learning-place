@@ -1,7 +1,7 @@
 export default function BillingPage() {
   return (
     <div>
-      <h1>Billing</h1>
+      <p>将来的に有料プランを提供する予定です。</p>
     </div>
   )
 }
