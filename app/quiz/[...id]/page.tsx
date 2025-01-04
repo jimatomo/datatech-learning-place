@@ -16,22 +16,22 @@ export default async function QuizPage({
   const id = (await params).id;
   
   try {
-    const folderPath = path.join(process.cwd(), 'contents/quiz', ...id);
-    const quizModule = await import(`@/contents/quiz/${id.join("/")}.tsx`).catch(() => null);
+    const folder_path = path.join(process.cwd(), 'contents/quiz', ...id);
+    const QuizModule = await import(`@/contents/quiz/${id.join("/")}.tsx`).catch(() => null);
     
     // Quizページの場合はQuizContentsを表示
-    if (quizModule) {
-      const quiz = quizModule.default();
+    if (QuizModule) {
+      const quiz = QuizModule.default();
       return <QuizContent quiz={quiz} folderId={id.join("/")} />;
     }
 
     // Quizページでない場合はQuizFileListを表示するためのデータを取得
-    const files = await getAllQuizFiles(folderPath);
-    const pathInfos = await getPathInfos(files, id);
+    const files = await getAllQuizFiles(folder_path);
+    const path_infos = await getPathInfos(files, id);
 
     // パスの重複を削除
     const unique_path_infos = Array.from(
-      new Map(pathInfos.map(info => [info.path, info]))
+      new Map(path_infos.map(info => [info.path, info]))
       .values()
     );
 

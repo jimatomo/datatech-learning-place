@@ -6,6 +6,7 @@ import { useState } from "react"
 interface QuizResultProps {
   answers: number[];
   explanation: string;
+  explanationJsx: React.ReactNode;
   selectedOptions: number[];
   onReset: () => void;
 }
@@ -13,6 +14,7 @@ interface QuizResultProps {
 export function QuizResult({
   answers,
   explanation,
+  explanationJsx,
   selectedOptions,
   onReset
 }: QuizResultProps) {
@@ -42,8 +44,13 @@ export function QuizResult({
             <p className="font-bold mb-2 text-center">
               {isCorrect ? "🎉 正解です！" : "❌ 不正解です"}
             </p>
-            <p className="mb-4 text-center">
-              {explanation}
+            <p className="mb-4 text-sm">
+              {/* 解説が文字列かJSXかで分岐 */}
+              {explanation ? (
+                explanation
+              ) : (
+                explanationJsx
+              )}
             </p>
             <div>
               <Button 

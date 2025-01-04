@@ -1,10 +1,13 @@
 import fs from 'fs/promises'
 import path from 'path'
 
-export async function getAllQuizFiles(dir: string, baseDir?: string): Promise<string[]> {
+export async function getAllQuizFiles(
+  dir: string,
+  base_dir?: string
+): Promise<string[]> {
   try {
     // 初回呼び出し時のbaseDirを設定
-    const actualBaseDir = baseDir || dir;
+    const actual_base_dir = base_dir || dir;
     
     // ディレクトリが存在するか確認
     const dirExists = await fs.access(dir).then(() => true).catch(() => false);
@@ -21,13 +24,13 @@ export async function getAllQuizFiles(dir: string, baseDir?: string): Promise<st
       try {
         if (file.isDirectory()) {
           // サブディレクトリの探索時にbaseDirを引き継ぐ
-          const subFiles = await getAllQuizFiles(fullPath, actualBaseDir);
+          const subFiles = await getAllQuizFiles(fullPath, actual_base_dir);
           quizFiles.push(...subFiles);
         } else if (file.name.endsWith('.tsx')) {
           // ファイルが読み取り可能か確認
           await fs.access(fullPath, fs.constants.R_OK);
           // 拡張子を除いた相対パスを計算
-          const relativePath = path.relative(actualBaseDir, fullPath);
+          const relativePath = path.relative(actual_base_dir, fullPath);
           const pathWithoutExt = path.join(path.dirname(relativePath), path.parse(relativePath).name);
           quizFiles.push(pathWithoutExt);
         }

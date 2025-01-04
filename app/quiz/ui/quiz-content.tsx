@@ -1,10 +1,10 @@
 import { Quiz, transformQuizIdToUrl } from "@/contents/quiz";
 import { CircleHelp, Calendar, AlertCircle, BookOpen, User, File } from "lucide-react"
-import { QuizForm } from "./quiz-form"
+import { QuizForm } from "@/app/quiz/ui/quiz-content-form"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion"
-import { QuizNavigation } from "@/app/quiz/ui/quiz-navigation"
+import { QuizNavigation } from "@/app/quiz/ui/quiz-content-navigation"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
 // QuizContents コンポーネント
@@ -101,7 +101,8 @@ export function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: string }
         <QuizForm
           options={quiz.getOptions()}
           answers={quiz.getAnswers()}
-          explanation={quiz.getExplanation()}
+          explanation={quiz.getExplanation() ?? ''}
+          explanationJsx={quiz.getExplanationJsx()}
           id={quiz.getId()}
         />
 

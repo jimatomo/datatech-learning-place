@@ -6,7 +6,8 @@ interface QuizParams {
   question_jsx?: React.ReactNode; // クイズの問題（Reactコンポーネントを使用している場合はこちら）
   options: { [key: number]: string }; // クイズの選択肢（キー：選択肢の番号、値：選択肢の内容）
   answers: number[]; // クイズの正解（optionsのキー番号を指定）
-  explanation: string; // クイズの解説
+  explanation?: string; // クイズの解説
+  explanation_jsx?: React.ReactNode; // クイズの解説（Reactコンポーネントを使用している場合はこちら）
   references: { title: string; url: string }[]; // クイズの参考文献のURL
   tags: string[]; // クイズのタグ
   created_at: Date; // クイズの作成日
@@ -35,9 +36,10 @@ export class Quiz {
   getTitle = () => this.params.title;
   getQuestion = () => this.params.question;
   getQuestionJsx = () => this.params.question_jsx;
+  getExplanation = () => this.params.explanation;
+  getExplanationJsx = () => this.params.explanation_jsx;
   getOptions = () => this.params.options;
   getAnswers = () => this.params.answers;
-  getExplanation = () => this.params.explanation;
   getReferences = () => this.params.references;
   getTags = () => this.params.tags;
   getCreatedAt = () => this.params.created_at;

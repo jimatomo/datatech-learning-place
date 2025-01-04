@@ -30,12 +30,6 @@ export default function Home() {
             imageSrc="/quiz_card.jpg"
             href="/quiz"
           />
-          <ContentCard 
-            title="データ基盤の構築"
-            description="データ基盤の構築"
-            imageSrc="/quiz_card.jpg"
-            href="/quiz"
-          />
         </div>
       </div>
     </div>

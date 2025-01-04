@@ -1,10 +1,10 @@
 export interface PathInfo {
   path: string;
-  isEndpoint: boolean;
+  is_endpoint: boolean;
   title: string;
   tags: string[];
-  createdAt: Date | null;
-  updatedAt: Date | null;
+  created_at: Date | null;
+  updated_at: Date | null;
   author: string | null;
 }
 
@@ -17,28 +17,28 @@ export async function getPathInfos(
     let path = '';
     let title = '';
     let tags: string[] = [];
-    let createdAt: Date | null = null;
-    let updatedAt: Date | null = null;
+    let created_at: Date | null = null;
+    let updated_at: Date | null = null;
     let author: string | null = null;
-    let isEndpoint = false;
+    let is_endpoint = false;
 
     if (find_full_path) {
       path = file;
-      isEndpoint = true;
+      is_endpoint = true;
     } else {
       path = file.split('/')[0];
-      isEndpoint = !file.includes('/');
+      is_endpoint = !file.includes('/');
     }
 
 
-    if (isEndpoint) {
+    if (is_endpoint) {
       try {
         const quizModule = await import(`@/contents/quiz/${[...id, file].join('/')}.tsx`);
         const quiz = quizModule.default();
         title = quiz.getTitle();
         tags = quiz.getTags();
-        createdAt = quiz.getCreatedAt();
-        updatedAt = quiz.getUpdatedAt();
+        created_at = quiz.getCreatedAt();
+        updated_at = quiz.getUpdatedAt();
         author = quiz.getAuthor();
       } catch (error) {
         console.error(`Failed to load quiz for ${file}:`, error);
@@ -47,11 +47,11 @@ export async function getPathInfos(
     
     return {
       path,
-      isEndpoint,
+      is_endpoint,
       title,
       tags,
-      createdAt,
-      updatedAt,
+      created_at,
+      updated_at,
       author,
     };
   }));

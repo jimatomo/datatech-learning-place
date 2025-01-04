@@ -23,19 +23,19 @@ export async function QuizNavigation({ previousQuizUrl, nextQuizUrl, folderId }:
   // previousQuizUrlかnextQuizUrlが#の場合は、全てのクイズのパスを取得して前後のファイルを取得する
   if (previousQuizUrl === '#' || nextQuizUrl === '#') {
     // クイズディレクトリのパスを取得
-    const quizDir = path.join(process.cwd(), 'contents', 'quiz')
+    const quiz_dir = path.join(process.cwd(), 'contents', 'quiz')
     // クイズディレクトリ内の全てのクイズファイルを取得
-    const quizFiles = await getAllQuizFiles(quizDir)
+    const quiz_files = await getAllQuizFiles(quiz_dir)
 
     // 自分のファイルのindexを取得
-    const currentIndex = quizFiles.findIndex(file => file === folderId)
+    const current_index = quiz_files.findIndex(file => file === folderId)
     // インデックスが最初でない場合は前のファイルの情報を取得
-    if (currentIndex > 0 && previousQuizUrl === '#') {
-      previousQuizUrl = `/quiz/${quizFiles[currentIndex - 1]}`
+    if (current_index > 0 && previousQuizUrl === '#') {
+      previousQuizUrl = `/quiz/${quiz_files[current_index - 1]}`
     }
     // インデックスが最後でない場合は次のファイルの情報を取得
-    if (currentIndex < quizFiles.length - 1 && nextQuizUrl === '#') {
-      nextQuizUrl = `/quiz/${quizFiles[currentIndex + 1]}`
+    if (current_index < quiz_files.length - 1 && nextQuizUrl === '#') {
+      nextQuizUrl = `/quiz/${quiz_files[current_index + 1]}`
     }
   }
 

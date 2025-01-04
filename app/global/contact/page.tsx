@@ -1,4 +1,4 @@
-import { LinkCard } from '@/components/ui/LinkCard'
+import { LinkCard } from '@/components/ui/link-card'
 
 export default function ContactPage() {
   return (
