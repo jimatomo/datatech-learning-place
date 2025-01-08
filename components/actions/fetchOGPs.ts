@@ -11,7 +11,7 @@ export const fetchOGPs = async (urlString: string) => {
   }
 
   
-  const res = await fetch(url);
+  const res = await fetch(url, { cache: 'force-cache' });
   
   if (!res.ok) {
     console.error(
@@ -21,10 +21,32 @@ export const fetchOGPs = async (urlString: string) => {
   }
   const text = await res.text();
   const $ = load(text);
-  const title =
-    $('meta[property="og:title"]').attr("content") || $("title").text();
-  const image = $('meta[property="og:image"]').attr("content");
-  
+  const title = $('meta[property="og:title"]').attr("content") || $("title").text();
+  let image = $('meta[property="og:image"]').attr("content");
+
+  // snowflake.comドメインまたはそのサブドメインの場合の特別処理
+  if (url.hostname.includes('snowflake.com')) {
+    // 相対パスの場合、完全なURLに変換
+    const snowflake_url = new URL('https://snowflake.com');
+    const snowflake_res = await fetch(snowflake_url, { cache: 'force-cache' });
+    const snowflake_text = await snowflake_res.text();
+    const $snowflake = load(snowflake_text);
+    const snowflake_image = $snowflake('meta[property="og:image"]').attr("content");
+    image = snowflake_image;
+  }
+
+  // 画像URLの有効性チェック
+  if (image) {
+    try {
+      const imageRes = await fetch(image);
+      if (!imageRes.ok) {
+        image = '/no-image.png';
+      }
+    } catch {
+      image = '/no-image.png';
+    }
+  }
+
   // descriptionの取得
   let description: string | null = null;
   // Zennの場合はog:descriptionがないので、zenn:descriptionをdescriptionとする

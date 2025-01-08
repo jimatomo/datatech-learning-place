@@ -89,7 +89,7 @@ export function AppSidebar() {
                 Datatech Learning Place
               </span>
             </Link>
-            <ChevronLeft className="w-10 group-data-[collapsible=icon]:hidden" onClick={() => toggleSidebar()} />
+            <ChevronLeft className="w-10 group-data-[collapsible=icon]:hidden cursor-pointer" onClick={() => toggleSidebar()} />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>

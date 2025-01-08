@@ -6,6 +6,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion"
 import { QuizNavigation } from "@/app/quiz/ui/quiz-content-navigation"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card"
+import { LinkCardWithoutLink } from "@/components/ui/link-card"
 
 // QuizContents コンポーネント
 // クイズの内容をレンダリングする
@@ -113,13 +115,22 @@ export function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: string }
               <BookOpen className="w-4 h-4 mr-2" />
               <span>参考文献</span>
             </AccordionTrigger>
-            <AccordionContent>
+            <AccordionContent className="flex flex-col items-center">
               {quiz.getReferences().map((reference, index) => (
-                <div key={`accordion-${index}`} className="text-center">
-                  <a href={reference.url} rel="noopener noreferrer" target="_blank">
-                    {reference.title}
-                  </a>
-                </div>
+                <HoverCard key={`hover-${index}`}>
+                  <HoverCardTrigger asChild>
+                    <div className="w-fit">
+                      <a href={reference.url} rel="noopener noreferrer" target="_blank">
+                        {reference.title}
+                      </a>
+                    </div>
+                  </HoverCardTrigger>
+                  <HoverCardContent>
+                    <div className="w-full">
+                      <LinkCardWithoutLink url={reference.url} />
+                    </div>
+                  </HoverCardContent>
+                </HoverCard>
               ))}
             </AccordionContent>
           </AccordionItem>

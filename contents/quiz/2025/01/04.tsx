@@ -30,7 +30,7 @@ export default function QuizContent() {
     references: [
       { title: "Attention Is All You Need", url: "https://arxiv.org/abs/1706.03762" },
       { title: "Language Models are Few-Shot Learners", url: "https://arxiv.org/abs/2005.14165" },
-      { title: "LLMの基礎", url: "https://example.com/llm-basics" }
+      { title: "LLMの基礎", url: "https://qiita.com/iitachi_tdse/items/e92729a49039ac87200d" }
     ],
   });
   return quiz;

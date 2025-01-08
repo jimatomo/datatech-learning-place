@@ -25,7 +25,7 @@ export default function QuizContent() {
     answers: [0, 2, 4],
     explanation: "dbtのインクリメンタルモデルについて、以下が正しい説明です：\n\n- インクリメンタルモデルは、全データを再処理する必要がなく、新しいデータのみを処理します。\n- インクリメンタルモデルは、特定の条件に基づいて新しいデータを追加し、データの更新を自動的に行います。",
     references: [
-      { title: "dbt Documentation - Incremental Models", url: "https://docs.getdbt.com/docs/building-a-dbt-project/building-models/incremental-models" }
+      { title: "dbt Documentation - Incremental Models", url: "https://docs.getdbt.com/docs/build/incremental-models" }
     ],
   });
   return quiz;
