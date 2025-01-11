@@ -4,74 +4,65 @@ import React, { useEffect, useState } from "react";
 import { Link as LinkIcon } from "lucide-react";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cache } from 'react'
 
-import { fetchOGPs } from "@/components/actions/fetchOGPs";
+import { fetchOGPs, OgpObjects } from "@/components/actions/fetchOGPs";
 
 type LinkCardProps = {
   url: string;
+  ogps?: OgpObjects;
 };
 
-type OgpObjects = {
-  href?: string;
-  image?: string;
-  title?: string;
-  description?: string;
-  domain?: string;
-};
 
-// OGPデータをキャッシュするための関数を作成
-const getOGPData = cache(async (url: string) => {
-  const res = await fetchOGPs(url);
-  if (res.error) {
-    console.log(res.error);
-    return null;
-  }
-  return res.ogps;
-});
 
-export const LinkCard = ({ url }: LinkCardProps) => {
-  const [ogps, setOgps] = useState<OgpObjects>({});
+export const LinkCard = ({ url, ogps }: LinkCardProps) => {
+  const [localOgps, setLocalOgps] = useState<OgpObjects>(ogps || {});
 
   useEffect(() => {
-    const fetchMetadata = async () => {
-      const data = await getOGPData(url);
-      if (data) {
-        setOgps(data);
-      }
-    };
-    fetchMetadata();
-  }, [url]);
+    if (!ogps) {
+      const fetchMetadata = async () => {
+        const res = await fetchOGPs(url);
+        if (res.error) {
+          console.log(res.error);
+        }
+        if (res.ogps) {
+          setLocalOgps(res.ogps);
+        }
+      };
+      fetchMetadata();
+    }
+  }, [url, ogps]);
 
-  if (!ogps) {
+  if (!localOgps) {
     return <SkeletonLinkItem />;
   }
 
   return (
     <div className="w-fit hover:scale-[1.02] transition rounded-xl shadow-lg">
-      <Link rel="noopener noreferrer" href={ogps.href ?? "/" } target="_blank">
+      <Link rel="noopener noreferrer" href={localOgps.href ?? "/" } target="_blank">
         <div className="flex flex-col md:flex-row">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={ogps.image ?? "/no-image.png"}
-            className="object-cover w-full
-              min-w-[9rem] max-w-[18rem] h-[9rem]
-              rounded-t-xl md:rounded-r-none md:rounded-l-xl"
-            alt="image"
-          />
+          {localOgps.image && localOgps.image !== "/no-image.png" && (
+            <img
+              src={localOgps.image}
+              className="object-cover w-full
+                min-w-[9rem] max-w-[18rem] h-[9rem]
+                rounded-t-xl md:rounded-r-none md:rounded-l-xl"
+              alt="image"
+            />
+          )}
           <div className="flex flex-col p-3 bg-secondary w-fit
               min-w-[9rem] max-w-[18rem] h-[6rem]
               md:min-w-[24rem] md:max-w-[24rem] md:h-[9rem]
               rounded-b-xl md:rounded-l-none md:rounded-r-xl">
             <h6 className="line-clamp-2 text-sm mb-2 font-semibold shrink-0 grow-0">
-              {ogps.title}
+              {localOgps.title}
             </h6>
             <p className="hidden md:line-clamp-2 text-xs text-secondary-foreground">
-              {ogps.description}
+              {localOgps.description}
             </p>
             <p className="shrink-0 text-xs pt-2 text-muted-foreground grow-0 flex items-center justify-start md:justify-end space-x-1 truncate">
               <LinkIcon className="w-4 h-4" />
-              <span>{ogps.domain}</span>
+              <span>{localOgps.domain}</span>
             </p>
           </div>
         </div>
@@ -110,20 +101,25 @@ export const SkeletonLinkItem = () => {
 
 
 
-export const LinkCardWithoutLink = ({ url }: LinkCardProps) => {
-  const [ogps, setOgps] = useState<OgpObjects>({});
+export const LinkCardWithoutLink = ({ url, ogps }: LinkCardProps) => {
+  const [localOgps, setLocalOgps] = useState<OgpObjects>(ogps || {});
 
   useEffect(() => {
-    const fetchMetadata = async () => {
-      const data = await getOGPData(url);
-      if (data) {
-        setOgps(data);
-      }
-    };
-    fetchMetadata();
-  }, [url]);
+    if (!ogps) {
+      const fetchMetadata = async () => {
+        const res = await fetchOGPs(url);
+        if (res.error) {
+          console.log(res.error);
+        }
+        if (res.ogps) {
+          setLocalOgps(res.ogps);
+        }
+      };
+      fetchMetadata();
+    }
+  }, [url, ogps]);
 
-  if (!ogps) {
+  if (!localOgps) {
     return <SkeletonLinkItem />;
   }
 
@@ -131,26 +127,28 @@ export const LinkCardWithoutLink = ({ url }: LinkCardProps) => {
     <div className="w-fit transition rounded-xl shadow-lg">
       <div className="flex flex-col md:flex-row">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={ogps.image ?? "/no-image.png"}
-          className="object-cover w-full
-            min-w-[9rem] max-w-[18rem] h-[9rem]
-            rounded-t-xl md:rounded-r-none md:rounded-l-xl"
-          alt="image"
-        />
+        {localOgps.image && localOgps.image !== "/no-image.png" && (
+          <img
+            src={localOgps.image}
+            className="object-cover w-full
+              min-w-[9rem] max-w-[18rem] h-[9rem]
+              rounded-t-xl md:rounded-r-none md:rounded-l-xl"
+            alt="image"
+          />
+        )}
         <div className="flex flex-col p-3 bg-secondary w-fit
             min-w-[9rem] max-w-[18rem] h-[6rem]
             md:min-w-[24rem] md:max-w-[24rem] md:h-[9rem]
             rounded-b-xl md:rounded-l-none md:rounded-r-xl">
           <h6 className="line-clamp-2 text-sm mb-2 font-semibold shrink-0 grow-0">
-            {ogps.title}
+            {localOgps.title}
           </h6>
           <p className="hidden md:line-clamp-2 text-xs text-secondary-foreground">
-            {ogps.description}
+            {localOgps.description}
           </p>
           <p className="shrink-0 text-xs pt-2 text-muted-foreground grow-0 flex items-center justify-start md:justify-end space-x-1 truncate">
             <LinkIcon className="w-4 h-4" />
-            <span>{ogps.domain}</span>
+            <span>{localOgps.domain}</span>
           </p>
         </div>
       </div>

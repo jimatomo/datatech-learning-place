@@ -8,18 +8,12 @@ import { QuizResult } from "@/app/quiz/ui/quiz-content-form-result";
 export interface QuizFormProps {
   options: { [key: number]: string };
   answers: number[];
-  explanation: string;
-  explanationJsx: React.ReactNode;
-  id: string;
+  quizId: string;
 }
 
-export function QuizForm({ options, answers, explanation, explanationJsx, id }: QuizFormProps) {
+export function QuizForm({ options, answers, quizId }: QuizFormProps) {
   const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
   const [key, setKey] = useState(0);
-
-
-  // 将来的にイベント情報を仕込む際にIDを追加する
-  console.log(id);
 
   const handleSelect = (values: number | number[]) => {
     if (Array.isArray(values)) {
@@ -58,9 +52,8 @@ export function QuizForm({ options, answers, explanation, explanationJsx, id }: 
         </p>
       </div>
       <QuizResult
-        answers={answers}
-        explanation={explanation}
-        explanationJsx={explanationJsx}
+        quizId={quizId}
+        answer_count={answers.length}
         selectedOptions={selectedOptions}
         onReset={handleReset}
       />

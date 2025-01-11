@@ -58,7 +58,7 @@ export const generateQuizId = (fileUrl: string): string => {
   return `Q${match[1].replace(/\//g, "")}`;
 };
 
-export const transformQuizIdToUrl = (id: string): string => {
+export const transformQuizIdToUrl = (id: string, with_quiz: boolean = true): string => {
   // クイズIDをURLに変換
   const match = id.match(/Q?(\d{4})(\d{2})(\d{2})/);
   
@@ -66,8 +66,14 @@ export const transformQuizIdToUrl = (id: string): string => {
   if (!match) {
     return id;
   }
-  
-  return `/quiz/${match[1]}/${match[2]}/${match[3]}`;
+
+  let url = '';
+  if (with_quiz) {
+    url = `/quiz/${match[1]}/${match[2]}/${match[3]}`;
+  } else {
+    url = `${match[1]}/${match[2]}/${match[3]}`;
+  }
+  return url;
 };
 
 export const generateFilePath = (file_path: string): string => {

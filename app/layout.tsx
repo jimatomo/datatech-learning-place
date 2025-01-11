@@ -19,9 +19,9 @@ export const metadata: Metadata = {
   description: "Datatech Learning Place",
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   // cookieの状態からサイドバーの開閉の情報を読み込む
-  const cookieStore = await cookies()
+  const cookieStore = cookies()
   const defaultOpen = cookieStore.get("sidebar:state")?.value === "true"
 
   return (

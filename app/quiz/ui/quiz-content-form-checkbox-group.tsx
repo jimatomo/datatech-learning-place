@@ -30,26 +30,21 @@ export function QuizCheckboxGroup({
     setRandomizedOptions(Object.entries(options).sort(() => Math.random() - 0.5))
   }, [options, tryKey])
 
+  // selectedValues が変更された時に状態を更新
+  useEffect(() => {
+    setSelectedAnswers(selectedValues);
+  }, [selectedValues]);
+
   // 選択肢を選択する処理
   const handleCheckboxChange = (key: number) => {
-    setSelectedAnswers(prev => {
-      // すでに選択されている場合は削除
-      if (prev.includes(key)) {
-        const newAnswers = prev.filter(item => item !== key);
-        onSelect(newAnswers);
-        return newAnswers;
-      }
-      
-      // 最大選択数に達している場合は現状を維持
-      if (maxSelections && prev.length >= maxSelections) {
-        return prev;
-      }
-
-      // 新しい値を追加
-      const newAnswers = [...prev, key];
-      onSelect(newAnswers);
-      return newAnswers;
-    });
+    const newSelectedAnswers = selectedAnswers.includes(key)
+      ? selectedAnswers.filter(item => item !== key)
+      : maxSelections && selectedAnswers.length >= maxSelections
+        ? selectedAnswers
+        : [...selectedAnswers, key];
+    
+    setSelectedAnswers(newSelectedAnswers);
+    onSelect(newSelectedAnswers);
   }
 
   return (

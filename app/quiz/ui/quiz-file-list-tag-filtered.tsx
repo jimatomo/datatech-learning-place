@@ -37,8 +37,6 @@ export default function QuizFileListTagFiltered({
       )
     )
   }, [selectedTag, quizPathInfos])
-  
-  console.log(filteredQuizPathInfos)
 
   return (
     <div>

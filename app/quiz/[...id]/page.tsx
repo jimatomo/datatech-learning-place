@@ -2,18 +2,18 @@
 
 import path from 'path'
 import { getAllQuizFiles } from '@/app/quiz/lib/get-files'
-import { getPathInfos } from '../lib/get-path-info'
+import { getPathInfos } from '@/app/quiz/lib/get-path-info'
 
-import { QuizContent } from '../ui/quiz-content'
-import { QuizFileList } from '../ui/quiz-file-list'
-import { ErrorDisplay } from '../ui/error-display'
+import { QuizContent } from '@/app/quiz/ui/quiz-content'
+import { QuizFileList } from '@/app/quiz/ui/quiz-file-list'
+import { ErrorDisplay } from '@/app/quiz/ui/error-display'
 
 export default async function QuizPage({
   params,
 }: {
-  params: Promise<{ id: string[] }>;
+  params: { id: string[] };
 }) {
-  const id = (await params).id;
+  const id = params.id;
   
   try {
     const folder_path = path.join(process.cwd(), 'contents/quiz', ...id);

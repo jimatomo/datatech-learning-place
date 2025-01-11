@@ -8,10 +8,24 @@ import { QuizNavigation } from "@/app/quiz/ui/quiz-content-navigation"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card"
 import { LinkCardWithoutLink } from "@/components/ui/link-card"
+import { fetchOGPs, OgpObjects } from "@/components/actions/fetchOGPs"
+
+type Reference = {
+  title: string;
+  url: string;
+  ogps?: OgpObjects;
+}
+
+async function getReferenceOgps(references: Reference[]) {
+  return Promise.all(references.map(async (reference: Reference) => {
+    const res = await fetchOGPs(reference.url);
+    return { ...reference, ogps: res.ogps };
+  }));
+}
 
 // QuizContents コンポーネント
 // クイズの内容をレンダリングする
-export function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: string }) {
+export async function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: string }) {
   const createdAt = quiz.getCreatedAt().toLocaleDateString('ja-JP', 
     { year: 'numeric', month: '2-digit', day: '2-digit' }
   ).split('/').join('.');
@@ -23,9 +37,12 @@ export function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: string }
   const previousQuizUrl = transformQuizIdToUrl(quiz.getPreviousQuizId());
   const nextQuizUrl = transformQuizIdToUrl(quiz.getNextQuizId());
 
+  const references = quiz.getReferences();
+  const referenceOgps = await getReferenceOgps(references);
+
   return (
     <div>
-      <div className="py-5 flex flex-col items-center w-full max-w-2xl mx-auto">
+      <div className="py-5 flex flex-col items-center w-full max-w-2xl mx-auto rounded-xl px-2 shadow-md dark:bg-stone-950 dark:shadow-neutral-900">
         <h2 className="scroll-m-20 border-b pb-2
           first:mt-0 whitespace-pre-wrap break-words
           text-lg font-semibold tracking-tight
@@ -103,9 +120,7 @@ export function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: string }
         <QuizForm
           options={quiz.getOptions()}
           answers={quiz.getAnswers()}
-          explanation={quiz.getExplanation() ?? ''}
-          explanationJsx={quiz.getExplanationJsx()}
-          id={quiz.getId()}
+          quizId={quiz.getId()}
         />
 
         {/* 参考文献 */}
@@ -115,23 +130,25 @@ export function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: string }
               <BookOpen className="w-4 h-4 mr-2" />
               <span>参考文献</span>
             </AccordionTrigger>
-            <AccordionContent className="flex flex-col items-center">
-              {quiz.getReferences().map((reference, index) => (
-                <HoverCard key={`hover-${index}`}>
-                  <HoverCardTrigger asChild>
-                    <div className="w-fit">
-                      <a href={reference.url} rel="noopener noreferrer" target="_blank">
-                        {reference.title}
-                      </a>
-                    </div>
-                  </HoverCardTrigger>
-                  <HoverCardContent>
-                    <div className="w-full">
-                      <LinkCardWithoutLink url={reference.url} />
-                    </div>
-                  </HoverCardContent>
-                </HoverCard>
-              ))}
+            <AccordionContent>
+              <div className="flex flex-col items-center w-full gap-2">
+                {referenceOgps.map((reference: Reference, index: number) => (
+                  <HoverCard key={`hover-${index}`}>
+                    <HoverCardTrigger asChild>
+                      <div className="w-fit">
+                        <a href={reference.url} rel="noopener noreferrer" target="_blank">
+                          {reference.title}
+                        </a>
+                      </div>
+                    </HoverCardTrigger>
+                    <HoverCardContent className="w-full">
+                      <div className="flex justify-center">
+                        <LinkCardWithoutLink url={reference.url} ogps={reference.ogps} />
+                      </div>
+                    </HoverCardContent>
+                  </HoverCard>
+                ))}
+              </div>
             </AccordionContent>
           </AccordionItem>
         </Accordion>

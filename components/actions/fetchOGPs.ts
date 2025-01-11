@@ -2,6 +2,14 @@
 
 import { load } from "cheerio";
 
+export type OgpObjects = {
+  href?: string;
+  image?: string;
+  title?: string;
+  description?: string;
+  domain?: string;
+};
+
 export const fetchOGPs = async (urlString: string) => {
   let url: URL;
   try {
