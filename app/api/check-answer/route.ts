@@ -15,14 +15,18 @@ export async function POST(request: Request) {
   // DBやキャッシュから正解と解説を取得
   const quiz : Quiz = await getQuizById(quizId)
 
+  const correctAnswers = quiz.getAnswers()
+
   // ロジックとして正しいかチェック
-  const isCorrect = quiz.getAnswers().every((answer: number) => 
+  const isCorrect = correctAnswers.every((answer: number) => 
     selectedOptions.includes(answer)
   )
 
   console.log(`quizId: ${quizId}, selectedOptions: ${selectedOptions}, isCorrect: ${isCorrect}`)
   
   return NextResponse.json({
+    selectedOptions: data.selectedOptions,
+    correctAnswers: correctAnswers,
     isCorrect,
     explanation: quiz.getExplanation(),
     explanationJsx: typeof quiz.getExplanationJsx === 'function' ? quiz.getExplanationJsx() : null
