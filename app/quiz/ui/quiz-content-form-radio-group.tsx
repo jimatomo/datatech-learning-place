@@ -9,6 +9,7 @@ interface QuizRadioGroupProps {
   options: { [key: number]: string };
   onSelect: (value: number) => void;
   selectedValue: number[] | null;
+  correctAnswers: number[];
   tryKey?: number;
 }
 
@@ -16,6 +17,7 @@ export function QuizRadioGroup({
   options, 
   onSelect, 
   selectedValue,
+  correctAnswers,
   tryKey = 0
 }: QuizRadioGroupProps) {
   const [selectedAnswer, setSelectedAnswer] = useState<string>(selectedValue?.[0]?.toString() ?? '')
@@ -37,9 +39,9 @@ export function QuizRadioGroup({
           key={key}
           className={cn(
             "flex items-center space-x-2 h-auto p-3 w-full border rounded-md",
-            "hover:bg-accent hover:text-accent-foreground",
+            "hover:bg-accent hover:text-accent-foreground cursor-pointer",
             selectedAnswer === key && "bg-secondary/50",
-            "cursor-pointer"
+            correctAnswers.includes(Number(key)) && "bg-emerald-100 dark:bg-emerald-950 hover:bg-emerald-200 dark:hover:bg-emerald-900",
           )}
           onClick={() => handleSelect(key)}
         >

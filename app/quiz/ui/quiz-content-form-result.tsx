@@ -12,13 +12,15 @@ interface QuizResultProps {
   answer_count: number;
   selectedOptions: number[];
   onReset: () => void;
+  onMarkAnswer: (correctAnswers: number[]) => void;
 }
 
 export function QuizResult({
   quizId,
   answer_count,
   selectedOptions,
-  onReset
+  onReset,
+  onMarkAnswer
 }: QuizResultProps) {
   const [showResult, setShowResult] = useState(false)
   const [result, setResult] = useState<{
@@ -42,8 +44,6 @@ export function QuizResult({
         }),
       });
       const data = await response.json();
-      console.log("selectedOptions:", data.selectedOptions.sort());
-      console.log("correctAnswers:", data.correctAnswers.sort());
       setResult(data);
       setShowResult(true);
 
@@ -51,10 +51,12 @@ export function QuizResult({
       setExplanation(quiz.getExplanation() || null)
       setExplanationJsx(quiz.getExplanationJsx())
 
-      
       if (data.isCorrect) {
         reward();
       }
+
+      // 選択肢の就職を実行する
+      onMarkAnswer(data.correctAnswers)
     } catch (error) {
       console.error('Error checking answer:', error);
     }

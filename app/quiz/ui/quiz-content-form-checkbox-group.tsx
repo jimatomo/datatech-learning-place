@@ -10,6 +10,7 @@ interface QuizCheckboxGroupProps {
   maxSelections: number;
   onSelect: (values: number[]) => void;
   selectedValues: number[];
+  correctAnswers: number[];
   tryKey?: number;
 }
 
@@ -18,6 +19,7 @@ export function QuizCheckboxGroup({
   maxSelections, 
   onSelect, 
   selectedValues, //初期化する際に選択しておく値（リセット用に用意しておく）
+  correctAnswers,
   tryKey = 0
 }: QuizCheckboxGroupProps) {
   // 選択した値を管理 
@@ -58,7 +60,8 @@ export function QuizCheckboxGroup({
             "border border-input rounded-md",
             "hover:bg-accent hover:text-accent-foreground",
             "cursor-pointer",
-            selectedAnswers.includes(Number(key)) && "bg-secondary/50"
+            selectedAnswers.includes(Number(key)) && "bg-secondary/50",
+            correctAnswers.includes(Number(key)) && "bg-emerald-100 dark:bg-emerald-950 hover:bg-emerald-200 dark:hover:bg-emerald-900",
           )}
         >
           <Checkbox
