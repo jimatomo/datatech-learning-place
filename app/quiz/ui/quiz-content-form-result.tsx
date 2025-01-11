@@ -41,8 +41,9 @@ export function QuizResult({
           selectedOptions,
         }),
       });
-      
       const data = await response.json();
+      console.log("selectedOptions:", data.selectedOptions.sort());
+      console.log("correctAnswers:", data.correctAnswers.sort());
       setResult(data);
       setShowResult(true);
 
