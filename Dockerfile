@@ -1,14 +1,10 @@
-FROM public.ecr.aws/docker/library/node:20.9.0-slim as builder
+FROM public.ecr.aws/docker/library/node:20-slim as builder
 WORKDIR /app
 COPY . .
 RUN npm ci && npm run build
 
 # runner
-FROM public.ecr.aws/docker/library/node:20.9.0-slim as runner
-
-# aws-lambda-web-adapter 非同期処理がうまくいかないのでちょっと高くなるがECSにする
-# COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:0.8.4 /lambda-adapter /opt/extensions/lambda-adapter
-# ENV AWS_LWA_ENABLE_COMPRESSION=true
+FROM public.ecr.aws/docker/library/node:20-slim as runner
 
 # Healthcheckのためにcurlをインストール
 RUN apt-get update && \
