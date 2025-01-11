@@ -11,8 +11,7 @@ import { AppSidebar } from "@/components/app-sidebar"
 import { ModeToggle } from "@/components/theme-mode-toggle"
 import { BreadcrumbCollapsed } from "@/components/app-breadcrumb"
 import Footer from "@/components/footer"
-import { Suspense } from "react"
-import Loading from "@/components/ui/loading"
+import NextTopLoader from 'nextjs-toploader';
 
 export const metadata: Metadata = {
   title: "Datatech Learning Place",
@@ -35,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           enableSystem
           disableTransitionOnChange
         >
+          <NextTopLoader color="#f59e0b" />
           <SidebarProvider defaultOpen={defaultOpen}>
             <AppSidebar />
             <div className="flex flex-col min-h-screen w-screen">
@@ -51,9 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </div>
                 <div className="px-6 py-2 flex flex-col xl:flex-row gap-4">
                   <div className="w-full flex-1">
-                    <Suspense fallback={<Loading />}>
-                      {children}
-                    </Suspense>
+                    {children}
                   </div>
                   <div className="w-full xl:flex-1 max-w-64 py-2">
                     <h2 className="text-lg font-bold py-2">Sponsored by</h2>
