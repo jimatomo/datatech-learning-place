@@ -3,7 +3,7 @@ import path from 'path'
 
 export async function getAllQuizFiles(
   dir: string,
-  base_dir?: string
+  base_dir?: string,
 ): Promise<string[]> {
   try {
     // 初回呼び出し時のbaseDirを設定

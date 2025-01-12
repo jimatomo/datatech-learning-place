@@ -16,34 +16,6 @@ npm run dev
 
 ## TODO
 
-### アルファ版
-
-- AWSのインフラを構築してデプロイしてみる
-  - ECR（Terraform化するときにライフサイクルを追加しておく）
-  - IAM
-  - ECS on Fargate
-  - VPC (SGをいじる)
-  - API Gateway
-  - CloudFront
-  - S3
-  - CloudWatch Logs
-- 動作確認
-- ドメイン買う
-- Terraformにimportしておく
-  - Route53
-  - ドメインをroute53に紐づける
-  - ACM
-  - VPC
-  - SG
-  - ECR (importする)
-  - IAM
-  - [ ] ECS
-  - [ ] API Gateway
-  - [ ] S3
-  - [ ] CloudFront (これはマネジメントコンソールで作ってからimportする)
-- CloudFrontのエイリアスレコードを追加する
-
-
 ### ベータ版 0.1.0
 
 - Auth0を契約（Freeプラン）
@@ -55,23 +27,25 @@ npm run dev
 
 ### ベータ版 0.2.0
 
-- OSS関係の情報を追加
-  - Issueのテンプレート
-- CI/CDのパイプラインを構築（GitHub Actions）
-- 動作確認
+- クイズのコンテンツを追加する
 
 
 ### ベータ版 0.3.0
 
-- クイズのコンテンツを追加する
 - ヘッダーを追加する（SEO対策）
+- OSS関係の情報を追加
+  - Issueのテンプレート
+- CI/CDのパイプラインを構築（GitHub Actions）
+- 動作確認
+- publicリポジトリに変換
+- インフラ関係のコードをprivateリポジトリに入れておく
 
 
 ### ベータ版 0.4.0
 
 - インフラ関係のチューニングをする
-  - DockerfileをArmに対応
-  - ECS Serviceを変更
+  - 静的ファイルをS3に保存する
+  - CloudFrontのビヘイビアを設定する
 
 
 ### ベータ版 0.5.0

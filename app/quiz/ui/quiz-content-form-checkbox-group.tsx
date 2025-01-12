@@ -30,7 +30,8 @@ export function QuizCheckboxGroup({
   // 選択肢をランダムに並び替える処理（0~1の乱数を生成して、0.5より小さい場合は前に、大きい場合は後ろに並び替える）
   useEffect(() => {
     setRandomizedOptions(Object.entries(options).sort(() => Math.random() - 0.5))
-  }, [options, tryKey])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tryKey])
 
   // selectedValues が変更された時に状態を更新
   useEffect(() => {

@@ -9,6 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card"
 import { LinkCardWithoutLink } from "@/components/ui/link-card"
 import { fetchOGPs, OgpObjects } from "@/components/actions/fetchOGPs"
+import Link from "next/link"
 
 type Reference = {
   title: string;
@@ -42,7 +43,7 @@ export async function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: st
 
   return (
     <div>
-      <div className="py-5 flex flex-col items-center w-full max-w-2xl mx-auto rounded-xl px-2 shadow-md dark:bg-stone-950 dark:shadow-neutral-900">
+      <div className="py-5 flex flex-col items-center w-full max-w-2xl mx-auto rounded-xl px-2 shadow-md bg-neutral-50 dark:bg-neutral-900">
         <h2 className="scroll-m-20 border-b pb-2
           first:mt-0 whitespace-pre-wrap break-words
           text-lg font-semibold tracking-tight
@@ -136,9 +137,10 @@ export async function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: st
                   <HoverCard key={`hover-${index}`}>
                     <HoverCardTrigger asChild>
                       <div className="w-fit">
-                        <a href={reference.url} rel="noopener noreferrer" target="_blank">
+                        <Link href={reference.url} rel="noopener noreferrer" target="_blank"
+                        className="underline hover:text-primary text-muted-foreground">
                           {reference.title}
-                        </a>
+                        </Link>
                       </div>
                     </HoverCardTrigger>
                     <HoverCardContent className="w-full">

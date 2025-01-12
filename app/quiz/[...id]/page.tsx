@@ -29,9 +29,16 @@ export default async function QuizPage({
     const files = await getAllQuizFiles(folder_path);
     const path_infos = await getPathInfos(files, id);
 
+    
+    // 将来日付のパス情報を削除
+    const today = new Date();
+    const path_infos_filtered = path_infos.filter(info => 
+      !info.created_at || info.created_at.getTime() <= today.getTime()
+    );
+
     // パスの重複を削除
     const unique_path_infos = Array.from(
-      new Map(path_infos.map(info => [info.path, info]))
+      new Map(path_infos_filtered.map(info => [info.path, info]))
       .values()
     );
 

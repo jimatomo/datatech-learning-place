@@ -2,36 +2,56 @@ import { Quiz, generateQuizId, generateFilePath } from "@/contents/quiz";
 
 export default function QuizContent() {
   const quiz = new Quiz({
-    // metadata
+    // ----- metadata -----
     id: generateQuizId(import.meta.url),
     file_path: generateFilePath(import.meta.url),
     author: "jimatomo",
-    // author_url: "https://github.com/jimatomo",
+    author_url: "https://github.com/jimatomo",
+    tags: ["Snowflake", "Edition", "Features"],
     created_at: new Date("2025-01-03"),
     updated_at: new Date("2025-01-03"),
-    // previous_quiz_id: "Q20250102",
-    // next_quiz_id: "Q20250104",
 
-    // quiz
-    title: "日本発のプログラミング言語は？",
-    tags: ["Programming", "Technology", "History", "Engineering"],
-    question: "以下のプログラミング言語のうち、日本で開発されたものを選んでください。",
+    // ----- quiz -----
+    title: "SnowflakeのStandard EditionとEnterprise Editionの機能差",
+    question_jsx: <QuizQuestion />,
     options: { 
-      0: "Ruby", 
-      1: "なでしこ", 
-      2: "Python", 
-      3: "プログラミング言語「ドリトル」", 
-      4: "Swift"
+      0: "マルチクラスター仮想ウェアハウス機能", 
+      1: "標準的なTime Travel（最大1日）", 
+      2: "暗号化されたデータの定期的なキー更新 による保護の強化", 
+      3: "半構造化データ （JSON、Avro、 ORC、Parquet、および XML）のネイティブサポート", 
+      4: "Snowpipeによる継続的なマイクロバッチロード"
     },
-    answers: [0, 1, 3],
-    explanation: "Rubyは1995年に日本人のまつもとゆきひろ氏によって開発されました。なでしこは日本語でプログラミングができる言語として開発され、ドリトルは子供向けのプログラミング教育用に日本で開発された言語です。PythonはオランダのGuido van Rossumによって、SwiftはApple社によって開発されました。",
+    answers: [0, 2],
+    explanation_jsx: <QuizExplanation />,
     references: [
-      { title: "Ruby公式サイト", url: "https://www.ruby-lang.org/ja/" },
-      { title: "なでしこ公式サイト", url: "https://nadesi.com/" },
-      { title: "ドリトル公式サイト", url: "https://dolittle.eplang.jp/" }
+      { title: "Snowflake Edition", url: "https://docs.snowflake.com/ja/user-guide/intro-editions" }
     ],
   });
   return quiz;
 }
 
+function QuizQuestion() {
+  return (
+    <div>
+      <p>以下の機能のうち、Enterprise Editionで利用可能だが、Standard Editionでは利用できない機能はどれですか？</p>
+    </div>
+  );
+}
 
+function QuizExplanation() {
+  return (
+    <div className="text-xs md:text-sm">
+      <p>Standard EditionとEnterprise Editionの主な機能差は以下の通りです：</p>
+      <ul className="py-2 space-y-2">
+        <li>・<strong>Enterprise Editionのみで利用可能な機能：</strong>
+          <br />- マルチクラスター仮想ウェアハウス（並行性のニーズに対応）
+          <br />- 暗号化されたデータの定期的なキー更新 による保護の強化</li>
+        <li>・<strong>両エディションで利用可能な機能：</strong>
+          <br />- 標準的なTime Travel（最大1日）
+          <br />- 半構造化データ （JSON、Avro、 ORC、Parquet、および XML）のネイティブサポート
+          <br />- Snowpipeによる継続的なマイクロバッチロード</li>
+      </ul>
+      <p>Enterprise Editionは、Standard Editionのすべての機能に加えて、大規模な企業や組織のニーズに合わせて設計された追加機能を提供します。特に、並行処理やプライベート接続に関する機能が強化されています。</p>
+    </div>
+  );
+}
