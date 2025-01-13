@@ -8,17 +8,19 @@ RUN apt-get update \
 && apt-get -y clean \
 && rm -rf /var/lib/apt/lists/*
 
+# Install aws cli
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
+&& unzip awscliv2.zip \
+&& ./aws/install \
+&& rm -rf awscliv2.zip aws
+
+# Switch to node user
 RUN chown -R node:node ./
 USER node
 
 # disable telemetry
 ARG NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_TELEMETRY_DISABLED=$NEXT_TELEMETRY_DISABLED
-
-# AWS Lambda Runtime Interface Emulator
-COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:0.8.4 /lambda-adapter /opt/extensions/lambda-adapter
-ENV PORT=3001
-ENV AWS_LWA_ENABLE_COMPRESSION=true
 
 # Install Oh My zsh
 RUN sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" \

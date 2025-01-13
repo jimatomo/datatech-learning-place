@@ -5,8 +5,7 @@ services:
       context: ..
       dockerfile: .devcontainer/Dockerfile
     ports:
-      - '127.0.0.1:8080:8080' # Lambda Runtime Interface Emulator on port 8080
-      - '127.0.0.1:3001:3001' # Next.js on port (avoid 3000 and 9001)
+      - '127.0.0.1:3000:3000' # Next.js on port 3000
     volumes:
       - ../:/workspace/app:cached
       - ~/.ssh/:/home/vscode/.ssh:cached
