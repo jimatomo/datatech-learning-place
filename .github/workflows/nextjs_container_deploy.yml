@@ -36,7 +36,7 @@ jobs:
 
       - name: Get dot environment file
         run: |
-          aws s3 cp s3://dtlp-prod-secret-files/env.production.local .env.production.local
+          aws s3 cp s3://dtlp-prod-secret-files/.env.production.local .env.production.local
 
       - name: Login to Amazon ECR
         id: login-ecr
