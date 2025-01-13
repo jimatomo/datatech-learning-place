@@ -13,20 +13,26 @@ import { BreadcrumbCollapsed } from "@/components/app-breadcrumb"
 import Footer from "@/components/footer"
 import NextTopLoader from 'nextjs-toploader';
 
+import { UserProvider } from '@auth0/nextjs-auth0/client';
+import { getSession } from '@auth0/nextjs-auth0';
+
 export const metadata: Metadata = {
   title: "Datatech Learning Place",
   description: "Datatech Learning Place",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   // cookieの状態からサイドバーの開閉の情報を読み込む
   const cookieStore = cookies()
   const defaultOpen = cookieStore.get("sidebar:state")?.value === "true"
+
+  const user = await getSession();
 
   return (
     // Dark Modeを実装すると発生してしまうワーニングがあるので、suppressHydrationWarningをつける
     // https://github.com/pacocoursey/next-themes?tab=readme-ov-file#with-app
     <html lang="ja" suppressHydrationWarning>
+      <UserProvider>
       <body>
         <ThemeProvider
           attribute="class"
@@ -48,6 +54,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <div className="ml-auto">
                     <ModeToggle />
                   </div>
+                  {!user && (
+                    <div>
+                      <a href="/api/auth/login"
+                        className="inline-flex items-center justify-center text-sm
+                          rounded-md h-9 px-3 py-2 hover:bg-secondary"
+                      >
+                        Sign in
+                      </a>
+                    </div>
+                  )}
                 </div>
                 <div className="px-6 py-2 flex flex-col xl:flex-row gap-4">
                   <div className="w-full flex-1">
@@ -64,6 +80,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </SidebarProvider>
         </ThemeProvider>
       </body>
+      </UserProvider>
     </html>
   );
 }

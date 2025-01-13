@@ -3,16 +3,20 @@ import { getAllQuizFiles } from '@/app/quiz/lib/get-files'
 import { getPathInfos, PathInfo } from '@/app/quiz/lib/get-path-info'
 import { QuizFileList } from '@/app/quiz/ui/quiz-file-list'
 import QuizFileListTagFiltered from '@/app/quiz/ui/quiz-file-list-tag-filtered'
+import { getSession } from '@auth0/nextjs-auth0';
 
 export default async function QuizList() {
   // クイズディレクトリのパスを取得
   const quiz_dir = path.join(process.cwd(), 'contents', 'quiz')
 
+  const session = await getSession()
+  const userEmail = session?.user?.email
+
   // クイズディレクトリ内の全てのクイズファイルを取得
   const quiz_files = await getAllQuizFiles(quiz_dir)
 
   // 全てのクイズのパス情報を取得
-  const path_infos_full_path = await getPathInfos(quiz_files, [], true)
+  const path_infos_full_path = await getPathInfos(quiz_files, [], true, userEmail)
 
   // 将来日付のクイズを除外
   const today = new Date()
@@ -39,7 +43,8 @@ export default async function QuizList() {
       tags: [],
       created_at: null,
       updated_at: null,
-      author: null
+      author: null,
+      is_correct: null
     })
     year_info++
   }

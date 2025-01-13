@@ -7,12 +7,10 @@ import {
   TableCell,
 } from "@/components/ui/table"
 
-export default function AccountPage() {
-  const user = {
-    name: "Anonymous User",
-    email: "anonymous@example.com",
-    id: "1234567890",
-  }
+import { getSession } from '@auth0/nextjs-auth0';
+
+export default async function AccountPage() {
+  const user = await getSession();
 
   return (
     <div className="flex flex-col max-w-3xl mx-auto">
@@ -29,15 +27,15 @@ export default function AccountPage() {
         <TableBody>
           <TableRow>
             <TableCell>ユーザー名</TableCell>
-            <TableCell>{user.name}</TableCell>
+            <TableCell>{user?.user?.name}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell>メールアドレス</TableCell>
-            <TableCell>{user.email}</TableCell>
+            <TableCell>{user?.user?.email}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell>ユーザーID</TableCell>
-            <TableCell>{user.id}</TableCell>
+            <TableCell>{user?.user?.sub}</TableCell>
           </TableRow>
         </TableBody>
       </Table>

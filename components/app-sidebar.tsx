@@ -36,6 +36,9 @@ import {
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
+import { useUser } from '@auth0/nextjs-auth0/client';
+
+
 // Menu items.
 const items = [
   {
@@ -64,19 +67,10 @@ export function AppSidebar() {
   const { toggleSidebar } = useSidebar()
 
   // TODO: 認証機能を実装したらユーザ情報をサーバから取得する処理に変更する
-  const user = {
-    name: "Anonymous User",
-    email: "anonymous@example.com",
-    avatar: "",
-    github_url: "",
-  }
+  const { user, error, isLoading } = useUser();
 
-  let avatar_url = ""
-  if (user.avatar !== "") {
-    avatar_url = user.avatar
-  } else if (user.github_url !== "") {
-    avatar_url = `${user.github_url}.png`
-  }
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>{error.message}</div>;
 
   return (
     <Sidebar collapsible="icon" aria-label="メインナビゲーション">
@@ -115,43 +109,53 @@ export function AppSidebar() {
       <SidebarFooter>
           <SidebarMenu>
             <SidebarMenuItem>
-              <DropdownMenu>
-                {/* ユーザ情報を表示するフッター */}
-                <DropdownMenuTrigger asChild>
-                  <SidebarMenuButton
-                    size="lg"
-                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              {user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <SidebarMenuButton
+                      size="lg"
+                      className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                    >
+                      <Avatar className="h-8 w-8 rounded-lg">
+                        <AvatarImage src={user.picture ?? ''} alt={user.name ?? ''} />
+                        <AvatarFallback className="rounded-lg"><User2 /></AvatarFallback>
+                      </Avatar>
+                      <div className="grid flex-1 text-left text-sm leading-tight">
+                        <span className="truncate font-semibold">{user.name}</span>
+                        <span className="truncate text-xs">{user.email}</span>
+                      </div>
+                      <ChevronUp className="ml-auto" />
+                    </SidebarMenuButton>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    side="top"
+                    className="w-[--radix-popper-anchor-width]"
                   >
-                    <Avatar className="h-8 w-8 rounded-lg">
-                      <AvatarImage src={avatar_url} alt={user.name} />
-                      <AvatarFallback className="rounded-lg"><User2 /></AvatarFallback>
-                    </Avatar>
-                    <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">{user.name}</span>
-                      <span className="truncate text-xs">{user.email}</span>
-                    </div>
-                    <ChevronUp className="ml-auto" />
-                  </SidebarMenuButton>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  side="top"
-                  className="w-[--radix-popper-anchor-width]"
-                >
-                  {footerItems.map((item) => (
-                    <DropdownMenuItem key={item.title}>
-                      <Link href={item.url} className="flex items-center gap-2 w-full">
-                        <item.icon />
-                        <span>{item.title}</span>
-                      </Link>
+                    {footerItems.map((item) => (
+                      <DropdownMenuItem key={item.title}>
+                        <Link href={item.url} className="flex items-center gap-2 w-full">
+                          <item.icon />
+                          <span>{item.title}</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem key="signout">
+                      <a href="/api/auth/logout" className="flex items-center gap-2 w-full">
+                        <LogOut />
+                        Sign out
+                      </a>
                     </DropdownMenuItem>
-                  ))}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem key="signout">
-                    <LogOut />
-                    <span>Sign out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <SidebarMenuButton asChild>
+                  <a href="/api/auth/login" className="flex items-center gap-2">
+                    <User2 />
+                    <span className="text-sm">Sign in</span>
+                  </a>
+                </SidebarMenuButton>
+              )}
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarFooter>

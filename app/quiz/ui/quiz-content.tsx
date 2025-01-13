@@ -1,5 +1,5 @@
 import { Quiz, transformQuizIdToUrl } from "@/contents/quiz";
-import { CircleHelp, Calendar, AlertCircle, BookOpen, User, File } from "lucide-react"
+import { CircleHelp, CircleCheckBig, Calendar, AlertCircle, BookOpen, User, File } from "lucide-react"
 import { QuizForm } from "@/app/quiz/ui/quiz-content-form"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -10,6 +10,8 @@ import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/h
 import { LinkCardWithoutLink } from "@/components/ui/link-card"
 import { fetchOGPs, OgpObjects } from "@/components/actions/fetchOGPs"
 import Link from "next/link"
+import { getSession } from '@auth0/nextjs-auth0';
+import { getQuizResult } from '@/app/quiz/lib/get-quiz-result';
 
 type Reference = {
   title: string;
@@ -40,6 +42,13 @@ export async function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: st
 
   const references = quiz.getReferences();
   const referenceOgps = await getReferenceOgps(references);
+
+  // ユーザ情報を取得
+  const user = await getSession();
+  const userEmail = user?.user?.email;
+
+  // ログイン済みユーザーの場合のみクイズ結果を取得
+  const quizResult = userEmail ? await getQuizResult(userEmail, quiz.getId()) : null;
 
   return (
     <div>
@@ -104,7 +113,11 @@ export async function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: st
 
         {/* クイズの問題文エリア */}
         <div className="w-full max-w-xl">
-          <CircleHelp className="my-5 w-full" size={40}/>
+          {quizResult?.Item?.is_correct === "true" ? (
+            <CircleCheckBig className="my-5 w-full text-emerald-500" size={40}/>
+          ) : (
+            <CircleHelp className="my-5 w-full" size={40}/>
+          )}
           <div className="text-center mb-5">
             {/* 問題文が文字列かHTMLかJSXかで分岐 */}
             {quiz.getQuestion() ? (
@@ -122,6 +135,7 @@ export async function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: st
           options={quiz.getOptions()}
           answers={quiz.getAnswers()}
           quizId={quiz.getId()}
+          userEmail={userEmail}
         />
 
         {/* 参考文献 */}

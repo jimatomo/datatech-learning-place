@@ -1,7 +1,8 @@
 import Link from 'next/link'
-import { Folder, ScrollText, Calendar, User } from 'lucide-react'
+import { Folder, ScrollText, CircleCheckBig, Calendar, User } from 'lucide-react'
 import { Badge } from "@/components/ui/badge"
 import { PathInfo } from '../lib/get-path-info'
+
 interface QuizFileListProps {
   pathInfos: PathInfo[];
   currentPath: string[];
@@ -17,7 +18,18 @@ export function QuizFileList({ pathInfos, currentPath }: QuizFileListProps) {
             className="flex items-start gap-2 w-full p-2 rounded-lg
               hover:bg-secondary bg-secondary/60"
           >
-            {pathInfo.is_endpoint ? <ScrollText className="w-5 h-5 flex-shrink-0 mt-0.5" /> : <Folder className="w-5 h-5 flex-shrink-0" />}
+            {pathInfo.is_endpoint ? (
+              <>
+                <div className="flex flex-col gap-1">
+                  <ScrollText className="w-5 h-5 flex-shrink-0" />
+                  {(pathInfo?.is_correct?.toString() === "true") && (
+                    <CircleCheckBig className="mt-1 w-5 h-5 flex-shrink-0 text-emerald-500" />
+                  )}
+                </div>
+              </>
+            ) : (
+              <Folder className="w-5 h-5 flex-shrink-0" />
+            )}
             {pathInfo.is_endpoint ? (
               <div className="flex flex-col gap-2 flex-1">
                 <div className="flex flex-wrap gap-1 max-h-12">
