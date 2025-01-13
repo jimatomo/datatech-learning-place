@@ -20,6 +20,8 @@ COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/run.sh ./run.sh
+# for Auth0
+COPY --from=builder /app/.env.production.local ./.env.production.local
 RUN ln -s /tmp/cache ./.next/cache
 
 USER node
