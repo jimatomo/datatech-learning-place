@@ -69,7 +69,7 @@ export function AppSidebar() {
   // TODO: 認証機能を実装したらユーザ情報をサーバから取得する処理に変更する
   const { user, error, isLoading } = useUser();
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <div></div>;
   if (error) return <div>{error.message}</div>;
 
   return (
@@ -122,7 +122,7 @@ export function AppSidebar() {
                       </Avatar>
                       <div className="grid flex-1 text-left text-sm leading-tight">
                         <span className="truncate font-semibold">{user.name}</span>
-                        <span className="truncate text-xs">{user.email}</span>
+                        <span className="truncate text-xs" aria-label={`メールアドレス: ${user.email}`}>{user.email}</span>
                       </div>
                       <ChevronUp className="ml-auto" />
                     </SidebarMenuButton>
