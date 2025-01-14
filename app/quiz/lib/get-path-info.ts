@@ -15,7 +15,7 @@ export async function getPathInfos(
   files: string[],
   id: string[] = [],
   find_full_path: boolean = false,
-  userEmail: string | null = null
+  userId: string | null = null
 ) {
   return await Promise.all(files.map(async (file) => {
     let path = '';
@@ -45,8 +45,8 @@ export async function getPathInfos(
         updated_at = quiz.getUpdatedAt();
         author = quiz.getAuthor();
         // ログイン済みユーザーの場合のみクイズ結果を取得
-        if (userEmail) {
-          const quizResult = await getQuizResult(userEmail, quiz.getId());
+        if (userId) {
+          const quizResult = await getQuizResult(userId, quiz.getId());
           is_correct = quizResult?.Item?.is_correct === "true";
         }
       } catch (error) {

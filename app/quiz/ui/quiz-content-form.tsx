@@ -9,10 +9,10 @@ export interface QuizFormProps {
   options: { [key: number]: string };
   answers: number[];
   quizId: string;
-  userEmail: string | null | undefined;
+  userId: string | null | undefined;
 }
 
-export function QuizForm({ options, answers, quizId, userEmail }: QuizFormProps) {
+export function QuizForm({ options, answers, quizId, userId }: QuizFormProps) {
   const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
   const [key, setKey] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState<number[]>([]);
@@ -65,7 +65,7 @@ export function QuizForm({ options, answers, quizId, userEmail }: QuizFormProps)
         selectedOptions={selectedOptions}
         onReset={handleReset}
         onMarkAnswer={handleMarkAnswer}
-        userEmail={userEmail}
+        userId={userId}
       />
     </div>
   );

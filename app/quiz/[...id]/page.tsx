@@ -28,9 +28,9 @@ export default async function QuizPage({
     
     // Quizページでない場合はQuizFileListを表示するためのデータを取得
     const session = await getSession();
-    const userEmail = session?.user?.email;
+    const userId = session?.user?.sub;
     const files = await getAllQuizFiles(folder_path);
-    const path_infos = await getPathInfos(files, id, false, userEmail);
+    const path_infos = await getPathInfos(files, id, false, userId);
 
     
     // 将来日付のパス情報を削除

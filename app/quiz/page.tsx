@@ -10,13 +10,13 @@ export default async function QuizList() {
   const quiz_dir = path.join(process.cwd(), 'contents', 'quiz')
 
   const session = await getSession()
-  const userEmail = session?.user?.email
+  const userId = session?.user?.sub
 
   // クイズディレクトリ内の全てのクイズファイルを取得
   const quiz_files = await getAllQuizFiles(quiz_dir)
 
   // 全てのクイズのパス情報を取得
-  const path_infos_full_path = await getPathInfos(quiz_files, [], true, userEmail)
+  const path_infos_full_path = await getPathInfos(quiz_files, [], true, userId)
 
   // 将来日付のクイズを除外
   const today = new Date()

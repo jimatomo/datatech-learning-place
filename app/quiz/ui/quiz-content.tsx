@@ -45,10 +45,10 @@ export async function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: st
 
   // ユーザ情報を取得
   const user = await getSession();
-  const userEmail = user?.user?.email;
+  const userId = user?.user?.sub;
 
   // ログイン済みユーザーの場合のみクイズ結果を取得
-  const quizResult = userEmail ? await getQuizResult(userEmail, quiz.getId()) : null;
+  const quizResult = userId ? await getQuizResult(userId, quiz.getId()) : null;
 
   return (
     <div>
@@ -135,7 +135,7 @@ export async function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: st
           options={quiz.getOptions()}
           answers={quiz.getAnswers()}
           quizId={quiz.getId()}
-          userEmail={userEmail}
+          userId={userId}
         />
 
         {/* 参考文献 */}
