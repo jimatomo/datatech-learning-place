@@ -1,9 +1,31 @@
+import { Metadata } from "next"
+
 import path from 'path'
 import { getAllQuizFiles } from '@/app/quiz/lib/get-files'
 import { getPathInfos, PathInfo } from '@/app/quiz/lib/get-path-info'
 import { QuizFileList } from '@/app/quiz/ui/quiz-file-list'
 import QuizFileListTagFiltered from '@/app/quiz/ui/quiz-file-list-tag-filtered'
 import { getSession } from '@auth0/nextjs-auth0';
+import QuizWeeklyContents from '@/app/quiz/ui/quiz-weekly-contents'
+
+export const metadata: Metadata = {
+  title: "DTLP Quiz",
+  description: "Datatech Learning PlaceのQuizページです。毎日更新されるクイズを通じてデータエンジニアとしての基礎を鍛えましょう。",
+  openGraph: {
+    title: "DTLP Quiz",
+    description: "Datatech Learning PlaceのQuizページです。毎日更新されるクイズを通じてデータエンジニアとしての基礎を鍛えましょう。",
+    url: "https://datatech-learning-place.net/quiz",
+    siteName: "Datatech Learning Place",
+    images: [
+      {
+        url: "https://datatech-learning-place.net/logo/logo-with-title.png",
+        width: 820,
+        height: 820,
+      },
+    ],
+  },
+}
+
 
 export default async function QuizList() {
   // クイズディレクトリのパスを取得
@@ -77,6 +99,15 @@ export default async function QuizList() {
           <p>タグ別Quiz一覧</p>
         </h2>
         <QuizFileListTagFiltered quizPathInfos={path_infos_full_path_filtered} />
+      </div>
+
+      <div>
+        <h2 className="scroll-m-20 pt-5 pb-2 text-lg font-semibold tracking-tight">
+          <p>曜日別のコンテンツ</p>
+        </h2>
+        <div className="px-2">
+          <QuizWeeklyContents />
+        </div>
       </div>
     </div>
   )

@@ -55,9 +55,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   <div className="w-full flex-1">
                     {children}
                   </div>
-                  <div className="w-full xl:flex-1 max-w-64 py-2">
+                  <div className="w-full xl:flex-1 xl:max-w-64 py-2">
                     <h2 className="text-lg font-bold py-2">Sponsored by</h2>
-                    <p className="text-sm text-muted-foreground">そのうちスポンサーを募集します</p>
+                    <p className="text-sm text-muted-foreground">スポンサーを募集中。紹介コンテンツもご用意しますので、ご興味あればお問い合わせください。</p>
                   </div>
                 </div>
               </main>

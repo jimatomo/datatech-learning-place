@@ -1,4 +1,5 @@
 //コンテンツをDynamo DBに置いたりするなど、性能が悪くなってきたらAPI + SSGを検討する
+import { Metadata } from "next"
 
 import path from 'path'
 import { getAllQuizFiles } from '@/app/quiz/lib/get-files'
@@ -8,6 +9,52 @@ import { QuizContent } from '@/app/quiz/ui/quiz-content'
 import { QuizFileList } from '@/app/quiz/ui/quiz-file-list'
 import { ErrorDisplay } from '@/app/quiz/ui/error-display'
 import { getSession } from '@auth0/nextjs-auth0';
+
+export async function generateMetadata({ params }: { params: { id: string[] } }): Promise<Metadata> {
+  const id = params.id;
+  const QuizModule = await import(`@/contents/quiz/${id.join("/")}.tsx`).catch(() => null);
+  
+  // Quizページの場合はQuizContentsのメタデータを取得
+  if (QuizModule) {
+    const quiz = QuizModule.default();
+    return {
+      title: quiz.getTitle() + " | DTLP Quiz",
+      description: quiz.getCreatedAt().toLocaleDateString('ja-JP') + "のQuiz。" + quiz.getTags().join(", "),
+      openGraph: {
+        title: quiz.getTitle() + " | DTLP Quiz",
+        description: quiz.getCreatedAt().toLocaleDateString('ja-JP') + "のQuiz。Tags:" + quiz.getTags().join(", "),
+        url: "https://datatech-learning-place.net/quiz/" + id.join("/"),
+        siteName: "Datatech Learning Place",
+        type: 'article',
+        images: [
+          {
+            url: "https://datatech-learning-place.net/logo/logo-with-title.png",
+            width: 820,
+            height: 820,
+          },
+        ],
+      },
+    };
+  };
+
+  return {
+    title: "DTLP Quiz list",
+    description: "Datatech Learning PlaceのQuizページです。毎日更新されるクイズを通じてデータエンジニアとしての基礎を鍛えましょう。",
+    openGraph: {
+      title: "DTLP Quiz list",
+      description: "Datatech Learning PlaceのQuizページです。毎日更新されるクイズを通じてデータエンジニアとしての基礎を鍛えましょう。",
+      url: "https://datatech-learning-place.net/quiz/" + id.join("/"),
+      siteName: "Datatech Learning Place",
+      images: [
+        {
+          url: "https://datatech-learning-place.net/logo/logo-with-title.png",
+          width: 820,
+          height: 820,
+        },
+      ],
+    },
+  };
+}
 
 export default async function QuizPage({
   params,

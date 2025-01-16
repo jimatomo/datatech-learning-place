@@ -1,5 +1,24 @@
+import { Metadata } from "next"
 import Link from "next/link"
 import { User2, CreditCard, MessageCircle } from "lucide-react"
+
+export const metadata: Metadata = {
+  title: "DTLP Global",
+  description: "Datatech Learning PlaceのGlobalページです。アカウント設定や課金設定、お問い合わせを行うことができます。",
+  openGraph: {
+    title: "DTLP Global",
+    description: "Datatech Learning PlaceのGlobalページです。アカウント設定や課金設定、お問い合わせを行うことができます。",
+    url: "https://datatech-learning-place.net/global",
+    siteName: "Datatech Learning Place",
+    images: [
+      {
+        url: "https://datatech-learning-place.net/logo/logo-with-title.png",
+        width: 820,
+        height: 820,
+      },
+    ],
+  },
+}
 
 export default function GlobalPage() {
   return (

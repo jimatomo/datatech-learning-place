@@ -32,9 +32,11 @@ export default function QuizFileListTagFiltered({
   // 選択されたタグが変わったら、クイズの情報をフィルタリング
   useEffect(() => {
     setFilteredQuizPathInfos(
-      quizPathInfos.filter((quizPathInfo) => 
-        quizPathInfo.tags?.includes(selectedTag)
-      )
+      quizPathInfos
+        .filter((quizPathInfo) => 
+          quizPathInfo.tags?.includes(selectedTag) && quizPathInfo.created_at !== null
+        )
+        .sort((a, b) => b.created_at!.getTime() - a.created_at!.getTime())
     )
   }, [selectedTag, quizPathInfos])
 

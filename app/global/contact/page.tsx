@@ -1,7 +1,26 @@
+import { Metadata } from "next"
 import { LinkCard } from '@/components/ui/link-card'
 import { fetchOGPs } from '@/components/actions/fetchOGPs'
 
 const url = "https://wiry-act-a67.notion.site/171d816a693580008c4cef8fbdc9b5ea";
+
+export const metadata: Metadata = {
+  title: "DTLP Contact",
+  description: "Datatech Learning PlaceのContactページです。お問い合わせに関する情報を記載しています。",
+  openGraph: {
+    title: "DTLP Contact",
+    description: "Datatech Learning PlaceのContactページです。お問い合わせに関する情報を記載しています。",
+    url: "https://datatech-learning-place.net/global/contact",
+    siteName: "Datatech Learning Place",
+    images: [
+      {
+        url: "https://datatech-learning-place.net/logo/logo-with-title.png",
+        width: 820,
+        height: 820,
+      },
+    ],
+  },
+}
 
 // データを取得するための関数を改善
 async function fetchData() {

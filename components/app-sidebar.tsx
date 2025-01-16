@@ -65,9 +65,14 @@ const footerItems = [
 export function AppSidebar() {
   const pathname = usePathname()
   const { toggleSidebar } = useSidebar()
-
-  // TODO: 認証機能を実装したらユーザ情報をサーバから取得する処理に変更する
   const { user, error, isLoading } = useUser();
+
+  // 画面サイズが小さい時のみサイドバーを閉じる関数
+  const handleLinkClick = () => {
+    if (window.innerWidth < 768) {
+      toggleSidebar()
+    }
+  }
 
   if (isLoading) return <div></div>;
   if (error) return <div>{error.message}</div>;
@@ -77,7 +82,7 @@ export function AppSidebar() {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem className="flex items-center justify-between">
-            <Link href="/" className="flex gap-2 items-center w-full">
+            <Link href="/" className="flex gap-2 items-center w-full" onClick={handleLinkClick}>
               <Image src="/favicon.ico" alt="Icon" width={30} height={30} className="flex-shrink-0" />
               <span className="text-sm font-bold group-data-[collapsible=icon]:hidden truncate">
                 Datatech Learning Place
@@ -95,7 +100,7 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild isActive={item.url === pathname}>
-                    <Link href={item.url}>
+                    <Link href={item.url} onClick={handleLinkClick}>
                       <item.icon />
                       <span>{item.title}</span>
                     </Link>
@@ -133,7 +138,7 @@ export function AppSidebar() {
                   >
                     {footerItems.map((item) => (
                       <DropdownMenuItem key={item.title}>
-                        <Link href={item.url} className="flex items-center gap-2 w-full">
+                        <Link href={item.url} className="flex items-center gap-2 w-full" onClick={handleLinkClick}>
                           <item.icon />
                           <span>{item.title}</span>
                         </Link>

@@ -1,3 +1,4 @@
+import { Metadata } from "next"
 import {
   Table,
   TableHeader,
@@ -7,6 +8,24 @@ import {
   TableCell,
 } from "@/components/ui/table"
 import { getSession } from '@auth0/nextjs-auth0';
+
+export const metadata: Metadata = {
+  title: "DTLP Account",
+  description: "Datatech Learning PlaceのAccountページです。アカウント設定を確認できます。",
+  openGraph: {
+    title: "DTLP Account",
+    description: "Datatech Learning PlaceのAccountページです。アカウント設定を確認できます。",
+    url: "https://datatech-learning-place.net/global/account",
+    siteName: "Datatech Learning Place",
+    images: [
+      {
+        url: "https://datatech-learning-place.net/logo/logo-with-title.png",
+        width: 820,
+        height: 820,
+      },
+    ],
+  },
+}
 
 export default async function AccountPage() {
   const user = await getSession();
