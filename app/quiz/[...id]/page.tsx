@@ -10,8 +10,8 @@ import { QuizFileList } from '@/app/quiz/ui/quiz-file-list'
 import { ErrorDisplay } from '@/app/quiz/ui/error-display'
 import { getSession } from '@auth0/nextjs-auth0';
 
-export async function generateMetadata({ params }: { params: { id: string[] } }): Promise<Metadata> {
-  const id = params.id;
+export async function generateMetadata({ params }: { params: Promise<{ id: string[] }> }): Promise<Metadata> {
+  const { id } = await params;
   const QuizModule = await import(`@/contents/quiz/${id.join("/")}.tsx`).catch(() => null);
   
   // Quizページの場合はQuizContentsのメタデータを取得
@@ -59,9 +59,9 @@ export async function generateMetadata({ params }: { params: { id: string[] } })
 export default async function QuizPage({
   params,
 }: {
-  params: { id: string[] };
+  params: Promise<{ id: string[] }>;
 }) {
-  const id = params.id;
+  const { id } = await params;
   
   try {
     const folder_path = path.join(process.cwd(), 'contents/quiz', ...id);

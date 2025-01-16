@@ -31,6 +31,7 @@ export default async function QuizList() {
   // クイズディレクトリのパスを取得
   const quiz_dir = path.join(process.cwd(), 'contents', 'quiz')
 
+  // ユーザー情報を取得
   const session = await getSession()
   const userId = session?.user?.sub
 

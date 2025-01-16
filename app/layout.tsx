@@ -3,6 +3,8 @@ import { cookies } from "next/headers"
 import type { Metadata } from "next";
 import "./globals.css";
 
+import { GoogleTagManager } from '@next/third-parties/google'
+
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { Separator } from "@/components/ui/separator"
 
@@ -22,11 +24,12 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const defaultOpen = cookieStore.get("sidebar:state")?.value === "true"
 
   return (
     <html lang="ja" suppressHydrationWarning>
+      <GoogleTagManager gtmId="GTM-56ZBLFZR" />
       <UserProvider>
       <body>
         <ThemeProvider
@@ -35,7 +38,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           enableSystem
           disableTransitionOnChange
         >
-          <NextTopLoader color="#f59e0b" />
+          <NextTopLoader color="#1d4ed8" />
           <SidebarProvider defaultOpen={defaultOpen}>
             <AppSidebar />
             <div className="flex flex-col min-h-screen w-screen">
