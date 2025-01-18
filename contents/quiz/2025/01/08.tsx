@@ -9,8 +9,7 @@ export default function QuizContent() {
     tags: ["Snowflake", "Engineering"],
     created_at: new Date("2025-01-08"),
     updated_at: new Date("2025-01-08"),
-    // previous_quiz_id: "Q20250104",
-    // next_quiz_id: "Q20250106",
+
 
     // ----- quiz -----
     title: "Snowflakeのマイクロパーティション",

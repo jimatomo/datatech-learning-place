@@ -77,7 +77,7 @@ async function saveQuizResult(
   // TODO:DynamoDBに保存
   try {
     const data = await ddbDocClient.send(new PutCommand(params));
-    console.log('result : ' + JSON.stringify(data));
+    return data;
   } catch (error) {
     console.error("Error saving quiz result:", error);
   }

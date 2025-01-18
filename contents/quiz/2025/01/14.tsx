@@ -11,6 +11,7 @@ export default function QuizContent() {
     created_at: new Date("2025-01-14"),
     updated_at: new Date("2025-01-14"),
 
+
     // ----- quiz -----
     title: "Streamlit in Snowflakeの実行に必要な権限",
     question_jsx: <QuizQuestion />,

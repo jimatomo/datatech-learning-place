@@ -11,6 +11,7 @@ export default function QuizContent() {
     created_at: new Date("2025-01-03"),
     updated_at: new Date("2025-01-03"),
 
+
     // ----- quiz -----
     title: "SnowflakeのStandard EditionとEnterprise Editionの機能差",
     question_jsx: <QuizQuestion />,

@@ -11,6 +11,7 @@ export default function QuizContent() {
     created_at: new Date("2025-01-05"),
     updated_at: new Date("2025-01-05"),
 
+
     // ----- quiz -----
     title: "Amazon S3のストレージクラス",
     question_jsx: <QuizQuestion />,

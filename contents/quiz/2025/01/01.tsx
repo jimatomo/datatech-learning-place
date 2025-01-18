@@ -11,6 +11,7 @@ export default function QuizContent() {
     created_at: new Date("2025-01-01"),
     updated_at: new Date("2025-01-01"),
 
+
     // ----- quiz -----
     title: "Snowflakeのアーキテクチャ",
     question_jsx: <QuizQuestion />,

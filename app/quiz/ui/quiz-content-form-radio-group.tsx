@@ -38,9 +38,9 @@ export function QuizRadioGroup({
         <div
           key={key}
           className={cn(
-            "flex items-center space-x-2 h-auto p-3 w-full border rounded-md",
+            "flex items-center space-x-2 h-auto p-3 w-full border rounded-md shadow-md",
             "hover:bg-accent hover:text-accent-foreground cursor-pointer",
-            selectedAnswer === key && "bg-secondary/50",
+            selectedAnswer === key && "bg-secondary/50 shadow-none",
             correctAnswers.includes(Number(key)) && "bg-emerald-100 dark:bg-emerald-950 hover:bg-emerald-200 dark:hover:bg-emerald-900",
           )}
           onClick={() => handleSelect(key)}
