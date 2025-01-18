@@ -3,8 +3,6 @@ import { cookies } from "next/headers"
 import type { Metadata } from "next";
 import "./globals.css";
 
-import { GoogleTagManager } from '@next/third-parties/google'
-
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { Separator } from "@/components/ui/separator"
 
@@ -17,6 +15,7 @@ import NextTopLoader from 'nextjs-toploader';
 
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 import { AuthStatus } from "@/components/auth-status"
+import ConsentManager from "@/components/ConsentManager"
 
 export const metadata: Metadata = {
   title: "Datatech Learning Place",
@@ -29,9 +28,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang="ja" suppressHydrationWarning>
-      <GoogleTagManager gtmId="GTM-56ZBLFZR" />
       <UserProvider>
       <body>
+        <ConsentManager />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
