@@ -12,11 +12,13 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { ScrollArea } from "@/components/ui/scroll-area"
-
+import { LimitSelector } from '@/app/quiz/ui/limit-selector'
 export default function QuizFileListTagFiltered({
   quizPathInfos,
+  defaultLimit,
 }: {
   quizPathInfos: PathInfo[],
+  defaultLimit: string,
 }) {
   // タグのリストに追加する値（将来的にグローバルに管理したい）
   const tags = [
@@ -44,16 +46,20 @@ export default function QuizFileListTagFiltered({
 
   return (
     <div>
-      <Select onValueChange={(value) => setSelectedTag(value)}>
-        <SelectTrigger className="w-[140px] mb-4 mx-2">
-          <SelectValue placeholder="Select a tag"/>
+      <div className="flex flex-row items-center justify-start mb-4 mx-2 gap-2">
+        <Select onValueChange={(value) => setSelectedTag(value)}>
+          <SelectTrigger className="w-[140px]">
+            <SelectValue placeholder="Select a tag"/>
         </SelectTrigger>
         <SelectContent>
           {tags.map((tag) => (
             <SelectItem key={tag} value={tag}>{tag}</SelectItem>
           ))}
-        </SelectContent>
-      </Select>
+          </SelectContent>
+        </Select>
+
+        <LimitSelector defaultLimit={defaultLimit} />
+      </div>
 
       <ScrollArea className="[&>[data-radix-scroll-area-viewport]]:max-h-[500px] px-2">
         <QuizFileList pathInfos={filteredQuizPathInfos} currentPath={[]} />

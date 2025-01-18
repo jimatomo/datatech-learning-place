@@ -1,14 +1,21 @@
 import fs from 'fs/promises'
 import path from 'path'
 
-export async function getAllQuizFiles(
-  dir: string,
-  base_dir?: string,
-): Promise<string[]> {
+interface GetQuizFilesParams {
+  dir: string;
+  base_dir?: string;
+  limit_count?: number;
+}
+
+export async function getQuizFiles({
+  dir,
+  base_dir,
+  limit_count = 60
+}: GetQuizFilesParams): Promise<string[]> {
   try {
     // 初回呼び出し時のbaseDirを設定
     const actual_base_dir = base_dir || dir;
-    
+
     // ディレクトリが存在するか確認
     const dirExists = await fs.access(dir).then(() => true).catch(() => false);
     if (!dirExists) {
@@ -16,7 +23,9 @@ export async function getAllQuizFiles(
       return [];
     }
 
+    // ディレクトリ内のファイルとディレクトリを取得
     const files = await fs.readdir(dir, { withFileTypes: true });
+
     const quizFiles: string[] = [];
 
     for (const file of files) {
@@ -24,7 +33,7 @@ export async function getAllQuizFiles(
       try {
         if (file.isDirectory()) {
           // サブディレクトリの探索時にbaseDirを引き継ぐ
-          const subFiles = await getAllQuizFiles(fullPath, actual_base_dir);
+          const subFiles = await getQuizFiles({ dir: fullPath, base_dir: actual_base_dir });
           quizFiles.push(...subFiles);
         } else if (file.name.endsWith('.tsx')) {
           // ファイルが読み取り可能か確認
@@ -43,6 +52,12 @@ export async function getAllQuizFiles(
 
     // ファイル名を昇順にソート
     quizFiles.sort((a, b) => a.localeCompare(b));
+
+
+    // limit_countが指定されている場合は制限（後ろから取得）
+    if (limit_count) {
+      return quizFiles.slice(-limit_count);
+    }
 
     return quizFiles;
   } catch (error) {

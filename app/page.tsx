@@ -56,13 +56,13 @@ export default function Home() {
         <h2 className="scroll-m-20 pb-2 text-xl font-bold tracking-tight">
           コンテンツ
         </h2>
+        <p className="text-sm md:text-base">
+          <a href="https://github.com/jimatomo/dtsb-learning-place" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-500">
+            GitHub
+          </a>
+          でコンテンツ含めてソースを公開しております。
+        </p>
         <div className="flex flex-col lg:flex-row gap-2">
-          <p className="text-sm md:text-base">
-            <a href="https://github.com/jimatomo/dtsb-learning-place" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-500">
-              GitHub
-            </a>
-            でコンテンツ含めてソースを公開しております。
-          </p>
           <ContentCard 
             title="Quiz"
             description="データ基盤に関するクイズ"

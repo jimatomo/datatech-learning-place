@@ -1,4 +1,5 @@
 import { getQuizResult } from '@/app/quiz/lib/get-quiz-result';
+import { headers } from 'next/headers';
 
 export interface PathInfo {
   path: string;
@@ -9,6 +10,7 @@ export interface PathInfo {
   updated_at: Date | null;
   author: string | null;
   is_correct: boolean | null;
+  is_liked: boolean | null;
 }
 
 export async function getPathInfos(
@@ -26,7 +28,7 @@ export async function getPathInfos(
     let author: string | null = null;
     let is_endpoint = false;
     let is_correct: boolean | null = null;
-
+    let is_liked: boolean | null = null;
     if (find_full_path) {
       path = file;
       is_endpoint = true;
@@ -48,6 +50,15 @@ export async function getPathInfos(
         if (userId) {
           const quizResult = await getQuizResult(userId, quiz.getId());
           is_correct = quizResult?.Item?.is_correct === "true";
+          // いいねステータスの取得
+          const encodedUserId = encodeURIComponent(userId);
+          const headersList = await headers();
+          const protocol = headersList.get('x-forwarded-proto') || 'http';
+          const host = headersList.get('host') || '';
+          const baseUrl = `${protocol}://${host}`;
+          const statusResponse = await fetch(`${baseUrl}/api/quiz/like?quizId=${quiz.getId()}&userId=${encodedUserId}`)
+          const statusResult = await statusResponse.json()
+          is_liked = statusResult.Item?.like ?? false
         }
       } catch (error) {
         console.error(`Failed to load quiz for ${file}:`, error);
@@ -63,7 +74,8 @@ export async function getPathInfos(
       created_at,
       updated_at,
       author,
-      is_correct
+      is_correct,
+      is_liked
     };
   }));
 }

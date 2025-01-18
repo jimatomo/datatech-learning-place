@@ -1,7 +1,7 @@
 import { Metadata } from "next"
 
 import path from 'path'
-import { getAllQuizFiles } from '@/app/quiz/lib/get-files'
+import { getQuizFiles } from '@/app/quiz/lib/get-files'
 import { getPathInfos, PathInfo } from '@/app/quiz/lib/get-path-info'
 import { QuizFileList } from '@/app/quiz/ui/quiz-file-list'
 import QuizFileListTagFiltered from '@/app/quiz/ui/quiz-file-list-tag-filtered'
@@ -26,8 +26,13 @@ export const metadata: Metadata = {
   },
 }
 
+// SearchParamsの型定義を追加
+type Props = {
+  searchParams: { limit?: string }
+}
 
-export default async function QuizList() {
+// searchParamsを受け取るように修正
+export default async function QuizList({ searchParams }: Props) {
   // クイズディレクトリのパスを取得
   const quiz_dir = path.join(process.cwd(), 'contents', 'quiz')
 
@@ -35,8 +40,15 @@ export default async function QuizList() {
   const session = await getSession()
   const userId = session?.user?.sub
 
-  // クイズディレクトリ内の全てのクイズファイルを取得
-  const quiz_files = await getAllQuizFiles(quiz_dir)
+  // searchParamsからlimitを取得し、デフォルト値を7に設定
+  const { limit } = await searchParams
+  const limit_count = limit ? parseInt(limit) : 7
+
+  // クイズディレクトリ内のクイズファイルを取得する際にlimitを使用
+  const quiz_files = await getQuizFiles({
+    dir: quiz_dir,
+    limit_count: limit_count
+  })
 
   // 全てのクイズのパス情報を取得
   const path_infos_full_path = await getPathInfos(quiz_files, [], true, userId)
@@ -67,7 +79,8 @@ export default async function QuizList() {
       created_at: null,
       updated_at: null,
       author: null,
-      is_correct: null
+      is_correct: null,
+      is_liked: null
     })
     year_info++
   }
@@ -99,7 +112,7 @@ export default async function QuizList() {
         <h2 className="scroll-m-20 pt-5 pb-2 text-lg font-semibold tracking-tight">
           <p>タグ別Quiz一覧</p>
         </h2>
-        <QuizFileListTagFiltered quizPathInfos={path_infos_full_path_filtered} />
+        <QuizFileListTagFiltered quizPathInfos={path_infos_full_path_filtered} defaultLimit={limit_count.toString()} />
       </div>
 
       <div>

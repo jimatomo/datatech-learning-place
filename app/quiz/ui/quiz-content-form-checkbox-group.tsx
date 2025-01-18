@@ -58,10 +58,10 @@ export function QuizCheckboxGroup({
           onClick={() => handleCheckboxChange(Number(key))}
           className={cn(
             "flex items-center gap-2 h-auto p-3 w-full",
-            "border border-input rounded-md",
+            "border border-input rounded-md shadow-md",
             "hover:bg-accent hover:text-accent-foreground",
             "cursor-pointer",
-            selectedAnswers.includes(Number(key)) && "bg-secondary/50",
+            selectedAnswers.includes(Number(key)) && "bg-secondary/50 shadow-none",
             correctAnswers.includes(Number(key)) && "bg-emerald-100 dark:bg-emerald-950 hover:bg-emerald-200 dark:hover:bg-emerald-900",
           )}
         >

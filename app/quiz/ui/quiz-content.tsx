@@ -12,6 +12,8 @@ import { fetchOGPs, OgpObjects } from "@/components/actions/fetchOGPs"
 import Link from "next/link"
 import { getSession } from '@auth0/nextjs-auth0';
 import { getQuizResult } from '@/app/quiz/lib/get-quiz-result';
+import QuizLikeButton from '@/app/quiz/ui/quiz-like-button';
+import { XShareButton } from '@/components/x-share-button';
 
 type Reference = {
   title: string;
@@ -35,6 +37,9 @@ export async function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: st
   const updatedAt = quiz.getUpdatedAt().toLocaleDateString('ja-JP', 
     { year: 'numeric', month: '2-digit', day: '2-digit' }
   ).split('/').join('.');
+
+  // 自分のURLを生成
+  const selfQuizUrl = transformQuizIdToUrl(quiz.getId());
 
   // 前のクイズと次のクイズのURLを取得
   const previousQuizUrl = transformQuizIdToUrl(quiz.getPreviousQuizId());
@@ -168,6 +173,19 @@ export async function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: st
             </AccordionContent>
           </AccordionItem>
         </Accordion>
+
+        {/* ウィジット系 */}
+        <div className="flex flex-row w-full items-center pb-4">
+          <div className="flex-1" />
+          <div className="flex-1 flex justify-center">
+            <QuizLikeButton quizId={quiz.getId()} />
+          </div>
+          <div className="flex-1 flex justify-end">
+            <XShareButton
+              title={`${quiz.getTitle()} | DTLP Quiz`}
+              url={`https://datatech-learning-place.com${selfQuizUrl}`} />
+          </div>
+        </div>
 
         {/* QuizNavigationコンポーネントを使用 */}
         <QuizNavigation previousQuizUrl={previousQuizUrl} nextQuizUrl={nextQuizUrl} folderId={folderId} />

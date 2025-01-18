@@ -1,5 +1,5 @@
 import path from 'path'
-import { getAllQuizFiles } from '@/app/quiz/lib/get-files'
+import { getQuizFiles } from '@/app/quiz/lib/get-files'
 
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
@@ -25,7 +25,7 @@ export async function QuizNavigation({ previousQuizUrl, nextQuizUrl, folderId }:
     // クイズディレクトリのパスを取得
     const quiz_dir = path.join(process.cwd(), 'contents', 'quiz')
     // クイズディレクトリ内の全てのクイズファイルを取得
-    const quiz_files = await getAllQuizFiles(quiz_dir)
+    const quiz_files = await getQuizFiles({ dir: quiz_dir })
 
     // 自分のファイルのindexを取得
     const current_index = quiz_files.findIndex(file => file === folderId)

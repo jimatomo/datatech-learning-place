@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Folder, ScrollText, CircleCheckBig, Calendar, User } from 'lucide-react'
+import { Folder, ScrollText, CircleCheckBig, Calendar, User, Heart } from 'lucide-react'
 import { Badge } from "@/components/ui/badge"
 import { PathInfo } from '../lib/get-path-info'
 
@@ -24,6 +24,9 @@ export function QuizFileList({ pathInfos, currentPath }: QuizFileListProps) {
                   <ScrollText className="w-5 h-5 flex-shrink-0" />
                   {(pathInfo?.is_correct?.toString() === "true") && (
                     <CircleCheckBig className="mt-1 w-5 h-5 flex-shrink-0 text-emerald-500" />
+                  )}
+                  {pathInfo?.is_liked && (
+                    <Heart className="mt-1 w-5 h-5 flex-shrink-0 text-red-500 fill-red-500" />
                   )}
                 </div>
               </>

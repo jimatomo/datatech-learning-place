@@ -2,13 +2,15 @@
 import { Metadata } from "next"
 
 import path from 'path'
-import { getAllQuizFiles } from '@/app/quiz/lib/get-files'
+import { getQuizFiles } from '@/app/quiz/lib/get-files'
 import { getPathInfos } from '@/app/quiz/lib/get-path-info'
 
 import { QuizContent } from '@/app/quiz/ui/quiz-content'
 import { QuizFileList } from '@/app/quiz/ui/quiz-file-list'
 import { ErrorDisplay } from '@/app/quiz/ui/error-display'
 import { getSession } from '@auth0/nextjs-auth0';
+import { UpperNavigation } from '@/app/quiz/ui/upper-navigation'
+
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string[] }> }): Promise<Metadata> {
   const { id } = await params;
@@ -76,7 +78,7 @@ export default async function QuizPage({
     // Quizページでない場合はQuizFileListを表示するためのデータを取得
     const session = await getSession();
     const userId = session?.user?.sub;
-    const files = await getAllQuizFiles(folder_path);
+    const files = await getQuizFiles({ dir: folder_path });
     const path_infos = await getPathInfos(files, id, false, userId);
 
     
@@ -100,6 +102,9 @@ export default async function QuizPage({
           {id.join("/")}のQuiz一覧
         </h2>
         <QuizFileList pathInfos={unique_path_infos} currentPath={id} />
+        <div className="flex justify-center pt-5">
+          <UpperNavigation folderId={id.join("/")} />
+        </div>
       </div>);
     }
     
