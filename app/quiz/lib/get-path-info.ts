@@ -51,12 +51,11 @@ export async function getPathInfos(
           const quizResult = await getQuizResult(userId, quiz.getId());
           is_correct = quizResult?.Item?.is_correct === "true";
           // いいねステータスの取得
-          const encodedUserId = encodeURIComponent(userId);
           const headersList = await headers();
           const protocol = headersList.get('x-forwarded-proto') || 'http';
           const host = headersList.get('host') || '';
           const baseUrl = `${protocol}://${host}`;
-          const statusResponse = await fetch(`${baseUrl}/api/quiz/like?quizId=${quiz.getId()}&userId=${encodedUserId}`)
+          const statusResponse = await fetch(`${baseUrl}/api/quiz/like?quizId=${quiz.getId()}&userId=${userId}`)
           const statusResult = await statusResponse.json()
           is_liked = statusResult.Item?.like ?? false
         }
