@@ -1,7 +1,6 @@
 import { Quiz, transformQuizIdToUrl } from "@/contents/quiz";
-import { CircleHelp, Calendar, AlertCircle, User, File } from "lucide-react"
+import { CircleHelp, AlertCircle } from "lucide-react"
 import { QuizForm } from "@/app/quiz/ui/quiz-content-form"
-import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { QuizNavigation } from "@/app/quiz/ui/quiz-content-navigation"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -10,6 +9,7 @@ import { QuizIcon } from '@/app/quiz/ui/quiz-icon';
 import { QuizWidgets } from '@/app/quiz/ui/quiz-widgets';
 import { Suspense } from 'react';
 import { QuizReferences } from '@/app/quiz/ui/quiz-references';
+import { QuizMetadata } from "@/app/quiz/ui/quiz-metadata";
 
 // QuizContents コンポーネント
 // クイズの内容をレンダリングする
@@ -48,42 +48,7 @@ export async function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: st
 
         {/* メタデータエリア */}
         <ScrollArea className="w-full [&>[data-radix-scroll-area-viewport]]:max-h-[130px]">
-          <div className="flex flex-col w-full max-w-2xl gap-2 py-2">
-            {/* タグ */}
-            <div className="flex flex-row flex-wrap gap-2">
-              {quiz.getTags().map((tag, index) => (
-                <Badge key={`tag-${index}`} variant="secondary">
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-
-            {/* 作成日と更新日 */}
-            <div className="w-full max-w-2xl flex flex-row justify-start text-sm text-muted-foreground">
-              <Calendar className="w-4 h-4 mr-1" />
-              {createdAt}{createdAt !== updatedAt && ` (updated: ${updatedAt})`}
-            </div>
-
-            {/* 作成者とファイルパス */}
-            <div className="w-full max-w-2xl flex flex-row flex-wrap justify-start text-sm text-muted-foreground gap-2">
-              <span className="flex items-center">
-                <User className="w-4 h-4 mr-1" />
-                {quiz.getAuthorUrl() ? (
-                  <a href={quiz.getAuthorUrl()} target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
-                    {quiz.getAuthor()}
-                  </a>
-                ) : (
-                  <span>{quiz.getAuthor()}</span>
-                )}
-              </span>
-              <span className="flex items-center break-all">
-                <File className="w-4 h-4 mr-1 flex-shrink-0" />
-                <a href={`https://github.com/jimatomo/dtsb-learning-place/blob/main/${quiz.getFilePath()}`} target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
-                  {quiz.getFilePath()}
-                </a>
-              </span>
-            </div>
-          </div>
+          <QuizMetadata quiz={quiz} createdAt={createdAt} updatedAt={updatedAt} />
         </ScrollArea>
 
         {/* 最終更新から1年経過したら警告を表示 */}
