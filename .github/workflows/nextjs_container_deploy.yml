@@ -14,7 +14,9 @@ jobs:
     runs-on: ubuntu-24.04-arm
     env:
       ECR_REPOSITORY: production/datatech-learing-place
-    
+      ECS_CLUSTER: dtlp_prod_common
+      ECS_SERVICE: dtlp_prod_nextjs_app
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -50,3 +52,7 @@ jobs:
       - name: Delete dot environment file
         run: |
           rm -f .env.production.local
+
+      - name: Deploy to ECS
+        run: |
+          aws ecs update-service --cluster ${{ env.ECS_CLUSTER }} --service ${{ env.ECS_SERVICE }} --force-new-deployment

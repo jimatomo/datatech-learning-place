@@ -27,8 +27,7 @@ export default function QuizLikeButton({ quizId }: QuizLikeButtonProps) {
       
       try {
         // いいねステータスの取得
-        const encodedUserId = encodeURIComponent(userId)
-        const statusResponse = await fetch(`/api/quiz/like?quizId=${quizId}&userId=${encodedUserId}`)
+        const statusResponse = await fetch(`/api/quiz/like?quizId=${quizId}&userId=${userId}`)
         const statusResult = await statusResponse.json()
         setLiked(statusResult.Item?.like ?? false)
 
@@ -62,7 +61,7 @@ export default function QuizLikeButton({ quizId }: QuizLikeButtonProps) {
         },
         body: JSON.stringify({ 
           quizId, 
-          userId: encodeURIComponent(userId), 
+          userId: userId, 
           like: !liked 
         })
       })
