@@ -1,5 +1,5 @@
 import { getQuizResult } from '@/app/quiz/lib/get-quiz-result';
-import { headers } from 'next/headers';
+import { getQuizLike } from '@/app/quiz/lib/get-quiz-like';
 
 export interface PathInfo {
   path: string;
@@ -51,13 +51,8 @@ export async function getPathInfos(
           const quizResult = await getQuizResult(userId, quiz.getId());
           is_correct = quizResult?.Item?.is_correct === "true";
           // いいねステータスの取得
-          const headersList = await headers();
-          const protocol = headersList.get('x-forwarded-proto') || 'http';
-          const host = headersList.get('host') || '';
-          const baseUrl = `${protocol}://${host}`;
-          const statusResponse = await fetch(`${baseUrl}/api/quiz/like?quizId=${quiz.getId()}&userId=${userId}`)
-          const statusResult = await statusResponse.json()
-          is_liked = statusResult.Item?.like ?? false
+          const quizLike = await getQuizLike(userId, quiz.getId());
+          is_liked = quizLike?.Item?.like ?? false;
         }
       } catch (error) {
         console.error(`Failed to load quiz for ${file}:`, error);
