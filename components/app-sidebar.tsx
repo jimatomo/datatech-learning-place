@@ -5,6 +5,7 @@ import Image from "next/image"
 import { usePathname } from "next/navigation"
 import {
   ScrollText,
+  Book,
   User2,
   ChevronUp,
   CreditCard,
@@ -45,6 +46,11 @@ const items = [
     title: "Quiz",
     url: "/quiz",
     icon: ScrollText,
+  },
+  {
+    title: "Text",
+    url: "/text",
+    icon: Book,
   },
 ]
 

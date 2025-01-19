@@ -65,9 +65,15 @@ export default function Home() {
         <div className="flex flex-col lg:flex-row gap-2">
           <ContentCard 
             title="Quiz"
-            description="データ基盤に関するクイズ"
-            imageSrc="/quiz_card.jpg"
+            description="データエンジニアリングのクイズ"
+            imageSrc="https://datatech-learning-place.net/logo/quiz_card.jpg"
             href="/quiz"
+          />
+          <ContentCard 
+            title="Text"
+            description="データエンジニアリングのテキスト"
+            imageSrc="https://datatech-learning-place.net/logo/book.png"
+            href="/text"
           />
         </div>
       </div>
