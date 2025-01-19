@@ -3,12 +3,15 @@
 
 export default async function TextPage({ params }: { params: { id: string[] } }) {
   const { id } = await params;
-  const TextModule = await import(`@/contents/text/${id.join("/")}.tsx`).catch(() => null);
+  const TextModule = await import(`@/contents/text/${id.join("/")}.tsx`).catch((error) => {
+    console.error("Error loading module:", error);
+    return null;
+  });
 
   if (TextModule) {
     return (
       <div>
-        <p>工事中です</p>
+        <TextModule.default />
       </div>
     );
   }
