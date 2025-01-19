@@ -1,32 +1,15 @@
 import { Quiz, transformQuizIdToUrl } from "@/contents/quiz";
-import { CircleHelp, CircleCheckBig, Calendar, AlertCircle, BookOpen, User, File } from "lucide-react"
+import { CircleHelp, Calendar, AlertCircle, User, File } from "lucide-react"
 import { QuizForm } from "@/app/quiz/ui/quiz-content-form"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion"
 import { QuizNavigation } from "@/app/quiz/ui/quiz-content-navigation"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card"
-import { LinkCardWithoutLink } from "@/components/ui/link-card"
-import { fetchOGPs, OgpObjects } from "@/components/actions/fetchOGPs"
-import Link from "next/link"
 import { getSession } from '@auth0/nextjs-auth0';
-import { getQuizResult } from '@/app/quiz/lib/get-quiz-result';
-import QuizLikeButton from '@/app/quiz/ui/quiz-like-button';
-import { XShareButton } from '@/components/x-share-button';
-
-type Reference = {
-  title: string;
-  url: string;
-  ogps?: OgpObjects;
-}
-
-async function getReferenceOgps(references: Reference[]) {
-  return Promise.all(references.map(async (reference: Reference) => {
-    const res = await fetchOGPs(reference.url);
-    return { ...reference, ogps: res.ogps };
-  }));
-}
+import { QuizIcon } from '@/app/quiz/ui/quiz-icon';
+import { QuizWidgets } from '@/app/quiz/ui/quiz-widgets';
+import { Suspense } from 'react';
+import { QuizReferences } from '@/app/quiz/ui/quiz-references';
 
 // QuizContents コンポーネント
 // クイズの内容をレンダリングする
@@ -46,14 +29,11 @@ export async function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: st
   const nextQuizUrl = transformQuizIdToUrl(quiz.getNextQuizId());
 
   const references = quiz.getReferences();
-  const referenceOgps = await getReferenceOgps(references);
 
-  // ユーザ情報を取得
+
+  // ユーザー情報を取得
   const user = await getSession();
   const userId = user?.user?.sub;
-
-  // ログイン済みユーザーの場合のみクイズ結果を取得
-  const quizResult = userId ? await getQuizResult(userId, quiz.getId()) : null;
 
   return (
     <div>
@@ -116,13 +96,13 @@ export async function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: st
           </Alert>
         )}
 
+        {/* ユーザー依存コンテンツを Suspense で囲む */}
+        <Suspense fallback={<CircleHelp className="my-5 w-full" size={40}/>}>
+          <QuizIcon quiz={quiz} userId={userId} />
+        </Suspense>
+
         {/* クイズの問題文エリア */}
         <div className="w-full max-w-xl">
-          {quizResult?.Item?.is_correct === "true" ? (
-            <CircleCheckBig className="my-5 w-full text-emerald-500" size={40}/>
-          ) : (
-            <CircleHelp className="my-5 w-full" size={40}/>
-          )}
           <div className="text-center mb-5">
             {/* 問題文が文字列かHTMLかJSXかで分岐 */}
             {quiz.getQuestion() ? (
@@ -144,48 +124,14 @@ export async function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: st
         />
 
         {/* 参考文献 */}
-        <Accordion type="single" collapsible className="w-full max-w-lg px-4 py-10">
-          <AccordionItem value={`references`}>
-            <AccordionTrigger className="flex items-center">
-              <BookOpen className="w-4 h-4 mr-2" />
-              <span>参考文献</span>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="flex flex-col items-center w-full gap-2">
-                {referenceOgps.map((reference: Reference, index: number) => (
-                  <HoverCard key={`hover-${index}`}>
-                    <HoverCardTrigger asChild>
-                      <div className="w-fit">
-                        <Link href={reference.url} rel="noopener noreferrer" target="_blank"
-                        className="underline hover:text-primary text-muted-foreground">
-                          {reference.title}
-                        </Link>
-                      </div>
-                    </HoverCardTrigger>
-                    <HoverCardContent className="w-full">
-                      <div className="flex justify-center">
-                        <LinkCardWithoutLink url={reference.url} ogps={reference.ogps} />
-                      </div>
-                    </HoverCardContent>
-                  </HoverCard>
-                ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+        <Suspense fallback={<div>loading References...</div>}>
+          <QuizReferences references={references} />
+        </Suspense>
 
-        {/* ウィジット系 */}
-        <div className="flex flex-row w-full items-center pb-4">
-          <div className="flex-1" />
-          <div className="flex-1 flex justify-center">
-            <QuizLikeButton quizId={quiz.getId()} />
-          </div>
-          <div className="flex-1 flex justify-end">
-            <XShareButton
-              title={`${quiz.getTitle()} | DTLP Quiz`}
-              url={`https://datatech-learning-place.com${selfQuizUrl}`} />
-          </div>
-        </div>
+        {/* ウィジェット部分を Suspense でラップ */}
+        <Suspense>
+          <QuizWidgets quiz={quiz} selfQuizUrl={selfQuizUrl} />
+        </Suspense>
 
         {/* QuizNavigationコンポーネントを使用 */}
         <QuizNavigation previousQuizUrl={previousQuizUrl} nextQuizUrl={nextQuizUrl} folderId={folderId} />
