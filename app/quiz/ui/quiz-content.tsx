@@ -11,6 +11,41 @@ import { Suspense } from 'react';
 import { QuizReferences } from '@/app/quiz/ui/quiz-references';
 import { QuizMetadata } from "@/app/quiz/ui/quiz-metadata";
 
+// 新しいコンポーネントを追加
+async function UserDependentContent({ quiz }: { quiz: Quiz }) {
+  const user = await getSession();
+  const userId = user?.user?.sub;
+
+  return (
+    <>
+      <Suspense fallback={<CircleHelp className="my-5 w-full" size={40}/>}>
+        <QuizIcon quiz={quiz} userId={userId} />
+      </Suspense>
+
+      {/* クイズの問題文エリア */}
+      <div className="w-full max-w-xl">
+        <div className="text-center mb-5">
+          {/* 問題文が文字列かHTMLかJSXかで分岐 */}
+          {quiz.getQuestion() ? (
+            quiz.getQuestion()
+          ) : quiz.getQuestionJsx() ? (
+            quiz.getQuestionJsx()
+          ) : (
+            <p>問題文がありません</p>
+          )}
+        </div>
+      </div>
+
+      <QuizForm
+        options={quiz.getOptions()}
+        answers={quiz.getAnswers()}
+        quizId={quiz.getId()}
+        userId={userId}
+      />
+    </>
+  );
+}
+
 // QuizContents コンポーネント
 // クイズの内容をレンダリングする
 export async function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: string }) {
@@ -29,11 +64,6 @@ export async function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: st
   const nextQuizUrl = transformQuizIdToUrl(quiz.getNextQuizId());
 
   const references = quiz.getReferences();
-
-
-  // ユーザー情報を取得
-  const user = await getSession();
-  const userId = user?.user?.sub;
 
   return (
     <div>
@@ -61,32 +91,10 @@ export async function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: st
           </Alert>
         )}
 
-        {/* ユーザー依存コンテンツを Suspense で囲む */}
-        <Suspense fallback={<CircleHelp className="my-5 w-full" size={40}/>}>
-          <QuizIcon quiz={quiz} userId={userId} />
+        {/* ユーザー依存のコンテンツを Suspense でラップ */}
+        <Suspense fallback={<div>Loading user content...</div>}>
+          <UserDependentContent quiz={quiz} />
         </Suspense>
-
-        {/* クイズの問題文エリア */}
-        <div className="w-full max-w-xl">
-          <div className="text-center mb-5">
-            {/* 問題文が文字列かHTMLかJSXかで分岐 */}
-            {quiz.getQuestion() ? (
-              quiz.getQuestion()
-            ) : quiz.getQuestionJsx() ? (
-              quiz.getQuestionJsx()
-            ) : (
-              <p>問題文がありません</p>
-            )}
-          </div>
-        </div>
-
-        {/* クライアントサイドのフォームコンポーネント */}
-        <QuizForm
-          options={quiz.getOptions()}
-          answers={quiz.getAnswers()}
-          quizId={quiz.getId()}
-          userId={userId}
-        />
 
         {/* 参考文献 */}
         <Suspense fallback={<div>loading References...</div>}>
