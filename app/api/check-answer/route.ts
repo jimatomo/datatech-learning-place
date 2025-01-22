@@ -11,11 +11,15 @@ export async function POST(request: Request) {
   const data = await request.json();
   
   // ここで data が null でないことを確認
-  if (!data || !data.quizId || !data.selectedOptions) {
+  if (!data || !data.selectedOptions) {
     return new Response(JSON.stringify({ error: '無効なデータ' }), { status: 400 });
   }
 
-  const { quizId, selectedOptions, userId } = data;
+  const { quizId, selectedOptions } = data;
+
+  // ユーザーIDを取得
+  const session = await getSession();
+  const userId = session?.user?.sub;
   
   // DBやキャッシュから正解と解説を取得
   const quiz : Quiz = await getQuizById(quizId)

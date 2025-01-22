@@ -14,7 +14,6 @@ interface QuizResultProps {
   selectedOptions: number[];
   onReset: () => void;
   onMarkAnswer: (correctAnswers: number[]) => void;
-  userId: string | null | undefined;
 }
 
 export function QuizResult({
@@ -23,7 +22,6 @@ export function QuizResult({
   selectedOptions,
   onReset,
   onMarkAnswer,
-  userId
 }: QuizResultProps) {
   const [showResult, setShowResult] = useState(false)
   const [result, setResult] = useState<{
@@ -46,7 +44,6 @@ export function QuizResult({
         body: JSON.stringify({
           quizId,
           selectedOptions,
-          userId
         }),
       });
       const data = await response.json();
