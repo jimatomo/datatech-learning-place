@@ -56,7 +56,9 @@ export async function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: st
         )}
 
         {/* ユーザー依存のコンテンツを Suspense でラップ */}
-        <QuizIcon quizId={quiz.getId()}/>
+        <Suspense>
+          <QuizIcon quizId={quiz.getId()}/>
+        </Suspense>
 
         {/* クイズの問題文エリア */}
         <div className="w-full max-w-xl">
@@ -72,11 +74,14 @@ export async function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: st
           </div>
         </div>
 
-        <QuizForm
-          options={quiz.getOptions()}
-          answers={quiz.getAnswers()}
-          quizId={quiz.getId()}
-        />
+        {/* クイズの回答欄と解説部分 */}
+        <Suspense>
+          <QuizForm
+            options={quiz.getOptions()}
+            answers={quiz.getAnswers()}
+            quizId={quiz.getId()}
+          />
+        </Suspense>
 
         {/* 参考文献 */}
         <Suspense>
