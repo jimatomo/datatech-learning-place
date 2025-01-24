@@ -23,6 +23,11 @@ export async function GET(request: NextRequest) {
     const session = await getSession();
     const userId = session?.user?.sub;
 
+    // ユーザーがログインしていない場合は、空の結果を返して終了
+    if (!userId) {
+      return NextResponse.json({ Item: null });
+    }
+
     const command = new GetCommand({
       TableName: 'quiz_results',
       Key: {
