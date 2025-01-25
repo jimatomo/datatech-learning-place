@@ -52,6 +52,7 @@ jobs:
 
       - name: Copy static files from builder
         run: |
+          mkdir -p .next/static
           docker cp $(docker create --rm ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest):/app/.next/static .next/static
           
       - name: Upload static files to S3
