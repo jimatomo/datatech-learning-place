@@ -16,7 +16,7 @@ jobs:
       ECR_REPOSITORY: production/datatech-learing-place
       ECS_CLUSTER: dtlp_prod_common
       ECS_SERVICE: dtlp_prod_nextjs_app
-      S3_STATIC_ASSETS_URI: s3://dtlp-prod-static-assets/_next
+      S3_STATIC_ASSETS_URI: s3://dtlp-prod-static-assets/_next/
 
     steps:
       - name: Checkout code
@@ -57,7 +57,7 @@ jobs:
           
       - name: Upload static files to S3
         run: |
-          aws s3 cp .next/static/ ${{ env.S3_STATIC_ASSETS_URI }}/static/ --recursive
+          aws s3 cp .next/static/ ${{ env.S3_STATIC_ASSETS_URI }} --recursive
 
       - name: Delete dot environment file
         run: |
