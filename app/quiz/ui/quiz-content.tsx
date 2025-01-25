@@ -1,14 +1,29 @@
 import { Quiz, transformQuizIdToUrl } from "@/contents/quiz";
 import { AlertCircle } from "lucide-react"
-import { QuizForm } from "@/app/quiz/ui/quiz-content-form"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { QuizNavigation } from "@/app/quiz/ui/quiz-content-navigation"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { QuizIcon } from '@/app/quiz/ui/quiz-icon';
-import { QuizWidgets } from '@/app/quiz/ui/quiz-widgets';
+
 import { Suspense } from 'react';
-import { QuizReferences } from '@/app/quiz/ui/quiz-references';
 import { QuizMetadata } from "@/app/quiz/ui/quiz-metadata";
+import dynamic from 'next/dynamic';
+
+// 動的インポートを使用してコンポーネントを遅延ロード
+const QuizIcon = dynamic(() => import('@/app/quiz/ui/quiz-icon').then(mod => mod.QuizIcon), {
+  ssr: false // クライアントサイドのみでレンダリング
+});
+
+const QuizWidgets = dynamic(() => import('@/app/quiz/ui/quiz-widgets').then(mod => mod.QuizWidgets), {
+  ssr: false
+});
+
+const QuizForm = dynamic(() => import('@/app/quiz/ui/quiz-content-form').then(mod => mod.QuizForm), {
+  ssr: false
+});
+
+const QuizReferences = dynamic(() => import('@/app/quiz/ui/quiz-references').then(mod => mod.QuizReferences), {
+  ssr: false
+});
 
 // QuizContents コンポーネント
 // クイズの内容をレンダリングする
