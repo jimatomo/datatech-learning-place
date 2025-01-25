@@ -1,5 +1,6 @@
 import { Quiz, generateQuizId, generateFilePath } from "@/contents/quiz";
 import { Table, TableHeader, TableBody, TableRow, TableCell, TableHead } from "@/components/ui/table";
+import { CodeBlock } from "@/components/ui/code-block";
 
 export default function QuizContent() {
   const quiz = new Quiz({
@@ -35,7 +36,7 @@ export default function QuizContent() {
 function QuizQuestion() {
   return (
     <div>
-      <p>以下のサンプルテーブルがあります：</p>
+      <p>以下のサンプルテーブルがあります</p>
       <Table>
         <TableHeader>
           <TableRow>
@@ -84,21 +85,22 @@ function QuizQuestion() {
           </TableRow>
         </TableBody>
       </Table>
-      <p>次のSQLを実行した結果として正しいものを選択してください：</p>
+      <p className="py-4">次のSQLを実行した結果として正しいものを選択してください</p>
       <SQLCodeBlock />
     </div>
   );
 }
 
+const code = `SELECT name
+FROM sample_table
+QUALIFY ROW_NUMBER() OVER (PARTITION BY class ORDER BY score DESC) = 1;`;
+
 function SQLCodeBlock() {
   return (
-    <div className="rounded-md py-4 mx-2 text-left">
-      SELECT name <br />
-      FROM sample_table <br />
-      QUALIFY ROW_NUMBER() OVER (PARTITION BY class ORDER BY score DESC) = 1;
-    </div>
+    <CodeBlock code={code} showLineNumbers={false} />
   );
 }
+
 
 function QuizExplanation() {
   return (

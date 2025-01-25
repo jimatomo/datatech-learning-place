@@ -18,7 +18,7 @@ export default function QuizWeeklyContents() {
           </TableRow>
           <TableRow>
             <TableCell>火</TableCell>
-            <TableCell>Snowflake Latest Release</TableCell>
+            <TableCell>Snowflake Advanced</TableCell>
             <TableCell>新しめのSnowflakeの機能からの出題</TableCell>
           </TableRow>
           <TableRow>
