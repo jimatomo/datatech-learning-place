@@ -1,4 +1,4 @@
-name: Deploy to ECR
+name: Deploy container image to ECR and static files to S3
 
 on:
   push:
@@ -16,6 +16,7 @@ jobs:
       ECR_REPOSITORY: production/datatech-learing-place
       ECS_CLUSTER: dtlp_prod_common
       ECS_SERVICE: dtlp_prod_nextjs_app
+      S3_STATIC_ASSETS_URI: s3://dtlp-prod-static-assets/_next
 
     steps:
       - name: Checkout code
@@ -34,6 +35,15 @@ jobs:
       - name: Get dot environment file
         run: |
           aws s3 cp s3://dtlp-prod-secret-files/.env.production.local .env.production.local
+
+      - name: Build static files
+        run: |
+          npm ci
+          npm run build
+          
+      - name: Upload static files to S3
+        run: |
+          aws s3 cp .next/static/ ${{ env.S3_STATIC_ASSETS_URI }}/static/ --recursive
 
       - name: Login to Amazon ECR
         id: login-ecr

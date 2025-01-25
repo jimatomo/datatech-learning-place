@@ -15,10 +15,11 @@ RUN apt-get update && \
 ENV PORT=3000 NODE_ENV=production
 
 WORKDIR /app
-COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
+# staticファイルはS3から配信するため、コピー不要
+# COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
 COPY --from=builder /app/run.sh ./run.sh
 # for Auth0
 COPY --from=builder /app/.env.production.local ./.env.production.local
