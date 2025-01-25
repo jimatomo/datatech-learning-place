@@ -51,7 +51,7 @@ export function QuizCheckboxGroup({
   }
 
   return (
-    <div className="flex flex-col gap-3 w-full max-w-lg">
+    <div className="flex flex-col gap-3 w-full max-w-xl md:px-2">
       {randomizedOptions.map(([key, value]) => (
         <div
           key={`options-${key}`}

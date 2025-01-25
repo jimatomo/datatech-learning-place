@@ -23,7 +23,7 @@ export async function QuizReferences({ references }: { references: Reference[] }
   const referenceOgps = await getReferenceOgps(references);
 
   return (
-    <Accordion type="single" collapsible className="w-full max-w-lg px-4 py-10">
+    <Accordion type="single" collapsible className="w-full max-w-2xl px-4 py-10">
       <AccordionItem value={`references`}>
         <AccordionTrigger className="flex items-center">
           <BookOpen className="w-4 h-4 mr-2" />

@@ -75,7 +75,7 @@ export function QuizResult({
     <div className="w-full">
       <div className="w-full flex justify-center" id="rewardId">
         <Button 
-          className="w-full max-w-lg mx-4" 
+          className="w-full max-w-xl mx-2 md:mx-4" 
           onClick={handleShowResult}
           disabled={selectedOptions.length !== answer_count || isAnimating || showResult || isLoading}
         >

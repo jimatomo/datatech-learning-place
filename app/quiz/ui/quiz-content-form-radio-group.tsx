@@ -33,7 +33,7 @@ export function QuizRadioGroup({
   };
 
   return (
-    <RadioGroup value={selectedAnswer} onValueChange={handleSelect} className="flex flex-col gap-3 w-full max-w-lg">
+    <RadioGroup value={selectedAnswer} onValueChange={handleSelect} className="flex flex-col gap-3 w-full max-w-xl">
       {randomizedOptions.map(([key, value]) => (
         <div
           key={key}

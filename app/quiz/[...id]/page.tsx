@@ -11,7 +11,6 @@ import { ErrorDisplay } from '@/app/quiz/ui/error-display'
 import { getSession } from '@auth0/nextjs-auth0';
 import { UpperNavigation } from '@/app/quiz/ui/upper-navigation'
 
-
 export async function generateMetadata({ params }: { params: Promise<{ id: string[] }> }): Promise<Metadata> {
   const { id } = await params;
   const QuizModule = await import(`@/contents/quiz/${id.join("/")}.tsx`).catch(() => null);

@@ -34,7 +34,7 @@ export function QuizForm({ options, answers, quizId }: QuizFormProps) {
   };
 
   return (
-    <div role="form" className="w-full max-w-xl">
+    <div role="form" className="w-full max-w-2xl">
       <div className="py-4 flex flex-col items-center">
         {answers.length === 1 ? (
           <QuizRadioGroup 
@@ -54,7 +54,7 @@ export function QuizForm({ options, answers, quizId }: QuizFormProps) {
             correctAnswers={correctAnswers}
           />
         )}
-        <p className="text-sm text-muted-foreground my-4 w-full max-w-lg text-right">
+        <p className="text-sm text-muted-foreground my-4 w-full max-w-xl text-right md:px-2 mx-2">
           (select {answers.length} option{answers.length > 1 ? 's' : ''})
         </p>
       </div>

@@ -40,7 +40,7 @@ export async function QuizNavigation({ previousQuizUrl, nextQuizUrl, folderId }:
   }
 
   return (
-    <div className="w-full max-w-lg flex flex-row justify-between items-center">
+    <div className="w-full max-w-2xl flex flex-row justify-between items-center">
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>

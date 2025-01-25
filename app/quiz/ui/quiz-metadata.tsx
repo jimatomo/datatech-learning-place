@@ -16,7 +16,7 @@ export function QuizMetadata({ quiz, createdAt, updatedAt }: QuizMetadataProps) 
   const authorUrl = quiz.getAuthorUrl() ?? undefined;
 
   return (
-    <div className="flex flex-col w-full max-w-2xl gap-2 py-2">
+    <div className="flex flex-col w-full gap-2 py-2">
       {/* タグ */}
       <div className="flex flex-row flex-wrap gap-2">
         {quiz.getTags().map((tag, index) => (
@@ -27,13 +27,13 @@ export function QuizMetadata({ quiz, createdAt, updatedAt }: QuizMetadataProps) 
       </div>
 
       {/* 作成日と更新日 */}
-      <div className="w-full max-w-2xl flex flex-row justify-start text-sm text-muted-foreground">
+      <div className="w-full flex flex-row justify-start text-sm text-muted-foreground">
         <Calendar className="w-4 h-4 mr-1" />
         {createdAt}{createdAt !== updatedAt && ` (updated: ${updatedAt})`}
       </div>
 
       {/* 作成者とファイルパス */}
-      <div className="w-full max-w-2xl flex flex-row flex-wrap justify-start text-sm text-muted-foreground gap-2">
+      <div className="w-full flex flex-row flex-wrap justify-start text-sm text-muted-foreground gap-2">
         <span className="flex items-center">
           <User className="w-4 h-4 mr-1" />
           {authorUrl ? (

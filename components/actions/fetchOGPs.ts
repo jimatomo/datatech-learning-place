@@ -33,15 +33,15 @@ export const fetchOGPs = async (urlString: string) => {
   let image = $('meta[property="og:image"]').attr("content");
 
   // snowflake.comドメインまたはそのサブドメインの場合の特別処理
-  if (url.hostname.includes('snowflake.com')) {
-    // 相対パスの場合、完全なURLに変換
-    const snowflake_url = new URL('https://snowflake.com');
-    const snowflake_res = await fetch(snowflake_url, { cache: 'force-cache' });
-    const snowflake_text = await snowflake_res.text();
-    const $snowflake = load(snowflake_text);
-    const snowflake_image = $snowflake('meta[property="og:image"]').attr("content");
-    image = snowflake_image;
-  }
+  // if (url.hostname.includes('snowflake.com')) {
+  //   // 相対パスの場合、完全なURLに変換
+  //   const snowflake_url = new URL('https://snowflake.com');
+  //   const snowflake_res = await fetch(snowflake_url, { cache: 'force-cache' });
+  //   const snowflake_text = await snowflake_res.text();
+  //   const $snowflake = load(snowflake_text);
+  //   const snowflake_image = $snowflake('meta[property="og:image"]').attr("content");
+  //   image = snowflake_image;
+  // }
 
   // 画像URLの有効性チェック
   if (image) {
