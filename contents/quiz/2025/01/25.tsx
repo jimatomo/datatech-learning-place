@@ -32,9 +32,9 @@ export default function QuizContent() {
 
 function QuizQuestion() {
   return (
-    <div>
+    <div className="flex flex-col items-center">
       <p className="pb-4">下記のDMBOKピラミッドのフェーズの組み合わせとして正しいものを選択してください</p>
-      <Image src="https://datatech-learning-place.net/image/quiz/2025/dmbok-pyramid.png" alt="DMBOKピラミッド" width={500} height={500} />
+      <Image src="https://datatech-learning-place.net/image/quiz/2025/dmbok-pyramid.png" alt="DMBOKピラミッド" width={600} height={600} />
       <ul className="pt-2 text-xs text-left">
         <li>・フェーズA: データ統合と相互運用性、データセキュリティ、データストレージとオペレーション、データモデリングとデザイン</li>
         <li>・フェーズB: データガバナンス、データウェアハウジング・BI、参照データとマスターデータ、ドキュメントとコンテンツ</li>
