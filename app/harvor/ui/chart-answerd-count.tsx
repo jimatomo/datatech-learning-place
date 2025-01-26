@@ -117,7 +117,7 @@ export function ChartAnswerdCount({
           </div>
         ) : correctRate > 0 ? (
           <div className="flex items-center gap-2 font-medium leading-none text-amber-600 dark:text-amber-300">
-            ⭐{correctRate}%もチャレンジしました！⭐
+            ⭐{correctRate}%も正答しました！⭐
           </div>
         ) : (
           <div className="flex items-center gap-2 font-medium leading-none text-amber-600 dark:text-amber-300">

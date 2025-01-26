@@ -5,6 +5,16 @@ import { Label } from "@/components/ui/label"
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 
+// 並べ替えの処理
+function shuffle<T>(array: T[]): T[] {
+  const copiedArray = [...array];
+  for (let i = copiedArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1)); // 0 から i のランダムなインデックス
+    [copiedArray[i], copiedArray[j]] = [copiedArray[j], copiedArray[i]]; // 要素を入れ替えます
+  }
+  return copiedArray;
+}
+
 interface QuizCheckboxGroupProps {
   options: { [key: number]: string };
   maxSelections: number;
@@ -27,9 +37,10 @@ export function QuizCheckboxGroup({
   // ランダムに並び替えた選択肢を管理
   const [randomizedOptions, setRandomizedOptions] = useState<[string, string][]>([])
 
-  // 選択肢をランダムに並び替える処理（0~1の乱数を生成して、0.5より小さい場合は前に、大きい場合は後ろに並び替える）
+  // 選択肢をランダムに並び替える処理
   useEffect(() => {
-    setRandomizedOptions(Object.entries(options).sort(() => Math.random() - 0.5))
+    const entries = Object.entries(options);
+    setRandomizedOptions(shuffle(entries));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tryKey])
 
