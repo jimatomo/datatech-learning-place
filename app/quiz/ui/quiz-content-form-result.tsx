@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { useReward } from 'react-rewards';
 import { Quiz } from '@/contents/quiz';
-import { getQuizById } from '@/app/quiz/lib/get-quid-by-id';
+import { getQuizById } from '@/app/quiz/lib/get-quiz-by-id';
 import { Loader2 } from "lucide-react"
 
 interface QuizResultProps {

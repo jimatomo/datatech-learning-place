@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getQuizById } from '@/app/quiz/lib/get-quid-by-id'
+import { getQuizById } from '@/app/quiz/lib/get-quiz-by-id'
 import { Quiz } from '@/contents/quiz'
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";

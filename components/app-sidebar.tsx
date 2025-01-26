@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation"
 import {
   ScrollText,
   Book,
+  Flag,
   User2,
   ChevronUp,
   CreditCard,
@@ -51,6 +52,11 @@ const items = [
     title: "Text",
     url: "/text",
     icon: Book,
+  },
+  {
+    title: "Harvor",
+    url: "/harvor",
+    icon: Flag,
   },
 ]
 
