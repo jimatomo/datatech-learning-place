@@ -1,7 +1,10 @@
 export default function TextContents() {
   return (
     <div className="w-full">
-      <p>01ページです。工事中です</p>
+      <h2 className="text-lg font-bold pb-4">第1章 このテキストで学ぶこと</h2>
+      <p>
+        工事中
+      </p>
     </div>
   );
 }
