@@ -45,12 +45,12 @@ export function ChartAnswerdCount({
   const correctRate = Math.round(answered_count / totalQuizCount * 100)
 
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col max-w-[400px]">
       <CardHeader className="items-center pb-0">
         <CardTitle>Quiz Progress</CardTitle>
         <CardDescription>正答済みクイズの数</CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-1 items-center pb-0">
+      <CardContent className="flex items-center justify-center pb-0">
         <ChartContainer
           config={chartConfig}
           className="mx-auto aspect-square w-full max-w-[300px]"

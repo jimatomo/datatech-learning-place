@@ -17,7 +17,7 @@ export default async function QuizDashboard() {
 
   return (
     <div>
-      <div className="flex flex-col gap-4 md:flex-row pt-2 pb-4">
+      <div className="flex flex-col gap-4 pt-2 pb-4">
         <ChartAnswerdCount
           answered_count={Number(correctCount)}
         not_answered_count={Number(quizCount - correctCount)}
