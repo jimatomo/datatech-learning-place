@@ -19,7 +19,7 @@ export default function QuizWeeklyContents() {
           <TableRow>
             <TableCell>火</TableCell>
             <TableCell>Snowflake Advanced</TableCell>
-            <TableCell>新しめのSnowflakeの機能からの出題</TableCell>
+            <TableCell>ちょっと踏み込んだSnowflakeの機能からの出題</TableCell>
           </TableRow>
           <TableRow>
             <TableCell>水</TableCell>
@@ -34,7 +34,7 @@ export default function QuizWeeklyContents() {
           <TableRow>
             <TableCell>金</TableCell>
             <TableCell>Data Application</TableCell>
-            <TableCell>Streamlit, Pythonなど整えたデータを活用するために必要な知識を鍛える</TableCell>
+            <TableCell>Streamlit, Pythonなど蓄積したデータを利活用するために必要な知識を鍛える</TableCell>
           </TableRow>
           <TableRow>
             <TableCell>土</TableCell>
