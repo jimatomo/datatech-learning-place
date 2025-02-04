@@ -4,7 +4,7 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Copy, CopyCheck, File } from 'lucide-react';
 import { useState } from 'react';
 
-export type HighlightType = 'add' | 'remove';
+export type HighlightType = 'add' | 'remove' | 'none';
 
 interface CodeBlockProps {
   code: string;
@@ -74,7 +74,7 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
         )}
       </button>
       <ScrollArea type="scroll"
-        className={`bg-gray-100 dark:bg-gray-950 p-2 w-full overflow-y-auto border border-gray-300 dark:border-gray-700 ${
+        className={`bg-gray-100 dark:bg-gray-950 p-2 w-full overflow-auto border border-gray-300 dark:border-gray-700 ${
           title ? 'rounded-b-md border-t-0' : 'rounded-md'
         }`}
       >
@@ -92,9 +92,9 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
                   key={lineNumber}
                   className={`flex ${
                     highlight
-                      ? highlight.type === 'add'
-                        ? 'bg-green-100/50 dark:bg-green-900/50'
-                        : 'bg-red-100/50 dark:bg-red-900/50'
+                      ? highlight.type === 'remove'
+                        ? 'bg-red-100/50 dark:bg-red-900/50'
+                        : 'bg-green-100/50 dark:bg-green-900/50'
                       : ''
                   }`}
                 >
@@ -104,15 +104,16 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
                     </span>
                   )}
                   <span className="select-none w-4 inline-block text-gray-400 dark:text-gray-500 flex-shrink-0">
-                    {highlight ? (highlight.type === 'add' ? '+' : '-') : ' '}
+                    {highlight ? (highlight.type === 'add' ? '+' : highlight.type === 'remove' ? '-' : ' ') : ' '}
                   </span>
-                  <span>{line}</span>
+                  <span className="whitespace-pre">{line}</span>
                 </div>
               );
             })}
           </code>
         </div>
         <ScrollBar orientation="vertical" />
+        <ScrollBar orientation="horizontal" />
       </ScrollArea>
     </div>
   );
