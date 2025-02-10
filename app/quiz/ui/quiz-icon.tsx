@@ -29,7 +29,7 @@ export function QuizIcon({ quizId }: { quizId: string }) {
 
   return (
     <>
-      {isCorrect ? (
+      {isCorrect && isCorrect === true ? (
         <CircleCheckBig className="my-5 w-full text-emerald-500" size={40}/>
       ) : (
         <CircleHelp className="my-5 w-full" size={40}/>
