@@ -94,9 +94,9 @@ export function AppSidebar() {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem className="flex items-center justify-between">
-            <Link href="/" className="flex gap-2 items-center w-full" onClick={handleLinkClick}>
-              <Image src="/favicon.ico" alt="Icon" width={30} height={30} className="flex-shrink-0" />
-              <span className="text-sm font-bold group-data-[collapsible=icon]:hidden truncate">
+            <Link href="/" className="flex gap-2 items-center w-full pl-1" onClick={handleLinkClick}>
+              <Image src="/favicon.ico" alt="Icon" width={25} height={25} className="flex-shrink-0" />
+              <span className="text-xs font-bold group-data-[collapsible=icon]:hidden truncate">
                 Datatech Learning Place
               </span>
             </Link>
