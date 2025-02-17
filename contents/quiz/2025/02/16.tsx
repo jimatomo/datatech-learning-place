@@ -8,8 +8,8 @@ export default function QuizContent() {
     author: "jimatomo",
     author_url: "https://github.com/jimatomo",
     tags: ["AI", "LLM"],
-    created_at: new Date("2025-02-09"),
-    updated_at: new Date("2025-02-09"),
+    created_at: new Date("2025-02-16"),
+    updated_at: new Date("2025-02-16"),
 
     // ----- quiz -----
     title: "AI/LLMの精度が向上した様々な技術",
