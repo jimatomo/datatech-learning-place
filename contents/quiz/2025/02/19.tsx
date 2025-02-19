@@ -51,7 +51,7 @@ function QuizQuestion() {
     <div>
       <p className="pb-4">
         フィボナッチ数列（1, 1, 2, 3, 5, 8, 13, 21, 34, 55, ...）の最初の10項を生成するための再帰的CTEとして、
-        正しいSQLを選択してください。
+        正しいSQLを選択してください。以下はサンプルです。
       </p>
       <CodeBlock code={sql_code} showLineNumbers={true} />
       <p className="pb-4 pt-4">
