@@ -1,5 +1,12 @@
 import { Badge } from "@/components/ui/badge";
-import { Calendar, User, File } from "lucide-react";
+import { Calendar, User, File, ChartPie } from "lucide-react";
+import { getInitialCorrectRate } from "@/app/quiz/lib/get-initial-correct-rate";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface QuizMetadataProps {
   quiz: {
@@ -7,13 +14,29 @@ interface QuizMetadataProps {
     getAuthorUrl: () => string | null;
     getAuthor: () => string;
     getFilePath: () => string;
+    getId: () => string;
   };
   createdAt: string;
   updatedAt: string;
 }
 
-export function QuizMetadata({ quiz, createdAt, updatedAt }: QuizMetadataProps) {
+export async function QuizMetadata({ quiz, createdAt, updatedAt }: QuizMetadataProps) {
   const authorUrl = quiz.getAuthorUrl() ?? undefined;
+  const initialCorrectRate = await getInitialCorrectRate(quiz.getId());
+
+  const firstCorrectRate = Math.round((initialCorrectRate?.Item?.first_correct_rate ?? 0) * 1000) / 10;
+  const answeredCount = initialCorrectRate?.Item?.answered_count;
+  const updateAt = initialCorrectRate?.Item?.update_at ? 
+    new Date(initialCorrectRate.Item.update_at)
+      .toLocaleString('ja-JP', { 
+        timeZone: 'Asia/Tokyo',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+      .replace(/\//g, '.') : undefined;
 
   return (
     <div className="flex flex-col w-full gap-2 py-2">
@@ -50,6 +73,25 @@ export function QuizMetadata({ quiz, createdAt, updatedAt }: QuizMetadataProps) 
             {quiz.getFilePath()}
           </a>
         </span>
+      </div>
+
+      {/* 初回正答率 */}
+      <div className="w-full flex flex-row flex-wrap justify-start text-sm text-muted-foreground gap-2">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <span className="flex items-center">
+                <ChartPie className="w-4 h-4 mr-1 cursor-default" />
+                <span className="cursor-default">
+                  {firstCorrectRate ? `${firstCorrectRate}% (${answeredCount}) ${updateAt}` : 'データがまだありません'}
+                </span>
+              </span>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>初回正答率% (回答者数) 集計日時</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
     </div>
   );
