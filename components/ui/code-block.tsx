@@ -106,7 +106,7 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
                   <span className="select-none w-4 inline-block text-gray-400 dark:text-gray-500 flex-shrink-0">
                     {highlight ? (highlight.type === 'add' ? '+' : highlight.type === 'remove' ? '-' : ' ') : ' '}
                   </span>
-                  <span className="whitespace-pre">{line}</span>
+                  <span className="whitespace-pre">{line || ' '}</span>
                 </div>
               );
             })}
