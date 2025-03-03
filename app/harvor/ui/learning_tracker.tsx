@@ -1,7 +1,6 @@
 import { queryLearningTrackers } from '@/app/harvor/lib/query-learning-trackers';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import * as React from "react";
-import { cn } from "@/lib/utils";
 
 // 活動データの型定義
 type Activity = {
@@ -141,15 +140,15 @@ export default async function LearningTracker() {
   });
   
   return (
-    <div className="p-2 dark:bg-gray-950 dark:text-white border-2 max-w-[52rem]">
+    <div className="p-2 dark:bg-gray-950 dark:text-white border-2 lg:max-w-[52rem] md:max-w-[40rem] max-w-[27rem]">
       
       {/* スクロール可能なコンテナ */}
-      <ScrollArea className={cn("w-full", "[&_[data-orientation=vertical]]:hidden [&_[data-orientation=horizontal]]:opacity-100")}>
-        <div className="min-w-max px-2 pb-6">
+      <ScrollArea className="w-full">
+        <div className="w-full px-2 pb-6">
           <div className="flex mb-1">
-            <div className="w-8"></div>
+            <div className="w-8 flex-shrink-0"></div>
             {weekKeys.map(week => (
-              <div key={week} className="w-3 mx-[1px] text-xs text-center">
+              <div key={week} className="w-3 mx-[1px] text-xs text-center flex-shrink-0">
                 {monthLabels[week]}
               </div>
             ))}
@@ -157,8 +156,8 @@ export default async function LearningTracker() {
           
           <div>
             {dayLabels.map((day, dayIndex) => (
-              <div key={day} className="flex items-center mb-0">
-                <div className="w-8 text-xs text-right pr-2">{displayDays[dayIndex] ? day : ''}</div>
+              <div key={day} className="flex items-center min-w-fit">
+                <div className="w-8 text-xs text-right pr-2 flex-shrink-0">{displayDays[dayIndex] ? day : ''}</div>
                 {weekKeys.map(week => {
                   const dayActivities = weeklyActivities[week].find(
                     a => getDayOfWeek(a.d) === dayIndex
@@ -167,7 +166,7 @@ export default async function LearningTracker() {
                   return (
                     <div 
                       key={`${week}-${dayIndex}`} 
-                      className={`w-3 h-3 mx-[1px] rounded-[3px] ${dayActivities ? getColorIntensity(dayActivities.a) : 'bg-gray-50 dark:bg-gray-900'}`}
+                      className={`w-3 h-3 mx-[1px] rounded-[3px] flex-shrink-0 ${dayActivities ? getColorIntensity(dayActivities.a) : 'bg-gray-50 dark:bg-gray-900'}`}
                       title={dayActivities ? `${dayActivities.d}: ${dayActivities.c}/${dayActivities.a} 正解` : ''}
                     />
                   );

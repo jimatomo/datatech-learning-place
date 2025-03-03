@@ -3,7 +3,7 @@ import LearningTracker from '@/app/harvor/ui/learning_tracker';
 
 export default async function Harvor() {
   return (
-    <div>
+    <div className="w-full">
       <h2 className="scroll-m-20 pb-2 text-lg font-bold tracking-tight">
         学習状況ダッシュボード
       </h2>
