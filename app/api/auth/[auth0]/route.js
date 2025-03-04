@@ -1,4 +1,37 @@
-// app/api/auth/[auth0]/route.js
-import { handleAuth } from '@auth0/nextjs-auth0';
+import { NextResponse } from 'next/server';
+import { handleAuth, handleLogin, handleCallback } from '@auth0/nextjs-auth0';
 
-export const GET = handleAuth();
+// Auth0のハンドラーを設定
+const handler = handleAuth({
+  login: async (req) => {
+    // URLSearchParamsを使用してクエリパラメータを取得
+    const url = new URL(req.url);
+    const returnTo = url.searchParams.get('returnTo') || '/harvor';
+    
+    // handleLoginを使用してログイン処理を行い、リダイレクト先を指定
+    return handleLogin(req, {
+      returnTo
+    });
+  },
+  callback: async (req) => {
+    // コールバック処理を行い、リダイレクト先を指定
+    const res = await handleCallback(req, {
+      redirectUri: `${process.env.AUTH0_BASE_URL}/api/auth/callback/auth0`,
+      afterCallback: (req, session) => {
+        return session;
+      }
+    });
+    
+    // リダイレクト先を/harvorに設定
+    if (res instanceof NextResponse) {
+      res.headers.set('Location', '/harvor');
+    }
+    
+    return res;
+  }
+});
+
+// GETリクエストのハンドラーを設定
+export const GET = handler;
+// POSTリクエストのハンドラーも設定（必要に応じて）
+export const POST = handler; 
