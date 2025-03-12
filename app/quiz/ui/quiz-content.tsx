@@ -40,7 +40,7 @@ export async function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: st
       </h2>
 
       {/* メタデータエリア */}
-      <ScrollArea className="w-full [&>[data-radix-scroll-area-viewport]]:max-h-[130px] max-w-2xl">
+      <ScrollArea className="w-full [&>[data-radix-scroll-area-viewport]]:max-h-[150px] max-w-2xl">
         <QuizMetadata quiz={quiz} createdAt={createdAt} updatedAt={updatedAt} />
       </ScrollArea>
 
