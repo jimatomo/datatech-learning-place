@@ -9,7 +9,6 @@ services:
     volumes:
       - ../:/workspace/app:cached
       - ~/.aws/:/home/vscode/.aws:cached
-      - ~/.gitconfig:/home/vscode/.gitconfig:cached
     tty: true
 
 volumes:
