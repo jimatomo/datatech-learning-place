@@ -9,10 +9,19 @@ RUN apt-get update \
 && rm -rf /var/lib/apt/lists/*
 
 # Install aws cli
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
-&& unzip awscliv2.zip \
-&& ./aws/install \
-&& rm -rf awscliv2.zip aws
+RUN case "$(uname -m)" in \
+    x86_64) \
+        ARCH_ZIP="awscli-exe-linux-x86_64.zip" ;; \
+    aarch64) \
+        ARCH_ZIP="awscli-exe-linux-aarch64.zip" ;; \
+    *) \
+        echo "Unsupported architecture: $(uname -m)" >&2; \
+        exit 1 ;; \
+    esac && \
+    curl "https://awscli.amazonaws.com/${ARCH_ZIP}" -o "awscliv2.zip" \
+    && unzip awscliv2.zip \
+    && ./aws/install \
+    && rm -rf awscliv2.zip aws
 
 # Switch to node user
 RUN chown -R node:node ./
