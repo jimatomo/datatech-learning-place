@@ -71,6 +71,11 @@ const footerItems = [
     url: "/global/billing",
     icon: CreditCard,
   },
+  {
+    title: "Terms",
+    url: "/global/terms",
+    icon: Book,
+  },
 ]
 
 

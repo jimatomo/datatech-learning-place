@@ -140,7 +140,7 @@ export default async function LearningTracker() {
   });
   
   return (
-    <div className="p-2 dark:bg-gray-950 dark:text-white border-2 lg:max-w-[52rem] md:max-w-[40rem] max-w-[27rem]">
+    <div className="p-2 dark:bg-gray-950 dark:text-white border-2 max-w-[56rem]">
       
       {/* スクロール可能なコンテナ */}
       <ScrollArea className="w-full">

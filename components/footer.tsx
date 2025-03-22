@@ -6,6 +6,10 @@ export default function Footer() {
       <div className="flex flex-col sm:flex-row items-center justify-between text-sm text-muted-foreground">
         <p className="mb-4 sm:mb-0">Datatech Learning Place</p>
         <div className="flex items-center gap-2">
+          <Link href="/global/terms" className="hover:underline">
+            <p>利用規約</p>
+          </Link>
+          <p>|</p>
           <Link href="/global/contact" className="hover:underline">
             <p>お問い合わせ</p>
           </Link>

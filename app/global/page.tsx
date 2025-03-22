@@ -1,6 +1,6 @@
 import { Metadata } from "next"
 import Link from "next/link"
-import { User2, CreditCard, MessageCircle } from "lucide-react"
+import { User2, CreditCard, MessageCircle, Book } from "lucide-react"
 
 export const metadata: Metadata = {
   title: "DTLP Global",
@@ -27,6 +27,12 @@ export default function GlobalPage() {
         GlobalPage
       </h1>
       <div className="flex flex-col gap-2 mt-4 px-2">
+        <Link href="/global/terms" className="hover:underline w-fit">
+          <div className="flex flex-row items-center text-lg">
+            <Book className="w-4 h-4 mr-2" />
+            <p>利用規約・プライバシーポリシー</p>
+          </div>
+        </Link>
         <Link href="/global/account" className="hover:underline w-fit">
           <div className="flex flex-row items-center text-lg">
             <User2 className="w-4 h-4 mr-2" />
