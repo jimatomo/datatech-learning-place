@@ -1,0 +1,48 @@
+---
+description: 
+globs: contents/quiz/**
+alwaysApply: false
+---
+
+# Your rule content
+
+- You can @ files here
+- You can use markdown but dont have to
+
+# 作成時のガイドライン
+
+- タグ:
+  - データ技術関連のキーワードを3つ程度指定する
+  - 末尾に曜日別のタグを付与する
+    - 月曜日: Snowflake Basic
+    - 火曜日: Snowflake Advanced
+    - 水曜日: Data Modeling
+    - 木曜日: Infrastructure
+    - 金曜日: Data Application
+    - 土曜日: Data Management
+    - 日曜日: Datatech News
+- 問題文: 明確かつ簡潔に記述する。必要に応じてコードや図を含めることができる
+- 選択肢:
+  - 一貫した文体と長さで作成する
+  - 複数選択の場合は問題文に「全て」と明記する
+  - 間違っているものを選択させる場合は文字色を赤にする
+- 解説:
+  - 正解の理由を詳しく説明する
+  - 誤答についても簡潔に触れることが望ましい
+  - コード例を用いる場合が効果的な場合は利用すると良い
+- 参考資料: 公式ドキュメントや信頼できる情報源を引用する
+- コーディングスタイル
+  - TSXファイル内のコンポーネント（QuizQuestion, QuizExplanation）はクラスではなく関数コンポーネントで実装する
+  - コードブロックを利用する際は「import { CodeBlock } from "@/components/ui/code-block";」でimportをして利用すること
+  - Tailwind CSSを使用してスタイリングする
+  - 複雑なレイアウトには<div>要素をネストして使用する
+  - リスト項目には<ul>と<li>を使用する（className="list-disc pl-4"をulに適用すること）
+  - paddingを適切に設定する
+  - 強調したいテキストには<strong>タグや緑色の文字を使用する
+- レビュープロセス
+  - 正確性: 内容が技術的に正確であること
+  - 明確性: 問題と選択肢が明確に理解できること
+  - 難易度: 適切な難易度レベルであること
+  - 参考資料: 信頼性の高い参考資料が提供されていること
+- 更新ガイドライン
+  - クイズの内容を更新する場合は必ずupdated_atの日付を変更する
