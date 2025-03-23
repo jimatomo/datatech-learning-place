@@ -4,19 +4,39 @@ import { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Datatech Learning Place",
-  description: "データエンジニアのための学び舎です。毎日更新されるクイズやコラム、テキストを通じてデータエンジニアとしての基礎を鍛えましょう。",
+  description: "データエンジニアのための学習サイトです。毎日更新されるクイズやコラム、テキストを通じてデータエンジニアとしての基礎を鍛えましょう。",
+  keywords: "データエンジニア, データエンジニアリング, 学習, クイズ, テキスト, データ基盤, データアナリティクス",
+  authors: [{ name: "Datatech Learning Place Team" }],
+  creator: "Datatech Learning Place",
+  robots: "index, follow",
+  metadataBase: new URL("https://datatech-learning-place.net"),
+  alternates: {
+    canonical: "https://datatech-learning-place.net",
+  },
+  icons: {
+    icon: "/favicon.ico"
+  },
   openGraph: {
     title: "Datatech Learning Place",
     description: "データエンジニアのための学び舎です。毎日更新されるクイズやコラム、テキストを通じてデータエンジニアとしての基礎を鍛えましょう。",
     url: "https://datatech-learning-place.net",
     siteName: "Datatech Learning Place",
+    locale: "ja_JP",
+    type: "website",
     images: [
       {
         url: "https://datatech-learning-place.net/logo/logo-with-title.png",
         width: 820,
         height: 820,
+        alt: "Datatech Learning Place ロゴ",
       },
     ],
+  },
+  twitter: {
+    card: "summary",
+    title: "Datatech Learning Place",
+    description: "データエンジニアのための学び舎です。毎日更新されるクイズやコラム、テキストを通じてデータエンジニアとしての基礎を鍛えましょう。",
+    images: ["https://datatech-learning-place.net/logo/logo-with-title.png"],
   },
 }
 

@@ -11,18 +11,40 @@ import QuizWeeklyContents from '@/app/quiz/ui/quiz-weekly-contents'
 export const metadata: Metadata = {
   title: "DTLP Quiz",
   description: "Datatech Learning PlaceのQuizページです。毎日更新されるクイズを通じてデータエンジニアとしての基礎を鍛えましょう。",
+  keywords: ["データエンジニア", "クイズ", "学習", "データ基盤", "DTLP"],
+  authors: [{ name: "Datatech Learning Place Team" }],
+  creator: "Datatech Learning Place",
+  robots: {
+    index: true,
+    follow: true,
+  },
+  alternates: {
+    canonical: "https://datatech-learning-place.net/quiz",
+  },
   openGraph: {
     title: "DTLP Quiz",
     description: "Datatech Learning PlaceのQuizページです。毎日更新されるクイズを通じてデータエンジニアとしての基礎を鍛えましょう。",
     url: "https://datatech-learning-place.net/quiz",
     siteName: "Datatech Learning Place",
+    type: "website",
+    locale: "ja_JP",
     images: [
       {
         url: "https://datatech-learning-place.net/logo/logo-with-title.png",
         width: 820,
         height: 820,
+        alt: "Datatech Learning Place Logo",
       },
     ],
+  },
+  twitter: {
+    card: "summary",
+    title: "DTLP Quiz",
+    description: "Datatech Learning PlaceのQuizページです。毎日更新されるクイズを通じてデータエンジニアとしての基礎を鍛えましょう。",
+    images: ["https://datatech-learning-place.net/logo/logo-with-title.png"],
+  },
+  icons: {
+    icon: "/favicon.ico"
   },
 }
 

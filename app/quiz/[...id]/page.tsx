@@ -21,6 +21,18 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     return {
       title: quiz.getTitle() + " | DTLP Quiz",
       description: quiz.getCreatedAt().toLocaleDateString('ja-JP') + "のQuiz。" + quiz.getTags().join(", "),
+      authors: [{ name: "Datatech Learning Place Team" }],
+      creator: "Datatech Learning Place",
+      robots: {
+        index: true,
+        follow: true,
+      },
+      alternates: {
+        canonical: "https://datatech-learning-place.net/quiz/" + id.join("/"),
+      },
+      icons: {
+        icon: "/favicon.ico"
+      },
       openGraph: {
         title: quiz.getTitle() + " | DTLP Quiz",
         description: quiz.getCreatedAt().toLocaleDateString('ja-JP') + "のQuiz。Tags:" + quiz.getTags().join(", "),
@@ -34,6 +46,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
             height: 820,
           },
         ],
+      },
+      twitter: {
+        card: "summary",
+        title: quiz.getTitle() + " | DTLP Quiz",
+        description: quiz.getCreatedAt().toLocaleDateString('ja-JP') + "のQuiz。Tags:" + quiz.getTags().join(", "),
+        images: ["https://datatech-learning-place.net/logo/logo-with-title.png"],
       },
     };
   };
