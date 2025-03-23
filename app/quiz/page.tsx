@@ -38,10 +38,7 @@ export const metadata: Metadata = {
     ],
   },
   twitter: {
-    card: "summary",
-    title: "DTLP Quiz",
-    description: "Datatech Learning PlaceのQuizページです。毎日更新されるクイズを通じてデータエンジニアとしての基礎を鍛えましょう。",
-    images: ["https://datatech-learning-place.net/logo/logo-with-title.png"],
+    card: "summary"
   },
   icons: {
     icon: "/favicon.ico"

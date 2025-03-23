@@ -7,7 +7,7 @@ export default function QuizContent() {
     file_path: generateFilePath(import.meta.url),
     author: "jimatomo",
     author_url: "https://github.com/jimatomo",
-    tags: ["Git", "GitHub Flow", "GitLab Flow"],
+    tags: ["Git", "GitHub Flow", "GitLab Flow", "Infrastructure"],
     created_at: new Date("2025-02-13"),
     updated_at: new Date("2025-02-13"),
 

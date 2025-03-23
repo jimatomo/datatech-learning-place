@@ -22,7 +22,14 @@ export default function QuizFileListTagFiltered({
 }) {
   // タグのリストに追加する値（将来的にグローバルに管理したい）
   const tags = [
-    'Snowflake', 'dbt', 'SQL', 'AWS', 'Terraform', 'Analytics', 'Engineering', 'AI'
+    'Snowflake',
+    'Snowflake Basic',
+    'Snowflake Advanced',
+    'Data Modeling',
+    'Infrastructure',
+    'Data Application',
+    'Data Management',
+    'Datatech News',
   ]
 
   // 選択されたタグ
@@ -42,13 +49,11 @@ export default function QuizFileListTagFiltered({
     )
   }, [selectedTag, quizPathInfos])
 
-  // TODO: フィルターする期間を設定できるようにする
-
   return (
     <div>
       <div className="flex flex-row items-center justify-start mb-4 mx-2 gap-2">
         <Select onValueChange={(value) => setSelectedTag(value)}>
-          <SelectTrigger className="w-[140px]">
+          <SelectTrigger className="w-[200px]">
             <SelectValue placeholder="Select a tag"/>
         </SelectTrigger>
         <SelectContent>

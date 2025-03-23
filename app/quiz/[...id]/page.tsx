@@ -48,10 +48,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
         ],
       },
       twitter: {
-        card: "summary",
-        title: quiz.getTitle() + " | DTLP Quiz",
-        description: quiz.getCreatedAt().toLocaleDateString('ja-JP') + "のQuiz。Tags:" + quiz.getTags().join(", "),
-        images: ["https://datatech-learning-place.net/logo/logo-with-title.png"],
+        card: "summary"
       },
     };
   };

@@ -33,10 +33,7 @@ export const metadata: Metadata = {
     ],
   },
   twitter: {
-    card: "summary",
-    title: "Datatech Learning Place",
-    description: "データエンジニアのための学び舎です。毎日更新されるクイズやコラム、テキストを通じてデータエンジニアとしての基礎を鍛えましょう。",
-    images: ["https://datatech-learning-place.net/logo/logo-with-title.png"],
+    card: "summary"
   },
 }
 

@@ -7,7 +7,7 @@ export default function QuizContent() {
     file_path: generateFilePath(import.meta.url),
     author: "jimatomo",
     author_url: "https://github.com/jimatomo",
-    tags: ["Python", "pandas", "データ分析"],
+    tags: ["Python", "pandas", "Data Application"],
     created_at: new Date("2025-01-31"),
     updated_at: new Date("2025-01-31"),
 
