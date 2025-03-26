@@ -13,7 +13,7 @@ export function QuizWidgets({ quiz, selfQuizUrl }: { quiz: Quiz, selfQuizUrl: st
       <div className="flex-1 flex justify-end">
         <XShareButton
           title={`${quiz.getTitle()} | DTLP Quiz`}
-          url={`https://datatech-learning-place.com${selfQuizUrl}`} />
+          url={`https://datatech-learning-place.net${selfQuizUrl}`} />
       </div>
     </div>
   );
