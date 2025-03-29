@@ -26,8 +26,7 @@ export default function QuizContent() {
     answers: [5],
     explanation_jsx: <QuizExplanation />,
     references: [
-      { title: "データ指向アプリケーションデザイン", url: "https://www.oreilly.co.jp/books/9784873118703/" },
-      { title: "NoSQLデータベース入門", url: "https://www.amazon.co.jp/NoSQL%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9%E5%85%A5%E9%96%80-%E6%96%B0%E3%81%97%E3%81%84%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9%E3%81%AE%E5%9F%BA%E7%A4%8E%E7%9F%A5%E8%AD%98-%E6%A5%A0%E7%94%B0-%E8%82%B2%E5%AD%90/dp/4797380357" },
+      { title: "データマネジメント知識体系ガイド 第二版", url: "https://www.amazon.co.jp/%E3%83%87%E3%83%BC%E3%82%BF%E3%83%9E%E3%83%8D%E3%82%B8%E3%83%A1%E3%83%B3%E3%83%88%E7%9F%A5%E8%AD%98%E4%BD%93%E7%B3%BB%E3%82%AC%E3%82%A4%E3%83%89-%E7%AC%AC%E4%BA%8C%E7%89%88-DAMA-International/dp/4296100491" },
     ],
   });
   return quiz;
