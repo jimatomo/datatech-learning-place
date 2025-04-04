@@ -42,15 +42,15 @@ function groupByWeek(activities: Activity[]): Record<string, Activity[]> {
   // 日付でソート
   const sortedActivities = [...activities].sort((a, b) => new Date(a.d).getTime() - new Date(b.d).getTime());
   
-  // 過去1年分のデータを生成（存在しない日付は空データで埋める）
+  // 過去3ヶ月分のデータを生成（存在しない日付は空データで埋める）
   const today = new Date();
   
   // 今月の1日を取得
   const currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
   
-  // 1年前の同じ月の1日を取得
-  const oneYearAgo = new Date(currentMonthStart);
-  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+  // 6ヶ月前の同じ月の1日を取得
+  const sixMonthsAgo = new Date(currentMonthStart);
+  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
   
   // 日付ごとのアクティビティをマップに変換
   const activityMap: Record<string, Activity> = {};
@@ -58,9 +58,9 @@ function groupByWeek(activities: Activity[]): Record<string, Activity[]> {
     activityMap[activity.d] = activity;
   });
   
-  // 過去1年分の日付を生成
+  // 過去6ヶ月分の日付を生成
   const allDates: Activity[] = [];
-  const currentDate = new Date(oneYearAgo);
+  const currentDate = new Date(sixMonthsAgo);
   
   while (currentDate <= today) {
     const dateStr = formatDate(currentDate.toISOString().split('T')[0]);
@@ -140,7 +140,7 @@ export default async function LearningTracker() {
   });
   
   return (
-    <div className="p-2 dark:bg-gray-950 dark:text-white border-2 max-w-[56rem]">
+    <div className="p-2 dark:bg-gray-950 dark:text-white border-2 max-w-[30rem]">
       
       {/* スクロール可能なコンテナ */}
       <ScrollArea className="w-full">
