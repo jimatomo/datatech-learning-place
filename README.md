@@ -52,4 +52,7 @@ aws configure sso
 
 # SSO
 aws sso login
+
+# local role
+aws sts assume-role --role-arn arn:aws:iam::179217610303:role/prod-dtlp-local-test-role --role-session-name local
 ```
