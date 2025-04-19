@@ -14,7 +14,7 @@ export default function QuizContent() {
     author_url: "https://github.com/jimatomo",
     tags: ["Python", "Pandas", "Data Processing", "Data Application"],
     created_at: new Date("2025-04-11"),
-    updated_at: new Date(),
+    updated_at: new Date("2025-04-11"),
     title: "pandasのデータフレームでの性別の文字列変換",
     question_jsx: <QuizQuestion />,
     options: { 
