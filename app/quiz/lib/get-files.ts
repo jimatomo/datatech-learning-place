@@ -10,7 +10,7 @@ interface GetQuizFilesParams {
 export async function getQuizFiles({
   dir,
   base_dir,
-  limit_count = 60
+  limit_count
 }: GetQuizFilesParams): Promise<string[]> {
   try {
     // 初回呼び出し時のbaseDirを設定
@@ -52,7 +52,6 @@ export async function getQuizFiles({
 
     // ファイル名を昇順にソート
     quizFiles.sort((a, b) => a.localeCompare(b));
-
 
     // limit_countが指定されている場合は制限（後ろから取得）
     if (limit_count) {
