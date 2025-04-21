@@ -23,7 +23,7 @@ export default function QuizContent() {
     answers: [3],
     explanation_jsx: <QuizExplanation />,
     references: [
-      { title: "データベース実践入門", url: "https://www.amazon.co.jp/dp/4297127470" },
+      { title: "データマネジメント知識体系ガイド 第二版", url: "https://www.amazon.co.jp/%E3%83%87%E3%83%BC%E3%82%BF%E3%83%9E%E3%83%8D%E3%82%B8%E3%83%A1%E3%83%B3%E3%83%88%E7%9F%A5%E8%AD%98%E4%BD%93%E7%B3%BB%E3%82%AC%E3%82%A4%E3%83%89-%E7%AC%AC%E4%BA%8C%E7%89%88-DAMA-International/dp/4296100491" },
     ],
   });
   return quiz;

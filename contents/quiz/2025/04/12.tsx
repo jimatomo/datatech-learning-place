@@ -23,7 +23,7 @@ export default function QuizContent() {
     answers: [3],
     explanation_jsx: <QuizExplanation />,
     references: [
-      { title: "Change data capture (CDC)とは？仕組みやメリット・デメリットをわかりやすく解説", url: "https://data.wingarc.com/what-is-cdc-change-data-capture-18243" },
+      { title: "データマネジメント知識体系ガイド 第二版", url: "https://www.amazon.co.jp/%E3%83%87%E3%83%BC%E3%82%BF%E3%83%9E%E3%83%8D%E3%82%B8%E3%83%A1%E3%83%B3%E3%83%88%E7%9F%A5%E8%AD%98%E4%BD%93%E7%B3%BB%E3%82%AC%E3%82%A4%E3%83%89-%E7%AC%AC%E4%BA%8C%E7%89%88-DAMA-International/dp/4296100491" },
       { title: "AWS Database Migration Service ドキュメント: Change Data Capture (CDC)", url: "https://docs.aws.amazon.com/ja_jp/dms/latest/userguide/CHAP_Task.CDC.html" },
     ],
   });
