@@ -9,7 +9,7 @@ export default function QuizContent() {
     author_url: "https://github.com/jimatomo",
     tags: ["Snowflake", "SQL", "Snowflake Basic"],
     created_at: new Date("2025-04-21"),
-    updated_at: new Date(),
+    updated_at: new Date("2025-04-21"),
 
     // ----- quiz -----
     title: "COPY INTO <table> のオプション",
