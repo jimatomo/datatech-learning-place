@@ -45,7 +45,7 @@ export function ChartAnswerdCount({
   const correctRate = Math.round(answered_count / totalQuizCount * 100)
 
   return (
-    <Card className="flex flex-col max-w-[400px]">
+    <Card className="flex flex-col w-[350px] max-w-[400px]">
       <CardHeader className="items-center pb-0">
         <CardTitle>Quiz Progress</CardTitle>
         <CardDescription>正答済みクイズの数</CardDescription>

@@ -3,6 +3,7 @@ import { ChartAnswerdCount } from '@/app/harvor/ui/chart-answerd-count';
 import { QuizFileList } from '@/app/quiz/ui/quiz-file-list';
 import { getQuizFiles } from '@/app/quiz/lib/get-files';
 import { getPathInfos } from '@/app/quiz/lib/get-path-info';
+import BadgeList from '@/app/harvor/ui/badge_list';
 
 export default async function QuizDashboard() {
   // クイズの最新の結果を取得
@@ -34,11 +35,14 @@ export default async function QuizDashboard() {
 
   return (
     <div>
-      <div className="flex flex-col gap-4 pt-2 pb-4">
-        <ChartAnswerdCount
-          answered_count={Number(correctCount)}
-        not_answered_count={Number(quizCount - correctCount)}
-        />
+      <div className="flex flex-col md:flex-row gap-4 pt-2 pb-4">
+        <div>
+          <ChartAnswerdCount
+            answered_count={Number(correctCount)}
+            not_answered_count={Number(quizCount - correctCount)}
+          />
+        </div>
+        <BadgeList correctAnswers={Number(correctCount)} />
       </div>
       <div>
         <h4 className="scroll-m-20 font-semibold tracking-tight">
