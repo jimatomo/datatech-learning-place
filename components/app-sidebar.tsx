@@ -40,6 +40,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 import { useUser } from '@auth0/nextjs-auth0/client';
 
+import { handleTrackEvent } from '@/app/lib/frontend_event_api';
+
 
 // Menu items.
 const items = [
@@ -85,10 +87,19 @@ export function AppSidebar() {
   const { user, error, isLoading } = useUser();
 
   // 画面サイズが小さい時のみサイドバーを閉じる関数
-  const handleLinkClick = () => {
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const clickedPath = e.currentTarget.getAttribute('href') ?? '';
+    
+    handleTrackEvent({
+      user_id: user?.sub?.toString() ?? '',
+      path: pathname,
+      event_name: 'sidebar_link_click',
+      properties: {link_path: clickedPath},
+    });
+
     if (window.innerWidth < 768) {
       toggleSidebar()
-    }
+    };
   }
 
   if (isLoading) return <div></div>;
@@ -155,7 +166,11 @@ export function AppSidebar() {
                   >
                     {footerItems.map((item) => (
                       <DropdownMenuItem key={item.title}>
-                        <Link href={item.url} className="flex items-center gap-2 w-full" onClick={handleLinkClick}>
+                        <Link
+                          href={item.url}
+                          className="flex items-center gap-2 w-full"
+                          onClick={handleLinkClick}
+                        >
                           <item.icon />
                           <span>{item.title}</span>
                         </Link>
@@ -163,7 +178,7 @@ export function AppSidebar() {
                     ))}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem key="signout">
-                      <a href="/api/auth/logout" className="flex items-center gap-2 w-full">
+                      <a href="/api/auth/logout" className="flex items-center gap-2 w-full" onClick={handleLinkClick}>
                         <LogOut />
                         Sign out
                       </a>
@@ -172,7 +187,7 @@ export function AppSidebar() {
                 </DropdownMenu>
               ) : (
                 <SidebarMenuButton asChild>
-                  <a href="/api/auth/login" className="flex items-center gap-2">
+                  <a href="/api/auth/login" className="flex items-center gap-2" onClick={handleLinkClick}>
                     <User2 />
                     <span className="text-sm">Sign in</span>
                   </a>
