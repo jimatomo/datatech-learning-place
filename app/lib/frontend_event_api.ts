@@ -27,9 +27,6 @@ export const sendEventPostRequest = async (data?: unknown) => {
       throw new Error(`Failed to post event: ${response.statusText}`);
     }
 
-    console.log('Event posted successfully');
-    // 必要であればレスポンスデータを返す
-    // return await response.json();
     return true; // 成功したことを示す値を返す例
 
   } catch (error) {
@@ -59,12 +56,9 @@ export const handleTrackEvent = async ({
 
   try {
     await sendEventPostRequest(eventData);
-    console.log(`Event '${event_name}' tracked successfully with params:`, properties);
     return true;
   } catch (error) {
     console.error(`Error tracking event '${event_name}':`, error);
-    // エラーを呼び出し元に伝えるか、ここで処理するかを選択できます
-    // throw error; // エラーを再スローする場合
     return false;
   }
 }; 
