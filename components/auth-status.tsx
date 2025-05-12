@@ -11,7 +11,9 @@ export function AuthStatus() {
     return (
       <div>
         <a href="/api/auth/login"
-          className="inline-flex items-center justify-center text-sm rounded-md h-9 px-3 py-2 hover:bg-secondary"
+          className="inline-flex items-center justify-center
+            text-sm rounded-md h-9 px-3 py-2
+            hover:bg-primary/75 bg-primary text-primary-foreground"
         >
           Sign in
         </a>
