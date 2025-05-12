@@ -15,6 +15,7 @@ import NextTopLoader from 'nextjs-toploader';
 
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 import { AuthStatus } from "@/components/auth-status"
+import { AuthDialog } from "@/components/auth-dialog"
 import ConsentManager from "@/components/ConsentManager"
 
 export const metadata: Metadata = {
@@ -52,6 +53,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                     <ModeToggle />
                   </div>
                   <AuthStatus />
+                  <AuthDialog />
                 </div>
                 <div className="px-6 py-2 flex flex-col xl:flex-row gap-4">
                   <div className="w-full flex-1">
