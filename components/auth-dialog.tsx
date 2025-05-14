@@ -11,10 +11,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { usePathname } from 'next/navigation';
 
 export function AuthDialog() {
   const { user, isLoading } = useUser();
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -36,7 +38,7 @@ export function AuthDialog() {
             </DialogDescription>
           </DialogHeader>
           <Button asChild>
-            <a href="/api/auth/login">サインインする</a>
+            <a href={`/api/auth/login?returnTo=${pathname}`}>サインインする</a>
           </Button>
         </DialogContent>
       </Dialog>

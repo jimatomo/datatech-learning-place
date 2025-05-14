@@ -187,7 +187,7 @@ export function AppSidebar() {
                 </DropdownMenu>
               ) : (
                 <SidebarMenuButton asChild>
-                  <a href="/api/auth/login" className="flex items-center gap-2" onClick={handleLinkClick}>
+                  <a href={`/api/auth/login?returnTo=${pathname}`} className="flex items-center gap-2" onClick={handleLinkClick}>
                     <User2 />
                     <span className="text-sm">Sign in</span>
                   </a>

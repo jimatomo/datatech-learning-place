@@ -1,4 +1,3 @@
-import { NextResponse } from 'next/server';
 import { handleAuth, handleLogin, handleCallback } from '@auth0/nextjs-auth0';
 
 // Auth0のハンドラーを設定
@@ -6,7 +5,7 @@ const handler = handleAuth({
   login: async (req) => {
     // URLSearchParamsを使用してクエリパラメータを取得
     const url = new URL(req.url);
-    const returnTo = url.searchParams.get('returnTo') || '/harvor';
+    const returnTo = url.searchParams.get('returnTo') || '/';
     
     // handleLoginを使用してログイン処理を行い、リダイレクト先を指定
     return handleLogin(req, {
@@ -21,11 +20,6 @@ const handler = handleAuth({
         return session;
       }
     });
-    
-    // リダイレクト先を/harvorに設定
-    if (res instanceof NextResponse) {
-      res.headers.set('Location', '/harvor');
-    }
     
     return res;
   }
