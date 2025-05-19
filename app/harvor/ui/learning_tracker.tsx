@@ -113,8 +113,11 @@ export default async function LearningTracker() {
   // 現在の日付を取得
   const today = new Date();
   
+  // 月の表示位置を追跡
+  const monthPositions: { week: string; month: number; year: number }[] = [];
+  
+  // まず月の位置を記録
   weekKeys.forEach(week => {
-    // 週の中央の日付を取得（水曜日）
     const weekStart = new Date(week);
     const midWeek = new Date(weekStart);
     midWeek.setDate(weekStart.getDate() + 3); // 週の中央（水曜日）
@@ -123,15 +126,48 @@ export default async function LearningTracker() {
     const year = midWeek.getFullYear();
     weekMonths[week] = month;
     
-    // 年と月の組み合わせをキーとして使用
+    // 月が変わる位置を記録
+    if (monthPositions.length === 0 || 
+        monthPositions[monthPositions.length - 1].month !== month ||
+        monthPositions[monthPositions.length - 1].year !== year) {
+      monthPositions.push({ week, month, year });
+    }
+  });
+  
+  // 月のラベルを設定
+  weekKeys.forEach(week => {
+    const weekStart = new Date(week);
+    const midWeek = new Date(weekStart);
+    midWeek.setDate(weekStart.getDate() + 3);
+    
+    const month = midWeek.getMonth();
+    const year = midWeek.getFullYear();
     const yearMonthKey = `${year}-${month}`;
     
-    // 月ラベルの表示条件を決定
-    // 1. 同じ月が既に表示されている場合は表示しない
-    // 2. 去年のひとつ前の月だけを非表示にする（例：現在3月なら去年の2月は表示しない）
+    // 月の位置を取得
+    const monthIndex = monthPositions.findIndex(mp => mp.week === week);
+    if (monthIndex === -1) {
+      monthLabels[week] = '';
+      return;
+    }
+    
+    // 前後の月との距離を計算
+    const prevMonth = monthIndex > 0 ? monthPositions[monthIndex - 1] : null;
+    const nextMonth = monthIndex < monthPositions.length - 1 ? monthPositions[monthIndex + 1] : null;
+    
+    // 前後の月との距離が近すぎる場合は表示を抑制
+    // 距離の閾値を3週に変更し、さらに月が変わる位置でのみ判定を行う
+    const weekIndex = weekKeys.indexOf(week);
+    const isMonthChange = monthIndex > 0 && monthPositions[monthIndex - 1].month !== month;
+    const shouldSuppress = isMonthChange && (
+      (prevMonth && weekIndex - weekKeys.indexOf(prevMonth.week) < 3) ||
+      (nextMonth && weekKeys.indexOf(nextMonth.week) - weekIndex < 3)
+    );
+    
+    // 去年のひとつ前の月は表示しない
     const isPreviousYearPreviousMonth = year === today.getFullYear() - 1 && month === (today.getMonth() + 11) % 12;
     
-    if (!displayedMonths.has(yearMonthKey) && !isPreviousYearPreviousMonth) {
+    if (!displayedMonths.has(yearMonthKey) && !isPreviousYearPreviousMonth && !shouldSuppress) {
       monthLabels[week] = getMonthName(month);
       displayedMonths.add(yearMonthKey);
     } else {
