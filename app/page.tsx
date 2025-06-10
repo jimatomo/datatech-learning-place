@@ -45,7 +45,7 @@ export default function Home() {
       </h1>
       <div className="flex flex-col gap-2 md:text-base text-sm">
         <p>
-          ここはデータエンジニアのための学び舎です。<br />
+          ここはデータエンジニアのための学び場です。<br />
           今後以下のコンテンツを追加予定です。
         </p>
         <ul className="list-disc pl-6">
