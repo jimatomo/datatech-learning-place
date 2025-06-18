@@ -17,7 +17,7 @@ export default function QuizContent() {
     question_jsx: <QuizQuestion />,
     options: {
       0: "所有者はこのファイルに対して読み取り、書き込み、実行の全ての権限を持っています。",
-      1: "`group` グループに所属するユーザーは、このファイルを読み取り、実行することができます。",
+      1: "group グループに所属するユーザーは、このファイルを読み取り、実行することができます。",
       2: "システムのどのユーザーでも、このファイルを読み取り、実行することが可能です。",
       3: "このファイルにはSUIDビットが設定されているため、誰が実行しても所有者の権限で動作します。",
     },
@@ -38,7 +38,7 @@ function QuizQuestion() {
       <p className="pb-3">
         以下の <code>ls -l</code> コマンドの出力結果を参考にして、ファイルのパーミッションに関する説明のうち、<strong className="text-red-500">誤っているもの</strong>を1つ選んでください。
       </p>
-      <CodeBlock code={code} />
+      <CodeBlock code={code} showLineNumbers={false} />
     </div>
   );
 }
@@ -63,7 +63,7 @@ function QuizExplanation() {
           <strong className="text-red-500">所有者はこのファイルに対して読み取り、書き込み、実行の全ての権限を持っています。</strong>：これは正しい記述です。パーミッションの <code>rwx</code> 部分が所有者の権限を示しており、読み取り(r), 書き込み(w), 実行(x)が許可されています。
         </li>
         <li>
-          <strong className="text-red-500">`group` グループに所属するユーザーは、このファイルを読み取り、実行することができます。</strong>：これも正しい記述です。中央の <code>r-x</code> 部分がグループの権限で、読み取り(r)と実行(x)が許可されていますが、書き込み(w)は許可されていません。
+          <strong className="text-red-500">group グループに所属するユーザーは、このファイルを読み取り、実行することができます。</strong>：これも正しい記述です。中央の <code>r-x</code> 部分がグループの権限で、読み取り(r)と実行(x)が許可されていますが、書き込み(w)は許可されていません。
         </li>
         <li>
           <strong className="text-red-500">システムのどのユーザーでも、このファイルを読み取り、実行することが可能です。</strong>：これも正しい記述です。最後の <code>r-x</code> 部分が「その他」のユーザーの権限で、読み取り(r)と実行(x)が許可されています。
