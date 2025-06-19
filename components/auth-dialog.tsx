@@ -31,10 +31,10 @@ export function AuthDialog() {
   };
 
   useEffect(() => {
-    if (!isLoading && !user) {
+    if (!isLoading && !user && pathname !== '/') {
       setOpen(true);
     }
-  }, [isLoading, user]);
+  }, [isLoading, user, pathname]);
 
   if (isLoading) return null;
 
