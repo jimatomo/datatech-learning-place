@@ -6,8 +6,8 @@ export default function QuizContent() {
     // ----- metadata -----
     id: generateQuizId(import.meta.url),
     file_path: generateFilePath(import.meta.url),
-    author: "いいじま",
-    author_url: "https://github.com/iijima-dev",
+    author: "jimatomo",
+    author_url: "https://github.com/jimatomo",
     tags: ["Python", "PEP8", "Code Style", "Best Practices", "Coding Standards"],
     created_at: new Date("2025-06-20"),
     updated_at: new Date("2025-06-20"),
