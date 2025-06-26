@@ -6,7 +6,7 @@ type XShareButtonProps = {
 };
 
 export function XShareButton({ title, url }: XShareButtonProps) {
-  const shareUrl = `https://x.com/share?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`;
+  const shareUrl = `https://x.com/share?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title + ' @jimatomo93')}`;
 
   return (
     <div className="px-2">
