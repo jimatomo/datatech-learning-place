@@ -21,6 +21,17 @@ import ConsentManager from "@/components/ConsentManager"
 export const metadata: Metadata = {
   title: "Datatech Learning Place",
   description: "Datatech Learning Place",
+  manifest: "/manifest.json",
+  themeColor: "#000000",
+  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Datatech Learning Place",
+  },
+  icons: {
+    apple: "/icons/apple-touch-icon.png",
+  },
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -29,6 +40,22 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang="ja" suppressHydrationWarning>
+      <head>
+        <meta name="application-name" content="Datatech Learning Place" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Datatech Learning Place" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="msapplication-config" content="/icons/browserconfig.xml" />
+        <meta name="msapplication-TileColor" content="#000000" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png" />
+        <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512x512.png" />
+        <link rel="manifest" href="/manifest.json" />
+      </head>
       <UserProvider>
       <body>
         <ConsentManager />
