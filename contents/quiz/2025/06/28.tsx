@@ -24,10 +24,7 @@ export default function QuizContent() {
     answers: [3, 4],
     explanation_jsx: <QuizExplanation />,
     references: [
-      { title: "データマネジメント知識体系ガイド 第二版 - 第5章 参照データとマスターデータ", url: "https://www.amazon.co.jp/dp/4296100491" },
-      { title: "Semantic Technologies for Data Management", url: "https://www.w3.org/standards/semanticweb/" },
-      { title: "ISO 25964 - Thesauri and interoperability with other vocabularies", url: "https://www.iso.org/standard/53657.html" },
-      { title: "Dublin Core Metadata Initiative", url: "https://dublincore.org/" },
+      { title: "データマネジメント知識体系ガイド 第二版", url: "https://www.amazon.co.jp/dp/4296100491" },
     ],
   });
   return quiz;
