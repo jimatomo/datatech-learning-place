@@ -7,9 +7,9 @@ export default function QuizContent() {
     file_path: generateFilePath(import.meta.url),
     author: "jimatomo",
     author_url: "https://github.com/jimatomo",
-    tags: ["Claude Code", "Claude 4.0", "Datatech News"],
+    tags: ["Snowflake", "COPY INTO", "Data Loading", "File Loading Options", "Snowflake Basic"],
     created_at: new Date("2025-06-29"),
-    updated_at: new Date("2025-06-30"),
+    updated_at: new Date("2025-06-29"),
 
     // ----- quiz -----
     title: "Claude Code & Claude 4.0: Anthropicの最新AI技術",
