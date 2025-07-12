@@ -31,10 +31,6 @@ export default function QuizContent() {
         title: "クエリプロファイル | Snowflake Documentation",
         url: "https://docs.snowflake.com/ja/user-guide/ui-query-profile",
       },
-      {
-        title: "クエリパフォーマンスの最適化 | Snowflake Documentation",
-        url: "https://docs.snowflake.com/ja/user-guide/performance-optimization",
-      },
     ],
   });
 
