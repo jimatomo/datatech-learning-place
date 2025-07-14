@@ -25,7 +25,6 @@ export default function QuizContent() {
     explanation_jsx: <QuizExplanation />,
     references: [
       { title: "LPAD - Snowflake Documentation", url: "https://docs.snowflake.com/ja/sql-reference/functions/lpad" },
-      { title: "String & Binary Functions - Snowflake Documentation", url: "https://docs.snowflake.com/en/sql-reference/functions-string-binary" },
     ],
   });
   return quiz;
