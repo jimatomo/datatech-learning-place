@@ -29,16 +29,8 @@ export default function QuizContent() {
     explanation_jsx: <QuizExplanation />,
     references: [
       {
-        title: "Introduction to Snowflake Accounts",
-        url: "https://docs.snowflake.com/en/user-guide/intro-accounts",
-      },
-      {
         title: "Snowflake Editions",
         url: "https://docs.snowflake.com/en/user-guide/intro-editions",
-      },
-      {
-        title: "Managing Multiple Snowflake Accounts",
-        url: "https://www.snowflake.com/blog/managing-multiple-snowflake-accounts/",
       },
     ],
   });
