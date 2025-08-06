@@ -2,6 +2,7 @@ import path from 'path';
 import { getQuizFiles } from '@/app/quiz/lib/get-files';
 import { getPathInfos } from '@/app/quiz/lib/get-path-info';
 import { getSession } from '@auth0/nextjs-auth0';
+import { filterFutureDates } from '@/lib/date-utils';
 
 export async function queryQuizResults(
   limit_count: number = 1000
@@ -19,11 +20,8 @@ export async function queryQuizResults(
   // path infoを取得
   const pathInfos = await getPathInfos(quizFiles, [], true, userId);
 
-  // 将来日付を除外
-  const today = new Date()
-  const quiz_results = pathInfos.filter(
-    pathInfo => pathInfo.created_at?.getTime() && pathInfo.created_at.getTime() <= today.getTime()
-  );
+  // 将来日付を除外（JST基準で判定）
+  const quiz_results = filterFutureDates(pathInfos);
 
   return quiz_results;
 }

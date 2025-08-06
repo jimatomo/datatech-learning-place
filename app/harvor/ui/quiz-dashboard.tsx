@@ -5,6 +5,7 @@ import { getQuizFiles } from '@/app/quiz/lib/get-files';
 import { getPathInfos } from '@/app/quiz/lib/get-path-info';
 import BadgeList from '@/app/harvor/ui/badge_list';
 import { getSession } from '@auth0/nextjs-auth0';
+import { filterFutureDates } from '@/lib/date-utils';
 
 export default async function QuizDashboard() {
   // クイズの最新の結果を取得
@@ -24,11 +25,8 @@ export default async function QuizDashboard() {
   const session = await getSession();
   const userId = session?.user?.sub;
   const latest_quizzes_path_info = await getPathInfos(latest_quizzes, [], true, userId);
-  // 将来日付のクイズを除外
-  const today = new Date()
-  const latest_quizzes_filtered = latest_quizzes_path_info.filter(quiz => 
-    quiz.created_at && quiz.created_at.getTime() <= today.getTime()
-  );
+  // 将来日付のクイズを除外（JST基準で判定）
+  const latest_quizzes_filtered = filterFutureDates(latest_quizzes_path_info);
   // 最新の日付だけに絞る
   const latest_quizzes_path_info_sorted = latest_quizzes_filtered.sort((a, b) => {
     if (!a.created_at || !b.created_at) return 0;

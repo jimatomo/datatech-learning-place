@@ -10,6 +10,7 @@ import { QuizFileList } from '@/app/quiz/ui/quiz-file-list'
 import { ErrorDisplay } from '@/app/quiz/ui/error-display'
 import { getSession } from '@auth0/nextjs-auth0';
 import { UpperNavigation } from '@/app/quiz/ui/upper-navigation'
+import { isBeforeJSTNow } from '@/lib/date-utils'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string[] }> }): Promise<Metadata> {
   const { id } = await params;
@@ -96,10 +97,9 @@ export default async function QuizPage({
     const path_infos = await getPathInfos(files, id, false, userId);
 
     
-    // 将来日付のパス情報を削除
-    const today = new Date();
+    // 将来日付のパス情報を削除（JST基準で判定）
     const path_infos_filtered = path_infos.filter(info => 
-      !info.created_at || info.created_at.getTime() <= today.getTime()
+      !info.created_at || isBeforeJSTNow(info.created_at)
     );
 
     // パスの重複を削除

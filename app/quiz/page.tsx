@@ -7,6 +7,7 @@ import { QuizFileList } from '@/app/quiz/ui/quiz-file-list'
 import QuizFileListTagFiltered from '@/app/quiz/ui/quiz-file-list-tag-filtered'
 import { getSession } from '@auth0/nextjs-auth0';
 import QuizWeeklyContents from '@/app/quiz/ui/quiz-weekly-contents'
+import { getJSTNow, filterFutureDates } from '@/lib/date-utils'
 
 export const metadata: Metadata = {
   title: "DTLP Quiz",
@@ -72,11 +73,8 @@ export default async function QuizList({ searchParams }: Props) {
   // 全てのクイズのパス情報を取得
   const path_infos_full_path = await getPathInfos(quiz_files, [], true, userId)
 
-  // 将来日付のクイズを除外
-  const today = new Date()
-  const path_infos_full_path_filtered = path_infos_full_path.filter(info => 
-    info.created_at && info.created_at.getTime() <= today.getTime()
-  )
+  // 将来日付のクイズを除外（JST基準で判定）
+  const path_infos_full_path_filtered = filterFutureDates(path_infos_full_path)
 
   // 最新のクイズ(3つ分)を取得
   const latest_path_infos_full_path = path_infos_full_path_filtered.slice(-3)
@@ -86,10 +84,11 @@ export default async function QuizList({ searchParams }: Props) {
     return b.created_at.getTime() - a.created_at.getTime()
   })
 
-  // Topの階層のパス情報を生成
+  // Topの階層のパス情報を生成（JST基準で年を判定）
   const top_path_infos: PathInfo[] = []
   let year_info = 2025
-  while (year_info <= today.getFullYear()) {
+  const jstNow = getJSTNow()
+  while (year_info <= jstNow.getFullYear()) {
     top_path_infos.push({
       path: year_info.toString(),
       is_endpoint: false,
