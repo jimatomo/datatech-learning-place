@@ -1,51 +1,267 @@
 ---
-description: 
+description: クイズファイル作成のための包括的なルール。ファイル構造、テンプレート、インポート文、スタイルガイド、曜日別タグなど、プロジェクト構造を調査することなく既存と同じ形式でクイズファイルを作成するために必要な全ての情報を含んでいます。
 globs: contents/quiz/**
 alwaysApply: false
 ---
 
-# Your rule content
+# クイズファイル作成包括ルール
 
-- You can @ files here
-- You can use markdown but dont have to
+## ファイル構造とパス規則
+- **配置場所**: `/workspace/contents/quiz/YYYY/MM/DD.tsx`
+- **ファイル名**: 日付の日部分（01-31.tsx）
+- **ディレクトリ構造**:
+  ```
+  /workspace/contents/quiz/
+  ├── 2025/
+  │   ├── 01/ (1月)
+  │   ├── 02/ (2月)
+  │   └── ...
+  └── quiz.tsx (基底クラス)
+  ```
 
-# 作成時のガイドライン
+## 必須インポート文
+```typescript
+import { Quiz, generateQuizId, generateFilePath } from "@/contents/quiz";
+```
 
-- タグ:
-  - データ技術関連のキーワードを3つ程度指定する
-  - 末尾に曜日別のタグを付与する
-    - 月曜日: Snowflake Basic
-    - 火曜日: Snowflake Advanced
-    - 水曜日: Data Modeling
-    - 木曜日: Infrastructure
-    - 金曜日: Data Application
-    - 土曜日: Data Management
-    - 日曜日: Datatech News
-- 日付： 作成日付と更新日付は初期の場合は同じ日にする。更新する場合は更新した日付に修正する。
-- 問題文: 明確かつ簡潔に記述する。必要に応じてコードや図を含めることができる
-- 選択肢:
-  - 一貫した文体と長さで作成する
-  - 複数選択の場合は問題文に「全て」と明記する
-  - 間違っているものを選択させる場合は文字色を赤にする
-- 解説:
-  - 正解の理由を詳しく説明する
-  - 誤答についても簡潔に触れることが望ましい
-  - コード例を用いる場合が効果的な場合は利用すると良い
-  - 「選択肢1は正しい」のように記載をせずに、「<選択肢の文全体>：これは正しい記載です。」のようにすること。なぜなら選択肢の番号はユーザーには表示されないため。
-- 参考資料: 公式ドキュメントや信頼できる情報源を引用する
-- コーディングスタイル
-  - TSXファイル内のコンポーネント（QuizQuestion, QuizExplanation）はクラスではなく関数コンポーネントで実装する
-  - コードブロックを利用する際は「import { CodeBlock } from "@/components/ui/code-block";」でimportをして利用すること
-    - JSX内で利用する場合は`<CodeBlock code={code} />`のように記述する。
-  - Tailwind CSSを使用してスタイリングする
-  - 複雑なレイアウトには<div>要素をネストして使用する
-  - リスト項目には<ul>と<li>を使用する（className="list-disc pl-4"をulに適用すること）
-  - paddingを適切に設定する
-  - 強調したいテキストには<strong>タグや緑色の文字を使用する
-- レビュープロセス
-  - 正確性: 内容が技術的に正確であること
-  - 明確性: 問題と選択肢が明確に理解できること
-  - 難易度: 適切な難易度レベルであること
-  - 参考資料: 信頼性の高い参考資料が提供されていること
-- 更新ガイドライン
-  - クイズの内容を更新する場合は必ずupdated_atの日付を変更する
+## オプションインポート文（必要に応じて）
+```typescript
+// テーブル表示用
+import { Table, TableHeader, TableBody, TableRow, TableCell, TableHead } from "@/components/ui/table";
+// コードブロック表示用
+import { CodeBlock } from "@/components/ui/code-block";
+```
+
+## 基本テンプレート（完全版）
+```typescript
+import { Quiz, generateQuizId, generateFilePath } from "@/contents/quiz";
+
+export default function QuizContent() {
+  const quiz = new Quiz({
+    // ----- metadata -----
+    id: generateQuizId(import.meta.url),
+    file_path: generateFilePath(import.meta.url),
+    author: "jimatomo",
+    author_url: "https://github.com/jimatomo",
+    tags: [/* タグ配列: 技術キーワード3つ + 曜日別タグ */],
+    created_at: new Date("YYYY-MM-DD"),
+    updated_at: new Date("YYYY-MM-DD"),
+
+    // ----- quiz -----
+    title: "クイズのタイトル",
+    question_jsx: <QuizQuestion />,
+    options: { 
+      0: "選択肢1",
+      1: "選択肢2", 
+      2: "選択肢3",
+      3: "選択肢4",
+      // 必要に応じて追加
+    },
+    answers: [/* 正解選択肢番号の配列 例: [0, 2] */],
+    explanation_jsx: <QuizExplanation />,
+    references: [
+      { title: "参考資料タイトル", url: "https://example.com" }
+    ],
+  });
+  return quiz;
+}
+
+function QuizQuestion() {
+  return (
+    <div>
+      <p>問題文をここに記述</p>
+    </div>
+  );
+}
+
+function QuizExplanation() {
+  return (
+    <div className="text-xs md:text-sm">
+      <p>解説をここに記述</p>
+    </div>
+  );
+}
+```
+
+## タグ設定ルール
+### 基本構成
+- データ技術関連キーワード: 3つ程度
+- 曜日別タグ: 必須（末尾に追加）
+
+### 曜日別タグ一覧
+- **月曜日**: "Snowflake Basic"
+- **火曜日**: "Snowflake Advanced"
+- **水曜日**: "Data Modeling"
+- **木曜日**: "Infrastructure"
+- **金曜日**: "Data Application"
+- **土曜日**: "Data Management"
+- **日曜日**: "Datatech News"
+
+### タグ例
+```typescript
+// 水曜日のクイズの場合
+tags: ["Snowflake", "SQL", "QUALIFY", "Data Modeling"]
+```
+
+## メタデータ設定ルール
+- **id**: `generateQuizId(import.meta.url)` - 自動生成（Q20250101形式）
+- **file_path**: `generateFilePath(import.meta.url)` - 自動生成
+- **author**: 通常は "jimatomo"
+- **author_url**: 通常は "https://github.com/jimatomo"
+- **created_at / updated_at**: 初期作成時は同じ日付、更新時のみ updated_at を変更
+
+## 問題・選択肢作成ガイドライン
+### 問題文（QuizQuestion）
+- 明確かつ簡潔に記述
+- 必要に応じてコードやテーブルを含める
+- 複数選択の場合は「全て選択してください」と明記
+
+### 選択肢（options）
+- キーは0から開始する連番
+- 一貫した文体と長さで作成
+- 間違っているものを選択させる場合は文字色を赤にする
+- 例: `{ 0: "選択肢1", 1: "選択肢2", 2: "選択肢3" }`
+
+### 正解（answers）
+- 正解選択肢の番号を配列で指定
+- 例: `[0, 2]` (選択肢0と2が正解)
+
+## JSXコンポーネントスタイルガイド
+### 基本ルール
+- `QuizQuestion` と `QuizExplanation` は関数コンポーネントで実装
+- Tailwind CSSを使用してスタイリング
+- 解説部分には `className="text-xs md:text-sm"` を適用
+
+### リスト表示
+```typescript
+<ul className="list-disc pl-4 py-2">
+  <li>リスト項目1</li>
+  <li>リスト項目2</li>
+</ul>
+```
+
+### 強調表示
+- 重要な部分: `<strong>テキスト</strong>`
+- 緑色の文字: `<span className="text-green-600">テキスト</span>`
+
+## コードブロック使用方法
+```typescript
+// 1. コード変数の定義
+const code = `SELECT name
+FROM sample_table
+QUALIFY ROW_NUMBER() OVER (PARTITION BY class ORDER BY score DESC) = 1;`;
+
+// 2. コードブロックコンポーネント
+function SQLCodeBlock() {
+  return (
+    <CodeBlock code={code} showLineNumbers={false} />
+  );
+}
+
+// 3. QuizQuestion内での使用
+function QuizQuestion() {
+  return (
+    <div>
+      <p>次のSQLを実行した結果として正しいものを選択してください</p>
+      <SQLCodeBlock />
+    </div>
+  );
+}
+```
+
+## テーブル使用方法
+```typescript
+<Table>
+  <TableHeader>
+    <TableRow>
+      <TableHead className="text-center">ID</TableHead>
+      <TableHead className="text-center">NAME</TableHead>
+      <TableHead className="text-center">SCORE</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    <TableRow>
+      <TableCell>1</TableCell>
+      <TableCell>Alice</TableCell>
+      <TableCell>95</TableCell>
+    </TableRow>
+    <TableRow>
+      <TableCell>2</TableCell>
+      <TableCell>Bob</TableCell>
+      <TableCell>85</TableCell>
+    </TableRow>
+  </TableBody>
+</Table>
+```
+
+## 解説作成ガイドライン
+### 基本構成
+- 正解の理由を詳しく説明
+- 誤答についても簡潔に触れる
+- コード例を効果的に活用
+
+### 記述ルール
+- ❌ **NG**: 「選択肢1は正しい」
+- ✅ **OK**: 「ウェアハウスのサイズを一つ上げると単位時間あたりに消費されるクレジットは2倍になります：これは正しい記載です。」
+- 理由: 選択肢番号はユーザーには表示されないため
+
+### 解説テンプレート
+```typescript
+function QuizExplanation() {
+  return (
+    <div className="text-xs md:text-sm">
+      <p>以下が正解の説明です：</p>
+      <ul className="list-disc pl-4 py-2">
+        <li>正解理由1の詳細説明</li>
+        <li>正解理由2の詳細説明</li>
+      </ul>
+      <p>誤った選択肢の説明：</p>
+      <ul className="list-disc pl-4 py-2">
+        <li>誤答理由1の説明</li>
+        <li>誤答理由2の説明</li>
+      </ul>
+    </div>
+  );
+}
+```
+
+## 参考文献設定
+- 公式ドキュメントや信頼できる情報源を使用
+- Snowflake公式ドキュメントを優先的に参照
+- **実在するURLであることを必ず確認する** - リンク切れや存在しないURLは使用禁止
+- 形式: `{ title: "タイトル", url: "URL" }`
+
+### 参考文献例
+```typescript
+references: [
+  { title: "Snowflake - ウェアハウスの概要", url: "https://docs.snowflake.com/ja/user-guide/warehouses-overview" },
+  { title: "重要な概念およびアーキテクチャ", url: "https://docs.snowflake.com/ja/user-guide/intro-key-concepts" }
+],
+```
+
+## 品質チェックリスト
+作成後は以下を確認：
+- [ ] **正確性**: 内容が技術的に正確である
+- [ ] **明確性**: 問題と選択肢が明確に理解できる  
+- [ ] **難易度**: 適切な難易度レベルである
+- [ ] **参考資料**: 信頼性の高い参考資料が提供されている
+- [ ] **URL確認**: 参考文献のURLが実在し、アクセス可能であることを確認済み
+- [ ] **曜日タグ**: 正しい曜日別タグが設定されている
+- [ ] **日付**: created_at と updated_at が適切に設定されている
+- [ ] **インポート**: 必要なコンポーネントがインポートされている
+- [ ] **スタイル**: Tailwind CSSが適切に適用されている
+
+## 更新時のルール
+- クイズ内容を更新する場合は **必ず** `updated_at` の日付を変更する
+- `created_at` は初期作成日のまま維持する
+
+## 実装の流れ
+1. 適切なパス（`/workspace/contents/quiz/YYYY/MM/DD.tsx`）でファイル作成
+2. 基本テンプレートをコピー
+3. 曜日に応じたタグを設定
+4. 問題文、選択肢、正解、解説を記述
+5. 必要に応じてコードブロックやテーブルを追加
+6. 参考文献を設定
+7. 品質チェックリストで確認
+
+このルールに従うことで、プロジェクト構造を調査することなく、既存のクイズファイルと同じ形式・品質でクイズファイルを作成できます。
