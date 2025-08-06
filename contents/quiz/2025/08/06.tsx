@@ -26,7 +26,6 @@ export default function QuizContent() {
     references: [
       { title: "dbt Labs - How we style our dbt models", url: "https://docs.getdbt.com/best-practices/how-we-style/1-how-we-style-our-dbt-models" },
       { title: "dbt Labs - How we style our dbt projects", url: "https://docs.getdbt.com/best-practices/how-we-style/0-how-we-style-our-dbt-projects" },
-      { title: "dbt Style Guide GitHub Issue", url: "https://github.com/dbt-labs/dbt/issues/1933" },
     ],
   });
 
