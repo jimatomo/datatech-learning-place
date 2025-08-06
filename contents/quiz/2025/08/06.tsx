@@ -41,12 +41,6 @@ function QuizQuestion() {
         <strong className="text-emerald-500">推奨される</strong>
         命名パターンはどれですか？
       </p>
-      <div className="bg-gray-50 p-4 rounded-lg mb-4">
-        <p className="text-sm text-gray-600 mb-2">
-          <strong>ヒント：</strong> 多くのデータプラットフォームでは<code>database.schema.object</code>の形式でドットが使用されているため、
-          クォートの必要性や問題のリスクを考慮する必要があります。
-        </p>
-      </div>
     </div>
   );
 }
