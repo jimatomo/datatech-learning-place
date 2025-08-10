@@ -19,6 +19,9 @@ export function AuthDialog() {
   const { user, isLoading } = useUser();
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const pathSegments = pathname.split('/').filter(Boolean);
+  const isTopLevelPage = pathSegments.length <= 1; // '/', '/quiz', '/text', '/global', '/harvor' など
+  const suppressOnThisPage = (isTopLevelPage && pathname !== '/harvor') || pathname.startsWith('/global');
 
   const handleLoginClick = async () => {
     const clientInfo = getClientInfo();
@@ -31,10 +34,10 @@ export function AuthDialog() {
   };
 
   useEffect(() => {
-    if (!isLoading && !user && pathname !== '/') {
+    if (!isLoading && !user && !suppressOnThisPage) {
       setOpen(true);
     }
-  }, [isLoading, user, pathname]);
+  }, [isLoading, user, pathname, suppressOnThisPage]);
 
   if (isLoading) return null;
 
