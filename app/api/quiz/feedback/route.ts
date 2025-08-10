@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, QueryCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
+import type { NativeAttributeValue } from '@aws-sdk/util-dynamodb';
 import { getSession } from '@auth0/nextjs-auth0';
+
+export const dynamic = 'force-dynamic';
 
 const client = new DynamoDBClient({});
 const ddbDocClient = DynamoDBDocumentClient.from(client);
@@ -77,26 +80,27 @@ export async function GET(request: NextRequest) {
     const sessionUserId: string | null = session?.user?.sub ?? null;
 
     const prefix = 'feedback|v1|';
-    let items: any[] = [];
-    let lastEvaluatedKey: Record<string, unknown> | undefined = undefined;
+    let items: Array<Record<string, unknown>> = [];
+    let lastEvaluatedKey: Record<string, NativeAttributeValue> | undefined = undefined;
 
     while (items.length < limit) {
-      const command = new QueryCommand({
-        TableName: 'quiz_informations',
-        KeyConditionExpression: 'quiz_id = :quizId AND begins_with(#rt, :prefix)',
-        ExpressionAttributeNames: { '#rt': 'record_type' },
-        ExpressionAttributeValues: { ':quizId': quizId, ':prefix': prefix },
-        ExclusiveStartKey: lastEvaluatedKey as any,
-        Limit: Math.min(100, limit - items.length),
-      });
-      const result = await ddbDocClient.send(command);
+      const result = (await ddbDocClient.send(
+        new QueryCommand({
+          TableName: 'quiz_informations',
+          KeyConditionExpression: 'quiz_id = :quizId AND begins_with(#rt, :prefix)',
+          ExpressionAttributeNames: { '#rt': 'record_type' },
+          ExpressionAttributeValues: { ':quizId': quizId, ':prefix': prefix },
+          ExclusiveStartKey: lastEvaluatedKey,
+          Limit: Math.min(100, limit - items.length),
+        })
+      )) as { Items?: Array<Record<string, unknown>>; LastEvaluatedKey?: Record<string, NativeAttributeValue> };
       items = items.concat(result.Items ?? []);
-      lastEvaluatedKey = result.LastEvaluatedKey as any;
+      lastEvaluatedKey = result.LastEvaluatedKey ?? undefined;
       if (!lastEvaluatedKey) break;
     }
 
     // created_at の降順で並び替えし、limit 件に絞る
-    const messages = (items as any[])
+    const messages = items
       .map((it) => {
         const user_id = typeof it.user_id === 'string' ? it.user_id : undefined;
         const record_type = typeof it.record_type === 'string' ? it.record_type : undefined;
@@ -133,7 +137,12 @@ export async function DELETE(request: NextRequest) {
     // 条件付き削除:
     // - ログイン時: 自分の投稿 または 匿名投稿（user_idなし）を削除可
     // - 未ログイン時: 匿名投稿のみ削除可
-    const baseParams: any = {
+    const baseParams: {
+      TableName: string;
+      Key: Record<string, NativeAttributeValue>;
+      ConditionExpression?: string;
+      ExpressionAttributeValues?: Record<string, NativeAttributeValue>;
+    } = {
       TableName: 'quiz_informations',
       Key: { quiz_id: quizId, record_type: recordType },
     };
@@ -148,8 +157,8 @@ export async function DELETE(request: NextRequest) {
     const cmd = new DeleteCommand(baseParams);
     await ddbDocClient.send(cmd);
     return NextResponse.json({ ok: true });
-  } catch (error: any) {
-    const code = error?.name || error?.code;
+  } catch (error: unknown) {
+    const code = (error as { name?: string; code?: string })?.name || (error as { code?: string })?.code;
     if (code === 'ConditionalCheckFailedException') {
       // 他人のフィードバック、または匿名（user_idなし）など条件不一致
       return NextResponse.json({ error: '削除権限がありません' }, { status: 403 });

@@ -2,6 +2,8 @@ import { Metadata } from "next"
 import { LinkCard } from '@/components/ui/link-card'
 import { fetchOGPs } from '@/components/actions/fetchOGPs'
 
+export const dynamic = 'force-dynamic'
+
 const url = "https://wiry-act-a67.notion.site/171d816a693580008c4cef8fbdc9b5ea";
 const xUrl = "https://x.com/jimatomo93";
 

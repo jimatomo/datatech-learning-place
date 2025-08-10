@@ -5,6 +5,8 @@ import { DynamoDBDocumentClient, GetCommand } from '@aws-sdk/lib-dynamodb';
 
 import { getSession } from '@auth0/nextjs-auth0';
 
+export const dynamic = 'force-dynamic';
+
 const client = new DynamoDBClient({});
 const ddbDocClient = DynamoDBDocumentClient.from(client);
 
