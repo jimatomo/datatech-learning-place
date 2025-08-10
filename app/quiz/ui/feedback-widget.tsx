@@ -18,8 +18,9 @@ export function FeedbackWidget({ quizId, isOpen, onOpenChange, hideTrigger }: Pr
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState<null | "success" | "error">(null)
   const [internalOpen, setInternalOpen] = useState(false)
-  const [messages, setMessages] = useState<Array<{ message: string; created_at?: string; user_id?: string }>>([])
+  const [messages, setMessages] = useState<Array<{ message: string; created_at?: string; user_id?: string; record_type?: string; can_delete?: boolean }>>([])
   const [isLoadingMessages, setIsLoadingMessages] = useState(false)
+  const [deletingKey, setDeletingKey] = useState<string | null>(null)
   const open = typeof isOpen === "boolean" ? isOpen : internalOpen
   const setOpen = (v: boolean) => {
     if (onOpenChange) onOpenChange(v)
@@ -36,6 +37,30 @@ export function FeedbackWidget({ quizId, isOpen, onOpenChange, hideTrigger }: Pr
       setMessages([])
     } finally {
       setIsLoadingMessages(false)
+    }
+  }
+
+  async function handleDelete(recordType?: string) {
+    if (!recordType) return
+    // 確認ダイアログ（軽量）
+    if (!confirm('このフィードバックを削除しますか？')) return
+    try {
+      setDeletingKey(recordType)
+      const res = await fetch('/api/quiz/feedback', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quizId, recordType }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data?.error || 'failed')
+      }
+      // 再取得
+      await fetchMessages()
+    } catch (e) {
+      alert('削除に失敗しました。権限があるか、しばらくしてから再試行してください。')
+    } finally {
+      setDeletingKey(null)
     }
   }
 
@@ -91,7 +116,7 @@ export function FeedbackWidget({ quizId, isOpen, onOpenChange, hideTrigger }: Pr
               <Label htmlFor="feedback">気づき・改善提案などがあれば教えてください</Label>
               <Textarea
                 id="feedback"
-                placeholder="例: 選択肢の説明が分かりにくい、参考リンクが欲しい など"
+                placeholder="例: 選択肢の説明が分かりにくい、間違っている、リンクが切れている、など"
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
                 maxLength={1000}
@@ -103,21 +128,40 @@ export function FeedbackWidget({ quizId, isOpen, onOpenChange, hideTrigger }: Pr
                 <p className="text-sm text-red-600">送信に失敗しました。時間をおいて再度お試しください。</p>
               )}
               <div className="pt-2">
-                <p className="text-sm text-muted-foreground mb-1">最近のフィードバック</p>
+                <p className="text-sm text-muted-foreground mb-1">直近のフィードバック</p>
                 {isLoadingMessages ? (
                   <p className="text-sm text-muted-foreground">読み込み中...</p>
                 ) : messages.length === 0 ? (
                   <p className="text-sm text-muted-foreground">まだフィードバックはありません</p>
                 ) : (
                   <ul className="space-y-2">
-                    {messages.map((m, idx) => (
-                      <li key={idx} className="text-sm border rounded p-2 bg-muted/30">
-                        <div className="whitespace-pre-wrap break-words">{m.message}</div>
-                        {m.created_at && (
-                          <div className="text-xs text-muted-foreground mt-1">{new Date(m.created_at).toLocaleString()}</div>
-                        )}
-                      </li>
-                    ))}
+                    {messages.map((m, idx) => {
+                      const key = m.record_type ?? String(idx)
+                      const canDelete = Boolean(m.can_delete && m.record_type)
+                      const isDeleting = deletingKey === m.record_type
+                      return (
+                        <li key={key} className="text-sm border rounded p-2 bg-muted/30">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="whitespace-pre-wrap break-words flex-1">{m.message}</div>
+                            {canDelete && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-red-600 hover:text-red-700"
+                                onClick={() => handleDelete(m.record_type)}
+                                disabled={isDeleting}
+                                aria-label="このフィードバックを削除"
+                              >
+                                {isDeleting ? '削除中…' : '削除'}
+                              </Button>
+                            )}
+                          </div>
+                          {m.created_at && (
+                            <div className="text-xs text-muted-foreground mt-1">{new Date(m.created_at).toLocaleString()}</div>
+                          )}
+                        </li>
+                      )
+                    })}
                   </ul>
                 )}
               </div>

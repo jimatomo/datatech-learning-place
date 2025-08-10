@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, PutCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
+import { DynamoDBDocumentClient, PutCommand, QueryCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
 import { getSession } from '@auth0/nextjs-auth0';
 
 const client = new DynamoDBClient({});
@@ -73,6 +73,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'quizId is required' }, { status: 400 });
     }
 
+    const session = await getSession();
+    const sessionUserId: string | null = session?.user?.sub ?? null;
+
     const prefix = 'feedback|v1|';
     let items: any[] = [];
     let lastEvaluatedKey: Record<string, unknown> | undefined = undefined;
@@ -94,11 +97,18 @@ export async function GET(request: NextRequest) {
 
     // created_at の降順で並び替えし、limit 件に絞る
     const messages = (items as any[])
-      .map((it) => ({
-        message: String(it.message ?? ''),
-        created_at: typeof it.created_at === 'string' ? it.created_at : undefined,
-        user_id: typeof it.user_id === 'string' ? it.user_id : undefined,
-      }))
+      .map((it) => {
+        const user_id = typeof it.user_id === 'string' ? it.user_id : undefined;
+        const record_type = typeof it.record_type === 'string' ? it.record_type : undefined;
+        const can_delete = user_id ? Boolean(sessionUserId && user_id === sessionUserId) : true; // 匿名は誰でも削除可
+        return {
+          message: String(it.message ?? ''),
+          created_at: typeof it.created_at === 'string' ? it.created_at : undefined,
+          user_id,
+          record_type,
+          can_delete,
+        };
+      })
       .filter((m) => m.message)
       .sort((a, b) => (b.created_at ?? '').localeCompare(a.created_at ?? ''))
       .slice(0, limit);
@@ -107,6 +117,46 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('[feedback] list error', error);
     return NextResponse.json({ error: '取得に失敗しました' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const session = await getSession();
+    const userId: string | null = session?.user?.sub ?? null;
+
+    const body = await request.json();
+    const { quizId, recordType } = body || {};
+    if (!quizId || !recordType || typeof quizId !== 'string' || typeof recordType !== 'string') {
+      return NextResponse.json({ error: 'quizId と recordType は必須です' }, { status: 400 });
+    }
+
+    // 条件付き削除:
+    // - ログイン時: 自分の投稿 または 匿名投稿（user_idなし）を削除可
+    // - 未ログイン時: 匿名投稿のみ削除可
+    const baseParams: any = {
+      TableName: 'quiz_informations',
+      Key: { quiz_id: quizId, record_type: recordType },
+    };
+    if (userId) {
+      baseParams.ConditionExpression = 'user_id = :uid OR attribute_not_exists(user_id)';
+      baseParams.ExpressionAttributeValues = { ':uid': userId };
+    } else {
+      baseParams.ConditionExpression = 'attribute_not_exists(user_id)';
+      // ExpressionAttributeValues は不要
+    }
+
+    const cmd = new DeleteCommand(baseParams);
+    await ddbDocClient.send(cmd);
+    return NextResponse.json({ ok: true });
+  } catch (error: any) {
+    const code = error?.name || error?.code;
+    if (code === 'ConditionalCheckFailedException') {
+      // 他人のフィードバック、または匿名（user_idなし）など条件不一致
+      return NextResponse.json({ error: '削除権限がありません' }, { status: 403 });
+    }
+    console.error('[feedback] delete error', error);
+    return NextResponse.json({ error: '削除に失敗しました' }, { status: 500 });
   }
 }
 
