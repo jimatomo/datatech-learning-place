@@ -6,7 +6,6 @@ import { XShareButton } from '@/components/x-share-button'
 import { FeedbackWidget } from "@/app/quiz/ui/feedback-widget"
 import { MessageSquare } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Badge } from '@/components/ui/badge'
 
 type Props = {
   quizId: string
@@ -35,11 +34,11 @@ export function QuizWidgetsClient({ quizId, quizTitle, selfQuizUrl }: Props) {
                 </button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>フィードバック（モック）</p>
+                <p>フィードバック</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          <Badge variant="secondary">Mock</Badge>
+          {/* Badge removed: モック表記削除 */}
         </div>
         <div className="flex-1 flex justify-center">
           <QuizLikeButton quizId={quizId} />
