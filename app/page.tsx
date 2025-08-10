@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Datatech Learning Place",
-    description: "データエンジニアのための学び舎です。毎日更新されるクイズやコラム、テキストを通じてデータエンジニアとしての基礎を鍛えましょう。",
+    description: "データエンジニアのための学習サイトです。毎日更新されるクイズやコラム、テキストを通じてデータエンジニアとしての基礎を鍛えましょう。",
     url: "https://datatech-learning-place.net",
     siteName: "Datatech Learning Place",
     locale: "ja_JP",
@@ -45,7 +45,7 @@ export default function Home() {
       </h1>
       <div className="flex flex-col gap-2 md:text-base text-sm">
         <p>
-          ここはデータエンジニアのための学び場です。<br />
+          ここはデータエンジニアのための学習サイトです。<br />
           今後以下のコンテンツを追加予定です。
         </p>
         <ul className="list-disc pl-6">
@@ -63,9 +63,6 @@ export default function Home() {
         <p>
           サインインすることで、学習状況の保存やお気に入り登録などの機能が利用できるようになります。<br />
           個人情報に関する取り扱いに関しては<a href="/global/terms" className="underline hover:text-blue-500">プライバシーポリシー</a>をご参照ください。
-        </p>
-        <p className="pt-2 text-muted-foreground text-xs md:text-sm">
-        Auth0の無料プランを利用しているのでドメイン名がデフォルトのままで利用しています。将来的に有料プランに移行してカスタムドメインにする予定です。
         </p>
       </div>
       <div className="flex flex-col gap-2 pt-8">
