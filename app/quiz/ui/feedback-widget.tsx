@@ -57,7 +57,7 @@ export function FeedbackWidget({ quizId, isOpen, onOpenChange, hideTrigger }: Pr
       }
       // 再取得
       await fetchMessages()
-    } catch (e) {
+    } catch {
       alert('削除に失敗しました。権限があるか、しばらくしてから再試行してください。')
     } finally {
       setDeletingKey(null)
