@@ -1,6 +1,7 @@
 "use server";
 
 import { load } from "cheerio";
+import { unstable_noStore as noStore } from "next/cache";
 
 export type OgpObjects = {
   href?: string;
@@ -11,6 +12,8 @@ export type OgpObjects = {
 };
 
 export const fetchOGPs = async (urlString: string) => {
+  // サーバーアクションの結果をNextのデータキャッシュに乗せない
+  noStore();
   let url: URL;
   try {
     url = new URL(urlString);
@@ -19,7 +22,8 @@ export const fetchOGPs = async (urlString: string) => {
   }
 
   
-  const res = await fetch(url, { cache: 'force-cache' });
+  // 大きなHTMLをキャッシュしようとしてNextのデータキャッシュ上限(2MB)を超えるのを防ぐため、キャッシュしない
+  const res = await fetch(url, { cache: 'no-store' });
   
   if (!res.ok) {
     console.error(
@@ -46,7 +50,8 @@ export const fetchOGPs = async (urlString: string) => {
   // 画像URLの有効性チェック
   if (image) {
     try {
-      const imageRes = await fetch(image);
+      // 画像の存在確認もキャッシュしない
+      const imageRes = await fetch(image, { cache: 'no-store' });
       if (!imageRes.ok) {
         image = '/no-image.png';
       }
