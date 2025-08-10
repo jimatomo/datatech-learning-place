@@ -1,20 +1,15 @@
-import QuizLikeButton from '@/app/quiz/ui/quiz-like-button';
-import { XShareButton } from '@/components/x-share-button';
 import { Quiz } from "@/contents/quiz";
+import { QuizWidgetsClient } from "@/app/quiz/ui/quiz-widgets.client";
 
-// ウィジェット用の新しいコンポーネント
+// Server Wrapper: Classインスタンスを直渡しせず、プリミティブに変換してClientへ
 export function QuizWidgets({ quiz, selfQuizUrl }: { quiz: Quiz, selfQuizUrl: string }) {
+  const quizId = quiz.getId();
+  const quizTitle = quiz.getTitle();
   return (
-    <div className="flex flex-row w-full max-w-2xl items-center pb-4">
-      <div className="flex-1" />
-      <div className="flex-1 flex justify-center">
-        <QuizLikeButton quizId={quiz.getId()} />
-      </div>
-      <div className="flex-1 flex justify-end">
-        <XShareButton
-          title={`${quiz.getTitle()} | DTLP Quiz`}
-          url={`https://datatech-learning-place.net${selfQuizUrl}`} />
-      </div>
-    </div>
+    <QuizWidgetsClient
+      quizId={quizId}
+      quizTitle={quizTitle}
+      selfQuizUrl={selfQuizUrl}
+    />
   );
 }
