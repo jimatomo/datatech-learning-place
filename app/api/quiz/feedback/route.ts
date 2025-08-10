@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     console.log('[mock-feedback]', { quizId, messageLength: String(message).length });
     // 将来的にここで DynamoDB に保存する
     return NextResponse.json({ ok: true });
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: 'invalid request' }, { status: 400 });
   }
 }

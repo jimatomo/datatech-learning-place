@@ -37,7 +37,7 @@ export function FeedbackWidget({ quizId, isOpen, onOpenChange, hideTrigger }: Pr
       if (!res.ok) throw new Error("failed")
       setSubmitted("success")
       setFeedback("")
-    } catch (e) {
+    } catch {
       setSubmitted("error")
     } finally {
       setIsSubmitting(false)
