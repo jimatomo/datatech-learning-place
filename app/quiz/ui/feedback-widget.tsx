@@ -18,7 +18,7 @@ export function FeedbackWidget({ quizId, isOpen, onOpenChange, hideTrigger }: Pr
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState<null | "success" | "error">(null)
   const [internalOpen, setInternalOpen] = useState(false)
-  const [messages, setMessages] = useState<Array<{ message: string; created_at?: string; user_id?: string; record_type?: string; can_delete?: boolean }>>([])
+  const [messages, setMessages] = useState<Array<{ message: string; created_at?: string; record_type?: string; can_delete?: boolean }>>([])
   const [isLoadingMessages, setIsLoadingMessages] = useState(false)
   const [deletingKey, setDeletingKey] = useState<string | null>(null)
   const open = typeof isOpen === "boolean" ? isOpen : internalOpen

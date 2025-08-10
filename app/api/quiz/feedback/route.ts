@@ -104,7 +104,6 @@ export async function GET(request: NextRequest) {
         return {
           message: String(it.message ?? ''),
           created_at: typeof it.created_at === 'string' ? it.created_at : undefined,
-          user_id,
           record_type,
           can_delete,
         };
