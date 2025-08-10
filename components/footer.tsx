@@ -10,6 +10,10 @@ export default function Footer() {
             <p>利用規約</p>
           </Link>
           <p>|</p>
+          <Link href="/global/privacy" className="hover:underline">
+            <p>プライバシーポリシー</p>
+          </Link>
+          <p>|</p>
           <Link href="/global/contact" className="hover:underline">
             <p>お問い合わせ</p>
           </Link>

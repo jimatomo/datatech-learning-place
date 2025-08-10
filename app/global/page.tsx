@@ -30,7 +30,13 @@ export default function GlobalPage() {
         <Link href="/global/terms" className="hover:underline w-fit">
           <div className="flex flex-row items-center text-lg">
             <Book className="w-4 h-4 mr-2" />
-            <p>利用規約・プライバシーポリシー</p>
+            <p>利用規約</p>
+          </div>
+        </Link>
+        <Link href="/global/privacy" className="hover:underline w-fit">
+          <div className="flex flex-row items-center text-lg">
+            <Book className="w-4 h-4 mr-2" />
+            <p>プライバシーポリシー</p>
           </div>
         </Link>
         <Link href="/global/account" className="hover:underline w-fit">

@@ -78,6 +78,11 @@ const footerItems = [
     url: "/global/terms",
     icon: Book,
   },
+  {
+    title: "Privacy",
+    url: "/global/privacy",
+    icon: Book,
+  },
 ]
 
 

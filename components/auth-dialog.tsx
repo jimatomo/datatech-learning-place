@@ -49,7 +49,7 @@ export function AuthDialog() {
             <DialogTitle>学習状況を記録しよう</DialogTitle>
             <DialogDescription>
               クイズの解答状況などの学習状況を記録するにはサインインが必要です。<br />
-              <Link href="/global/terms" onClick={() => setOpen(false)} className="underline text-blue-500">プライバシーポリシーはこちら</Link>
+              <Link href="/global/privacy" onClick={() => setOpen(false)} className="underline text-blue-500">プライバシーポリシーはこちら</Link>
             </DialogDescription>
           </DialogHeader>
           <Button asChild>

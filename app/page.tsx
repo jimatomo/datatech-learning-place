@@ -62,7 +62,7 @@ export default function Home() {
         </h2>
         <p>
           サインインすることで、学習状況の保存やお気に入り登録などの機能が利用できるようになります。<br />
-          個人情報に関する取り扱いに関しては<a href="/global/terms" className="underline hover:text-blue-500">プライバシーポリシー</a>をご参照ください。
+          個人情報に関する取り扱いに関しては<a href="/global/privacy" className="underline hover:text-blue-500">プライバシーポリシー</a>をご参照ください。
         </p>
       </div>
       <div className="flex flex-col gap-2 pt-8">
