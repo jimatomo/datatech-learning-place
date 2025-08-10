@@ -23,7 +23,7 @@ export function LimitSelector({ defaultLimit }: { defaultLimit: string }) {
   return (
     <div className="flex items-center gap-2">
       <Select value={currentLimit} onValueChange={handleValueChange}>
-        <SelectTrigger className="w-[100px]">
+        <SelectTrigger className="w-[120px]">
           <SelectValue placeholder="select limit" />
         </SelectTrigger>
         <SelectContent>
@@ -32,6 +32,8 @@ export function LimitSelector({ defaultLimit }: { defaultLimit: string }) {
           <SelectItem value="30">30 days</SelectItem>
           <SelectItem value="60">60 days</SelectItem>
           <SelectItem value="90">90 days</SelectItem>
+          <SelectItem value="180">180 days</SelectItem>
+          <SelectItem value="365">365 days</SelectItem>
         </SelectContent>
       </Select>
     </div>
