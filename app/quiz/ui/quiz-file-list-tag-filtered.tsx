@@ -71,10 +71,10 @@ export default function QuizFileListTagFiltered({
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-[200px] p-0">
-            <Command>
+            <Command className="max-h-[400px]">
               <CommandInput placeholder="Search tag..." />
               <CommandEmpty>No tag found.</CommandEmpty>
-              <CommandGroup>
+              <CommandGroup className="max-h-[320px] overflow-auto">
                 {tags.map((tag) => (
                   <CommandItem
                     key={tag}
