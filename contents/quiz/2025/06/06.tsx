@@ -7,7 +7,7 @@ export default function QuizContent() {
     file_path: generateFilePath(import.meta.url),
     author: "jimatomo",
     author_url: "https://github.com/jimatomo",
-    tags: ["streamlit", "st.date_input", "Data Application"],
+    tags: ["Data Application", "Streamlit", "streamlit"],
     created_at: new Date("2025-06-06"),
     updated_at: new Date("2025-06-06"),
     title: "Streamlitでカレンダーから日付をピックアップする方法",

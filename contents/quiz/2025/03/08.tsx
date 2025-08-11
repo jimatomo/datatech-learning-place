@@ -7,7 +7,7 @@ export default function QuizContent() {
     file_path: generateFilePath(import.meta.url),
     author: "jimatomo",
     author_url: "https://github.com/jimatomo",
-    tags: ["DMBOK", "Dimensional Modeling", "SCD", "Data Management"],
+    tags: ["DMBOK", "Data Management", "Data Modeling"],
     created_at: new Date("2025-03-08"),
     updated_at: new Date("2025-03-08"),
 

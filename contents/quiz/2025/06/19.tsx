@@ -8,7 +8,7 @@ export default function QuizContent() {
     file_path: generateFilePath(import.meta.url),
     author: "jimatomo",
     author_url: "https://github.com/jimatomo",
-    tags: ["Data Lakehouse", "Delta Lake", "Apache Iceberg", "Open Table Format", "Infrastructure"],
+    tags: ["Data Lakehouse", "Delta Lake", "Infrastructure"],
     created_at: new Date("2025-06-19"),
     updated_at: new Date("2025-06-19"),
 

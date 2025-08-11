@@ -6,7 +6,7 @@ export default function QuizContent() {
     file_path: generateFilePath(import.meta.url),
     author: "jimatomo",
     author_url: "https://github.com/jimatomo",
-    tags: ["Polars", "Pandas", "Data Processing", "Data Application"],
+    tags: ["Data Application", "Pandas", "Polars"],
     created_at: new Date("2025-04-25"),
     updated_at: new Date("2025-04-25"),
     title: "PolarsとPandasの比較",

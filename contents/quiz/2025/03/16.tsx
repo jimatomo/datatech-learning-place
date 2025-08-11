@@ -7,7 +7,7 @@ export default function QuizContent() {
     file_path: generateFilePath(import.meta.url),
     author: "jimatomo",
     author_url: "https://github.com/jimatomo",
-    tags: ["AWS", "SageMaker", "Data Lakehouse", "S3 Tables", "Datatech News"],
+    tags: ["AWS", "Data Lakehouse", "Datatech News", "S3 Tables", "SageMaker"],
     created_at: new Date("2025-03-16"),
     updated_at: new Date("2025-03-16"),
 

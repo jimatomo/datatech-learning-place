@@ -7,7 +7,7 @@ export default function QuizContent() {
     file_path: generateFilePath(import.meta.url),
     author: "jimatomo",
     author_url: "https://github.com/jimatomo",
-    tags: ["streamlit", "bi-directional component", "Data Application"],
+    tags: ["Data Application", "Streamlit", "streamlit"],
     created_at: new Date("2025-06-13"),
     updated_at: new Date("2025-06-13"),
     title: "Streamlitの双方向（bi-directional）コンポーネントの基本的な実装方法",

@@ -7,7 +7,7 @@ export default function QuizContent() {
     file_path: generateFilePath(import.meta.url),
     author: "jimatomo",
     author_url: "https://github.com/jimatomo",
-    tags: ["pandas", "DataFrame", "describe", "Data Application"],
+    tags: ["Data Application", "Pandas"],
     created_at: new Date("2025-05-30"),
     updated_at: new Date("2025-05-30"),
     title: "pandas DataFrameのdescribe()メソッドのデフォルト動作",

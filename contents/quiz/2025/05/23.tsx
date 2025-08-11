@@ -7,7 +7,7 @@ export default function QuizContent() {
     file_path: generateFilePath(import.meta.url),
     author: "jimatomo",
     author_url: "https://github.com/jimatomo",
-    tags: ["Python", "JSON", "リスト内包表記", "Data Application"],
+    tags: ["Data Application", "Python"],
     created_at: new Date("2025-05-23"),
     updated_at: new Date("2025-05-23"),
     title: "Pythonで辞書のリストから特定のキーの値を安全に取得する方法",

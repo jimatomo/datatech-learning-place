@@ -8,7 +8,7 @@ export default function QuizContent() {
     file_path: generateFilePath(import.meta.url),
     author: "jimatomo",
     author_url: "https://github.com/jimatomo",
-    tags: ["Snowflake", "Search Optimization", "Performance", "Snowflake Advanced"],
+    tags: ["Snowflake", "Snowflake Advanced", "Snowflake Performance"],
     created_at: new Date("2025-06-03"),
     updated_at: new Date("2025-06-03"),
 

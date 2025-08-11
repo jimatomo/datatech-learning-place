@@ -8,7 +8,7 @@ export default function QuizContent() {
     file_path: generateFilePath(import.meta.url),
     author: "jimatomo",
     author_url: "https://github.com/jimatomo",
-    tags: ["Snowflake", "S3 Tables", "Iceberg REST", "Datatech News"],
+    tags: ["Datatech News", "Iceberg", "S3 Tables", "Snowflake"],
     created_at: new Date("2025-03-30"),
     updated_at: new Date("2025-03-30"),
 

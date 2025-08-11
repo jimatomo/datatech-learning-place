@@ -7,7 +7,7 @@ export default function QuizContent() {
     file_path: generateFilePath(import.meta.url),
     author: "jimatomo",
     author_url: "https://github.com/jimatomo",
-    tags: ["AI", "Multi-Agent", "Anthropic", "Datatech News"],
+    tags: ["AI", "Anthropic", "Datatech News"],
     created_at: new Date("2025-07-27"),
     updated_at: new Date("2025-07-27"),
 

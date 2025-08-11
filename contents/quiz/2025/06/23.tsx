@@ -9,7 +9,7 @@ export default function QuizContent() {
     file_path: generateFilePath(import.meta.url),
     author: "jimatomo",
     author_url: "https://github.com/jimatomo",
-    tags: ["Snowflake", "Time Travel", "Data History", "Snowflake Basic"],
+    tags: ["Data History", "Snowflake", "Snowflake Basic", "Time Travel"],
     created_at: new Date("2025-06-23"),
     updated_at: new Date("2025-06-23"),
 

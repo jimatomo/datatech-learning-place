@@ -8,7 +8,7 @@ export default function QuizContent() {
     file_path: generateFilePath(import.meta.url),
     author: "jimatomo",
     author_url: "https://github.com/jimatomo",
-    tags: ["Model Context Protocol", "JSON-RPC", "LLM", "Datatech News"],
+    tags: ["Datatech News", "AI"],
     created_at: new Date("2025-04-20"),
     updated_at: new Date("2025-04-20"),
 

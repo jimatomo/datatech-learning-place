@@ -9,7 +9,7 @@ export default function QuizContent() {
     file_path: generateFilePath(import.meta.url),
     author: "jimatomo",
     author_url: "https://github.com/jimatomo",
-    tags: ["Snowflake", "Recursive CTE", "Data Modeling"],
+    tags: ["Data Modeling", "SQL", "Snowflake"],
     created_at: new Date("2025-02-19"),
     updated_at: new Date("2025-02-19"),
 

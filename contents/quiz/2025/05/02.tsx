@@ -7,7 +7,7 @@ export default function QuizContent() {
     file_path: generateFilePath(import.meta.url),
     author: "jimatomo",
     author_url: "https://github.com/jimatomo",
-    tags: ["DuckDB", "Window Functions", "Stream Processing", "Data Application"],
+    tags: ["Data Application", "DuckDB", "SQL"],
     created_at: new Date("2025-05-02"),
     updated_at: new Date("2025-05-02"),
     title: "DuckDBにおけるタンブリングウィンドウの実装",

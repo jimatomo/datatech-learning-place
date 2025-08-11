@@ -7,7 +7,7 @@ export default function QuizContent() {
     file_path: generateFilePath(import.meta.url),
     author: "jimatomo",
     author_url: "https://github.com/jimatomo",
-    tags: ["CSV", "RFC 4180", "Data Format", "Data Application"],
+    tags: ["Data Application", "Infrastructure"],
     created_at: new Date("2025-05-09"),
     updated_at: new Date("2025-05-09"),
     title: "CSVの標準規格 (RFC 4180) に関する理解",

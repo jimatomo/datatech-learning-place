@@ -6,15 +6,14 @@ export const tags = [
   'Terraform',
   'Docker',
   'Linux',
+  'Git',
   'GitHub',
 
   // Snowflake Features
   'Snowflake Basic',      // Monday
   'Snowflake Advanced',     // Tuesday
   'Snowpark',
-  'Snowflake Data Load',
   'Cortex',
-  'Snowflake Security',
   'Snowflake Performance',
   
   // Data Science & Libraries
@@ -26,21 +25,45 @@ export const tags = [
   'AI',
   'Anthropic',
   'Claude',
+  'Iceberg',
+  'DuckDB',
+  'DevOps',
   
   // Core Concepts
   'SQL',
   'Data Modeling',        // Wednesday
   'Infrastructure',         // Thursday
   'Data Application',       // Friday
+  'Data Architecture',
   'Data Management',        // Saturday
   'Data Governance',
   'Data Integration',
   'Data Lakehouse',
+  'Data Storage',
+  'Data Quality',
   'Knowledge Graph',
   'Master Data Mgmt',
   'IaC',
   'Container',
+  'Security',
+  'Governance',
+  'Operation',
 
   // Others
   'Datatech News',        // Sunday
+
+  // AWS Services
+  'CloudFront',
+  'EC2',
+  'ECS',
+  'EKS',
+  'KMS',
+  'Lambda',
+  'IAM',
+  'RDS',
+  'Route 53',
+  'SageMaker',
+  'S3',
+  'S3 Tables',
+  'VPC',
 ]

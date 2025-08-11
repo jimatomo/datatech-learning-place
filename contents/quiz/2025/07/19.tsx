@@ -8,7 +8,7 @@ export default function QuizContent() {
     file_path: generateFilePath(import.meta.url),
     author: "jimatomo",
     author_url: "https://github.com/jimatomo",
-    tags: ["Master Data Management", "Reference Data", "Data Governance", "Data Management"],
+    tags: ["Governance", "Data Management", "Master Data Mgmt"],
     created_at: new Date("2025-07-19"),
     updated_at: new Date("2025-07-19"),
 

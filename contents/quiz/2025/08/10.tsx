@@ -7,9 +7,9 @@ export default function QuizContent() {
     file_path: generateFilePath(import.meta.url),
     author: "jimatomo",
     author_url: "https://github.com/jimatomo",
-    tags: ["Snowflake Copilot", "Snowflake Intelligence", "Cortex", "Datatech News"],
+    tags: ["Cortex", "Datatech News"],
     created_at: new Date("2025-08-10"),
-    updated_at: new Date("2025-08-11"),
+    updated_at: new Date("2025-08-10"),
 
     // ----- quiz -----
     title: "Snowflake CopilotとSnowflake Intelligence",
