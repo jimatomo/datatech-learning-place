@@ -36,7 +36,6 @@ export const tags = [
   'Data Application',       // Friday
   'Data Architecture',
   'Data Management',        // Saturday
-  'Data Governance',
   'Data Integration',
   'Data Lakehouse',
   'Data Storage',
@@ -44,7 +43,6 @@ export const tags = [
   'Knowledge Graph',
   'Master Data Mgmt',
   'IaC',
-  'Container',
   'Security',
   'Governance',
   'Operation',
@@ -53,12 +51,7 @@ export const tags = [
   'Datatech News',        // Sunday
 
   // AWS Services
-  'CloudFront',
-  'EC2',
-  'ECS',
-  'EKS',
   'KMS',
-  'Lambda',
   'IAM',
   'RDS',
   'Route 53',
