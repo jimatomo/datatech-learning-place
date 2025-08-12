@@ -62,7 +62,7 @@ export default function QuizFileListTagFiltered({
               variant="outline"
               role="combobox"
               aria-expanded={open}
-              className="w-[200px] justify-between"
+              className="flex-1 sm:flex-initial sm:w-[350px] justify-between max-w-[350px]"
             >
               {inputTextTag
                 ? tags.find((tag) => tag === inputTextTag)
@@ -70,11 +70,11 @@ export default function QuizFileListTagFiltered({
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[200px] p-0">
-            <Command className="max-h-[400px]">
+          <PopoverContent className="w-[var(--radix-popover-trigger-width)] sm:w-[350px] p-0" side="bottom" align="start" avoidCollisions={false}>
+            <Command className="max-h-[200px] sm:max-h-[400px]">
               <CommandInput placeholder="Search tag..." />
               <CommandEmpty>No tag found.</CommandEmpty>
-              <CommandGroup className="max-h-[320px] overflow-auto">
+              <CommandGroup className="max-h-[160px] sm:max-h-[320px] overflow-auto">
                 {tags.map((tag) => (
                   <CommandItem
                     key={tag}
