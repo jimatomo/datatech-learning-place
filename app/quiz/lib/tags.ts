@@ -28,6 +28,7 @@ export const tags = [
   'Iceberg',
   'DuckDB',
   'DevOps',
+  'MLOps',
   
   // Core Concepts
   'SQL',
