@@ -6,7 +6,7 @@ export default function TextPage() {
       <div>
         <p>データ基盤を一から作りながらデータエンジニアリングを一から学ぶシリーズ</p>
       </div>
-      <div className="flex flex-col lg:flex-row gap-2">
+      <div className="pt-4 p-2 flex flex-col lg:flex-row gap-2">
         <ContentCard 
           title="Data Pipeline"
           description="データパイプラインを構築"
