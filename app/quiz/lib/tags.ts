@@ -51,6 +51,7 @@ export const tags = [
   'Datatech News',        // Sunday
 
   // AWS Services
+  'AWS CDK',
   'KMS',
   'IAM',
   'RDS',
