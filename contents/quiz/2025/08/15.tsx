@@ -22,7 +22,7 @@ export default function QuizContent() {
       3: "Model Registry はモデルのバージョン管理やデプロイ管理を一元化できる",
       4: "モデルモニターはドリフトや精度指標を追跡し、ダッシュボードを自動生成できる",
     },
-    answers: [0, 1, 3, 4],
+    answers: [2],
     explanation_jsx: <QuizExplanation />,
     references: [
       { title: "Snowflakeだけで完結するMLOps", url: "https://zenn.dev/takikomi/articles/091914b9b60b23" },
@@ -45,22 +45,22 @@ job = process()`;
 const codeModelMonitor = `-- モデルモニターの作成例（指標・ドリフトの監視）
 CREATE MODEL MONITOR FOR_DEMO_MODEL
 WITH
-    MODEL=DEMO_MODEL
-    VERSION=WONDERFUL_VAMPIREBAT_1
-    FUNCTION=predict
-    SOURCE=PRED_DATA_WITH_ACT
-    BASELINE=TRAIN_DATA
-    TIMESTAMP_COLUMN=TRANSACTIONDATE
-    PREDICTION_SCORE_COLUMNS=(PRED)
-    ACTUAL_SCORE_COLUMNS=(TARGET)
-    WAREHOUSE=COMPUTE_XSMALL
-    REFRESH_INTERVAL='1 day'
-    AGGREGATION_WINDOW='1 day';`;
+    MODEL = DEMO_MODEL
+    VERSION = WONDERFUL_VAMPIREBAT_1
+    FUNCTION = predict
+    SOURCE = PRED_DATA_WITH_ACT
+    BASELINE = TRAIN_DATA
+    TIMESTAMP_COLUMN = TRANSACTIONDATE
+    PREDICTION_SCORE_COLUMNS = (PRED)
+    ACTUAL_SCORE_COLUMNS = (TARGET)
+    WAREHOUSE = COMPUTE_XSMALL
+    REFRESH_INTERVAL = '1 day'
+    AGGREGATION_WINDOW = '1 day';`;
 
 function QuizQuestion() {
   return (
     <div>
-      <p>Snowflake内でMLOpsを完結させるための機能に関して、正しいものを全て選択してください。</p>
+      <p>Snowflake内でMLOpsを完結させるための機能に関して、<strong className="text-red-600">誤っているもの</strong>を全て選択してください。</p>
     </div>
   );
 }
@@ -68,26 +68,48 @@ function QuizQuestion() {
 function QuizExplanation() {
   return (
     <div className="text-xs md:text-sm">
-      <p>以下が正解の説明です：</p>
+      <p>以下が正解（誤っている記述）の説明です：</p>
       <ul className="list-disc pl-4 py-2">
         <li>
-          <strong>Snowflake Notebooks</strong>：ブラウザ上でSQLとPythonを併用でき、環境構築なしで素早い仮説検証が可能です。
-        </li>
-        <li>
-          <strong>ML Jobs</strong>：Snowpark Container Services上でコードを実行し、<span className="text-green-600">実行中のみ課金</span>されます。
-        </li>
-        <li>
-          <strong>Model Registry</strong>：モデルの登録・バージョン管理・デプロイを一元化できます。
-        </li>
-        <li>
-          <strong>モデルモニター</strong>：精度・ドリフト等の指標を追跡し、ダッシュボードを自動生成できます。
+          <span className="text-red-600">Feature Store は学習用と推論用で別々の特徴量定義を持つことが推奨される</span>：誤りです。
+          Feature Store の目的は、学習と推論で<strong>同一の特徴量定義を共有</strong>し、<strong>training-serving skew</strong>（学習時と推論時の不一致）を防ぐことにあります。
+          
+          <ul className="list-disc pl-6 py-1">
+            <li>単一のソース・オブ・トゥルース：特徴量生成ロジックを一元管理してロジックの分岐やドリフトを防止</li>
+            <li>再現性：学習時点の特徴量定義・計算条件に基づく再学習・検証が容易</li>
+            <li>運用効率：オンライン／バッチを跨いだ一貫性により、監視や不具合時の原因切り分けが簡便</li>
+          </ul>
         </li>
       </ul>
-      <p>誤った選択肢：</p>
+      <p>他の選択肢が正しい理由：</p>
       <ul className="list-disc pl-4 py-2">
         <li>
-          <span className="text-red-600">Feature Store は学習と推論で定義を分けるべき</span>：誤りです。Feature Store は
-          学習・推論で<span className="text-green-600">同一の特徴量定義を共有</span>し、一貫性を担保するために用います。
+          <strong>Snowflake Notebooks</strong>：SQLとPythonの併用で、ブラウザ上から素早く仮説検証が可能。
+          <ul className="list-disc pl-6 py-1">
+            <li>管理された実行環境（主要なDS/MLライブラリが事前インストール）</li>
+            <li>ウェアハウス選択により計算資源とコストを調整可能</li>
+          </ul>
+        </li>
+        <li>
+          <strong>ML Jobs</strong>：SPCS上でジョブを実行し、<span className="text-green-600">実行中のみ課金</span>。
+          <ul className="list-disc pl-6 py-1">
+            <li><code>@remote</code> デコレータでローカル開発コードをSnowflake側で実行</li>
+            <li>ノートブックよりライブラリ制約が緩く、重い前処理や学習に適する</li>
+          </ul>
+        </li>
+        <li>
+          <strong>Model Registry</strong>：モデル登録・バージョン管理・デプロイを一元化。
+          <ul className="list-disc pl-6 py-1">
+            <li>チーム間でのモデル共有・権限管理・監査（ガバナンス）</li>
+            <li><code>predict</code> や <code>explain</code>（SHAP等）のインターフェースを提供</li>
+          </ul>
+        </li>
+        <li>
+          <strong>モデルモニター</strong>：ドリフトや精度の指標を追跡し、ダッシュボードを自動生成。
+          <ul className="list-disc pl-6 py-1">
+            <li>リフレッシュ間隔やアグリゲーションウィンドウを指定可能</li>
+            <li>メトリクスはSQLでクエリでき、定時ジョブでのアラート連携が容易</li>
+          </ul>
         </li>
       </ul>
 
