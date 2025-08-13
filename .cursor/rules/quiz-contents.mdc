@@ -103,6 +103,25 @@ function QuizExplanation() {
 tags: ["Snowflake", "SQL", "QUALIFY", "Data Modeling"]
 ```
 
+### 運用ルール（tags.ts 準拠）
+- **出典の一本化**: タグは必ず `app/quiz/lib/tags.ts` の `tags` 配列から選択する。
+- **不足時の追加方針**:
+  - 既存に該当タグがない場合のみ、新規タグを `app/quiz/lib/tags.ts` に追加する。
+  - 追加は既存のカテゴリコメント（例: "Platforms & Services", "Snowflake Features" 等）に沿って、最も近いカテゴリ内へ追記する。
+  - 同義語・綴り違い（例: "Github" vs "GitHub"）は作らず、既存表記に統一する。
+- **命名規則**:
+  - 固有名詞は公式表記・大文字小文字を厳格に守る（例: "GitHub", "Snowflake", "dbt"）。
+  - 複合語は半角スペース区切り（例: "Data Modeling"）。
+  - 略語は既存の慣用に合わせる（例: "IaC"）。
+- **禁止事項**:
+  - ハッシュタグ記号（`#`）、絵文字、記号付きのタグ。
+  - 日本語・英語の重複タグを併存させること（いずれかに統一）。
+  - 既存タグと意味が重複する新規作成。
+- **レビュー時チェック**:
+  - 曜日別タグが正しいか（本ルールの一覧に一致）。
+  - 技術キーワードが `tags.ts` 出典であるか。
+  - 新規タグ使用時は同一PRで `app/quiz/lib/tags.ts` への追加が含まれているか。
+
 ## メタデータ設定ルール
 - **id**: `generateQuizId(import.meta.url)` - 自動生成（Q20250101形式）
 - **file_path**: `generateFilePath(import.meta.url)` - 自動生成
