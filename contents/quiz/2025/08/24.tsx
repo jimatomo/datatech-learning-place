@@ -51,7 +51,7 @@ function QuizExplanation() {
       <p className="font-semibold text-green-600 mt-2">解説:</p>
       <ul className="list-disc pl-4 py-2">
         <li>
-          DuckDBの新しい<code>SPATIAL_JOIN</code>オペレータは、<strong>R-tree</strong>という空間インデックスを内部で構築して利用します。R-treeは、多次元データ（例：地理的座標）を効率的に扱うためのツリーデータ構造です。(RはrectangularのR)
+          DuckDBの新しい<code>SPATIAL_JOIN</code>オペレータは、<strong>R-tree</strong>という空間インデックスを内部で構築して利用します。R-treeは、多次元データ（例：地理的座標）を効率的に扱うためのツリーデータ構造です。(RはRectangular)
         </li>
         <li>
           具体的には、JOINの一方のテーブル（通常はポリゴンのような領域データを持つ小さい方）からR-treeインデックスをメモリ上に構築します。その後、もう一方のテーブル（通常はポイントデータのような大量のデータ）の各ジオメトリを使ってインデックスを探索（プローブ）します。
