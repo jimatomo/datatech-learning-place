@@ -195,7 +195,7 @@ export default function TextContents() {
 
         {/* この先の進め方 */}
         <div className="mt-12 p-6 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 rounded-lg">
-           <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-4">
             <WorkflowIcon className="h-6 w-6 text-gray-600 dark:text-gray-400" />
             <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200">次のステップ: 実践へ</h2>
           </div>
@@ -204,6 +204,21 @@ export default function TextContents() {
             まずはローカルのDocker環境でdbtを実行し、Snowflakeに最初のデータモデルをデプロイする手順から始めます。
             理論と実践を繋げ、着実にスキルを身につけていきましょう。
           </p>
+        </div>
+
+        {/* ページネーション */}
+        <div className="mt-8 flex justify-between items-center">
+          <div className="w-1/3"></div>
+          <div className="w-1/3 text-center">
+            <a href="/text/pipeline" className="inline-flex items-center gap-2 px-6 py-2 font-semibold text-white bg-gray-600 rounded-lg shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition">
+              トップへ戻る
+            </a>
+          </div>
+          <div className="w-1/3 text-right">
+            <a href="/text/pipeline/02" className="inline-flex items-center gap-2 px-6 py-2 font-semibold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+              次のチャプターへ進む →
+            </a>
+          </div>
         </div>
       </div>
     </div>
