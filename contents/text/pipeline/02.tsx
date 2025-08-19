@@ -250,18 +250,18 @@ DROP SCHEMA IF EXISTS SAMPLE_SCHEMA;`}
       {/* ページネーション */}
       <div className="mt-8 flex justify-between items-center">
         <div className="w-1/3">
-          <a href="/text/pipeline/01" className="inline-flex items-center gap-2 px-6 py-2 font-semibold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
-            ← 前のチャプターへ
+          <a href="/text/pipeline/01" className="inline-flex items-center gap-2 p-2 px-4 font-semibold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+            Back
           </a>
         </div>
         <div className="w-1/3 text-center">
-          <a href="/text/pipeline" className="inline-flex items-center gap-2 px-6 py-2 font-semibold text-white bg-gray-600 rounded-lg shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition">
-            トップへ戻る
+          <a href="/text/pipeline" className="inline-flex items-center gap-2 p-2 px-4 font-semibold text-white bg-gray-600 rounded-lg shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition">
+            Top
           </a>
         </div>
         <div className="w-1/3 text-right">
-          <a href="/text/pipeline/03" className="inline-flex items-center gap-2 px-6 py-2 font-semibold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
-            次のチャプターへ進む →
+          <a href="/text/pipeline/03" className="inline-flex items-center gap-2 p-2 px-4 font-semibold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+            Next
           </a>
         </div>
       </div>
