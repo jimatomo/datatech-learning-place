@@ -235,15 +235,159 @@ LIMIT 5;`}
           作業完了後は、不要なリソースを削除してクリーンアップしましょう。
         </p>
         <CodeBlock
-          code={`-- 内部ステージの削除
--- スキーマの削除
-DROP SCHEMA IF EXISTS SAMPLE_SCHEMA;`}
+          code={`-- データベースの削除
+DROP DATABASE IF EXISTS TUTORIAL_DB;
+
+-- dbt関連リソースの削除
+DROP DATABASE IF EXISTS dbt_tutorial;`}
           title="リソース削除"
           showLineNumbers={true}
         />
         
         <p className="mt-4">
           次章では、このSnowflake環境にdbtから接続し、最初のデータモデルを構築していきます。
+        </p>
+      </div>
+
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold mb-2">8. dbt接続用ユーザーとキーペア認証の設定</h3>
+        <p className="mb-3">
+          次章でのdbt接続に備えて、専用のdbtユーザーを作成し、セキュアなキーペア認証を設定します。
+          パスワード認証よりも安全で、自動化にも適した認証方式です。
+        </p>
+        
+        <Alert className="bg-blue-50 dark:bg-blue-950 border-l-4 border-blue-400 mb-4">
+          <ListOrderedIcon className="h-5 w-5 text-blue-600" />
+          <AlertTitle className="font-bold text-blue-800 dark:text-blue-200">キーペア認証のメリット</AlertTitle>
+          <AlertDescription className="text-blue-700 dark:text-blue-300 leading-loose">
+            1. <strong>セキュリティ</strong>: パスワードよりも強固な認証<br/>
+            2. <strong>自動化対応</strong>: CI/CDパイプラインでの利用に最適<br/>
+            3. <strong>ローテーション</strong>: 定期的なキー更新が容易<br/>
+            4. <strong>監査</strong>: アクセスログの追跡が明確
+          </AlertDescription>
+        </Alert>
+
+        <h4 className="text-md font-semibold mb-2">手順1: dbt専用ユーザーとロールの作成</h4>
+        
+        <CodeBlock
+          code={`-- Step 1: USERADMINロールでユーザーとロールを作成
+USE ROLE USERADMIN;
+
+-- 1. dbt専用ロールを作成
+CREATE ROLE IF NOT EXISTS dbt_role
+  COMMENT = 'Role for dbt operations';
+
+-- 2. sysadminロールを親ロールに設定
+GRANT ROLE dbt_role to ROLE SYSADMIN;
+
+-- 3. dbt専用ユーザーを作成（キーペア認証専用）
+CREATE USER IF NOT EXISTS dbt_user
+  PASSWORD = NULL  -- パスワード認証を無効化
+  COMMENT = 'dbt development user'
+  DEFAULT_WAREHOUSE = 'dbt_wh'
+  DEFAULT_ROLE = 'dbt_role';
+
+-- 4. ロールにユーザーを割り当て
+GRANT ROLE dbt_role TO USER dbt_user;
+
+-- Step 2: SYSADMINロールでデータベースとウェアハウスを作成・権限付与
+USE ROLE SYSADMIN;
+
+-- 4. dbt専用ウェアハウスを作成
+CREATE WAREHOUSE IF NOT EXISTS dbt_wh
+WAREHOUSE_SIZE = 'X-SMALL'
+AUTO_SUSPEND = 60
+INITIALLY_SUSPENDED = TRUE
+COMMENT = 'Warehouse for dbt operations';
+
+-- 5. dbt開発用データベースを作成
+CREATE DATABASE IF NOT EXISTS dbt_tutorial
+  COMMENT = 'Database for dbt tutorial';
+
+-- 6. ロールに必要な権限を付与
+-- データベースの使用権限
+GRANT USAGE ON DATABASE dbt_tutorial TO ROLE dbt_role;
+GRANT CREATE SCHEMA ON DATABASE dbt_tutorial TO ROLE dbt_role;
+
+-- ウェアハウスの使用権限
+GRANT USAGE ON WAREHOUSE dbt_wh TO ROLE dbt_role;`}
+          title="dbtユーザー・ロール作成"
+          showLineNumbers={true}
+          maxLines={45}
+        />
+
+        <Alert className="bg-yellow-50 dark:bg-yellow-950 border-l-4 border-yellow-400 mt-4 mb-4">
+          <CheckCircleIcon className="h-5 w-5 text-yellow-600" />
+          <AlertTitle className="font-bold text-yellow-800 dark:text-yellow-200">Snowflakeロール分離のベストプラクティス</AlertTitle>
+          <AlertDescription className="text-yellow-700 dark:text-yellow-300 leading-loose">
+            <strong>USERADMIN</strong>: ユーザーとロールの管理を担当<br/>
+            <strong>SYSADMIN</strong>: データベース、スキーマ、ウェアハウスの管理を担当<br/>
+            この分離により、責任の明確化とセキュリティの向上を図れます。<br/>
+            キーペア認証の詳細設定は、次章の開発環境構築後に行います。
+          </AlertDescription>
+        </Alert>
+
+        <h4 className="text-md font-semibold mb-2">手順2: 権限とアクセス確認</h4>
+        
+        <CodeBlock
+          code={`-- Step 3: 作成したユーザーとロールの確認
+-- USERADMINロールで確認
+USE ROLE USERADMIN;
+SHOW USERS LIKE 'dbt_user';
+SHOW ROLES LIKE 'dbt_role';
+
+DESC USER dbt_user;
+
+-- SYSADMINロールで権限確認
+USE ROLE SYSADMIN;
+SHOW GRANTS TO ROLE dbt_role;
+SHOW GRANTS TO USER dbt_user;
+
+-- Step 4: dbt_userでのログインテスト
+-- ※キーペア認証設定後に新しいワークシートまたはセッションで以下を実行
+USE ROLE dbt_role;
+USE WAREHOUSE dbt_wh;
+USE DATABASE dbt_tutorial;
+
+-- 基本的な操作が可能か確認
+SELECT CURRENT_USER(), CURRENT_ROLE(), CURRENT_WAREHOUSE(), CURRENT_DATABASE();
+
+-- スキーマ作成権限の確認
+CREATE SCHEMA IF NOT EXISTS dbt_tutorial.dbt_test;
+
+-- テーブル作成権限の確認
+CREATE OR REPLACE TABLE test_dbt_access (
+    id INTEGER,
+    test_message STRING
+);
+
+INSERT INTO test_dbt_access VALUES (1, 'dbt access test successful');
+SELECT * FROM test_dbt_access;
+
+-- テストスキーマを削除
+DROP SCHEMA dbt_tutorial.dbt_test;`}
+          title="権限確認とアクセステスト"
+          showLineNumbers={true}
+          maxLines={40}
+        />
+
+        <Alert className="bg-green-50 dark:bg-green-950 border-l-4 border-green-400 mt-4">
+          <CheckCircleIcon className="h-5 w-5 text-green-600" />
+          <AlertTitle className="font-bold text-green-800 dark:text-green-200">Snowflake設定完了の確認項目</AlertTitle>
+          <AlertDescription className="text-green-700 dark:text-green-300 leading-loose">
+            以下の項目がすべて完了していることを確認してください：<br/>
+            ✓ dbt_userとdbt_roleの作成<br/>
+            ✓ dbt_tutorialデータベースの作成<br/>
+            ✓ 必要な権限の付与（USAGE、CREATE SCHEMA、FUTURE権限など）<br/>
+            ✓ dbt_userでのアクセステスト成功<br/>
+            ✓ テーブル作成・操作権限の確認<br/>
+            次章では、Devcontainer環境でRSAキーペアを生成し、キーペア認証を設定します。
+          </AlertDescription>
+        </Alert>
+        
+        <p className="mt-4">
+          これでSnowflake側のdbt接続準備が完了しました。<br/>
+          次章では、Mac環境でDevcontainerをセットアップし、キーペア認証を設定してdbt開発環境を構築します。
         </p>
       </div>
 
