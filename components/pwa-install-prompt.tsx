@@ -135,7 +135,7 @@ export function PWAInstallPrompt() {
   }
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 md:left-auto md:right-4 md:max-w-sm">
+    <div className="fixed top-16 right-4 z-50 max-w-sm mx-4">
       <Card className="shadow-lg border-2 border-primary/20 bg-background/95 backdrop-blur-sm">
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
@@ -155,7 +155,7 @@ export function PWAInstallPrompt() {
         </CardHeader>
         <CardContent className="pt-0 space-y-3">
           <CardDescription className="text-sm">
-            アプリをホーム画面に追加して、より快適にご利用いただけます。
+            アプリをホーム画面に追加しましょう！
           </CardDescription>
           
           {isIOS ? (
