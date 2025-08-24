@@ -22,22 +22,34 @@ const contents = [
     icon: TerminalSquare,
   },
   {
+    title: "dbtモデルの開発",
+    description: "実際のデータを使ってdbtモデルを作成し、データ変換の基本的な処理を学びます。",
+    href: "/text/pipeline/04",
+    icon: Database,
+  },
+  {
     title: "AWS環境のセットアップ",
     description: "データパイプラインのインフラとなるAWSの各種サービス（S3, IAM等）をセットアップします。",
-    href: "/text/pipeline/04",
+    href: "/text/pipeline/05",
     icon: CloudCog,
   },
   {
     title: "FargateとStep Functionsによるバッチ処理",
     description: "dbtのバッチ処理をECS on Fargateで実行し、Step Functionsでワークフローを管理します。",
-    href: "/text/pipeline/05",
+    href: "/text/pipeline/06",
     icon: Workflow,
   },
   {
     title: "GitHub ActionsによるCI/CD",
     description: "GitHub Actionsを用いて、テストとデプロイの自動化パイプラインを構築します。",
-    href: "/text/pipeline/06",
+    href: "/text/pipeline/07",
     icon: GitMerge,
+  },
+  {
+    title: "モデルの改善と最適化",
+    description: "作成したdbtモデルの性能改善、テストの追加、ドキュメント化などの運用面を学びます。",
+    href: "/text/pipeline/08",
+    icon: Database,
   },
 ];
 
