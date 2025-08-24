@@ -8,6 +8,7 @@ export const tags = [
   'Linux',
   'Git',
   'GitHub',
+  'Lightdash',
 
   // Snowflake Features
   'Snowflake Basic',      // Monday
