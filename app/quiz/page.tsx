@@ -60,9 +60,9 @@ export default async function QuizList({ searchParams }: Props) {
   const session = await getSession()
   const userId = session?.user?.sub
 
-  // searchParamsからlimitを取得し、デフォルト値を7に設定
+  // searchParamsからlimitを取得し、デフォルト値を14に設定
   const { limit } = await searchParams
-  const limit_count = limit ? parseInt(limit) : 7
+  const limit_count = limit ? parseInt(limit) : 14
 
   // クイズディレクトリ内のクイズファイルを取得する際にlimitを使用
   const quiz_files = await getQuizFiles({
