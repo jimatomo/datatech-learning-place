@@ -17,11 +17,12 @@ import { UserProvider } from '@auth0/nextjs-auth0/client';
 import { AuthStatus } from "@/components/auth-status"
 import { AuthDialog } from "@/components/auth-dialog"
 import ConsentManager from "@/components/ConsentManager"
+import { PWAInstallPrompt } from "@/components/pwa-install-prompt"
 
 export const metadata: Metadata = {
   title: "Datatech Learning Place",
   description: "データ技術を学ぶためのオンライン学習プラットフォーム",
-  manifest: "/manifest.json",
+  manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -106,6 +107,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <Footer />
             </div>
           </SidebarProvider>
+          <PWAInstallPrompt />
         </ThemeProvider>
       </body>
       </UserProvider>

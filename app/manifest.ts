@@ -3,7 +3,7 @@ import type { MetadataRoute } from 'next'
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Datatech Learning Place',
-    short_name: 'DLP',
+    short_name: 'DTLP',
     description: 'データ技術を学ぶためのオンライン学習プラットフォーム',
     start_url: '/',
     display: 'standalone',
