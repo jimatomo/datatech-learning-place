@@ -7,7 +7,7 @@ import { getSession } from '@auth0/nextjs-auth0';
 
 export const dynamic = 'force-dynamic';
 
-const client = new DynamoDBClient({});
+const client = new DynamoDBClient({ region: 'ap-northeast-1' });
 const ddbDocClient = DynamoDBDocumentClient.from(client);
 
 export async function GET(request: NextRequest) {

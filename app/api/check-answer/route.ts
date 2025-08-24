@@ -4,7 +4,7 @@ import { Quiz } from '@/contents/quiz'
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { getSession } from '@auth0/nextjs-auth0';
-const client = new DynamoDBClient({});
+const client = new DynamoDBClient({ region: 'ap-northeast-1' });
 const ddbDocClient = DynamoDBDocumentClient.from(client);
 
 export async function POST(request: Request) {
