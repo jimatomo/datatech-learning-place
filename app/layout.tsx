@@ -20,8 +20,37 @@ import ConsentManager from "@/components/ConsentManager"
 
 export const metadata: Metadata = {
   title: "Datatech Learning Place",
-  description: "Datatech Learning Place",
+  description: "データ技術を学ぶためのオンライン学習プラットフォーム",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Datatech Learning Place",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  openGraph: {
+    type: "website",
+    siteName: "Datatech Learning Place",
+    title: "Datatech Learning Place",
+    description: "データ技術を学ぶためのオンライン学習プラットフォーム",
+  },
+  twitter: {
+    card: "summary",
+    title: "Datatech Learning Place",
+    description: "データ技術を学ぶためのオンライン学習プラットフォーム",
+  },
 };
+
+export function generateViewport() {
+  return {
+    themeColor: "#1d4ed8",
+    width: "device-width",
+    initialScale: 1,
+    shrinkToFit: "no",
+  };
+}
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies()
@@ -29,6 +58,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang="ja" suppressHydrationWarning>
+      <head>
+        <link rel="apple-touch-icon" href="/icon-192x192.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Datatech Learning Place" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="msapplication-config" content="/browserconfig.xml" />
+        <meta name="msapplication-TileColor" content="#1d4ed8" />
+      </head>
       <UserProvider>
       <body>
         <ConsentManager />
