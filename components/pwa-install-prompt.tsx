@@ -73,18 +73,21 @@ export function PWAInstallPrompt() {
         e.preventDefault()
         const beforeInstallPromptEvent = e as BeforeInstallPromptEvent
         setDeferredPrompt(beforeInstallPromptEvent)
-        setShowPrompt(true)
+        // セッション中に無効化されていない場合のみ表示
+        if (!sessionStorage.getItem('pwa-prompt-session-dismissed')) {
+          setShowPrompt(true)
+        }
       }
 
       window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
 
       // Safari用の表示ロジック（iOS Safari と macOS Safari）
-      if ((iOS || macOS) && isSafari) {
+      if ((iOS || macOS) && isSafari && !sessionDismissed) {
         setShowPrompt(true)
       }
 
       // MacOS Chrome/Edge用のフォールバック機能
-      if (macOS && (isChrome || isEdge) && !standalone) {
+      if (macOS && (isChrome || isEdge) && !standalone && !sessionDismissed) {
         // beforeinstallpromptが発生しない場合のフォールバック
         const fallbackTimer = setTimeout(() => {
           setShowPrompt(true)
