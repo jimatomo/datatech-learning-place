@@ -46,10 +46,10 @@ export const metadata: Metadata = {
 
 export function generateViewport() {
   return {
-    themeColor: "#1d4ed8",
     width: "device-width",
     initialScale: 1,
     shrinkToFit: "no",
+    viewportFit: "cover", // PWA対応：セーフエリア全体を使用
   };
 }
 
@@ -82,7 +82,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <AppSidebar />
             <div className="flex flex-col min-h-screen w-screen">
               <main className="flex-1">
-                <div className="flex items-center px-4 py-2 w-full">
+                {/* スマホ対応の固定ヘッダー */}
+                <div className="sticky top-0 z-40 flex items-center px-4 py-2 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border/40">
                   <div className="flex items-center gap-2">
                     <SidebarTrigger className="w-10" />
                     <Separator orientation="vertical" className="h-4" />

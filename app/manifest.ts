@@ -7,8 +7,6 @@ export default function manifest(): MetadataRoute.Manifest {
     description: 'データ技術を学ぶためのオンライン学習プラットフォーム',
     start_url: '/',
     display: 'standalone',
-    background_color: '#ffffff',
-    theme_color: '#1d4ed8',
     icons: [
       {
         src: '/icon-192x192.png',
