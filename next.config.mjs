@@ -1,4 +1,5 @@
 import withPWA from 'next-pwa';
+import { NotificationScheduler } from './lib/notification-scheduler.js';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -12,6 +13,12 @@ const nextConfig = {
     ],
   },
 };
+
+// サーバー起動時の処理
+if (typeof window === 'undefined') {
+  console.log('サーバー起動時の処理を実行中...')
+  new NotificationScheduler()
+}
 
 const pwaConfig = withPWA({
   dest: 'public',

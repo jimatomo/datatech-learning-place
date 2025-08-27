@@ -1,7 +1,7 @@
 import { Metadata } from "next"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
-import { NotificationSettingsComponent } from "@/components/notification-settings"
+import { NotificationSettingsComponent } from "@/app/global/notifications/ui/notification-settings"
 
 export const metadata: Metadata = {
   title: "通知設定 - DTLP Global",
