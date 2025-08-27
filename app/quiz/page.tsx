@@ -8,6 +8,8 @@ import QuizFileListTagFiltered from '@/app/quiz/ui/quiz-file-list-tag-filtered'
 import { getSession } from '@auth0/nextjs-auth0';
 import QuizWeeklyContents from '@/app/quiz/ui/quiz-weekly-contents'
 import { getJSTNow, filterFutureDates } from '@/lib/date-utils'
+import Link from "next/link"
+import { Settings } from "lucide-react"
 
 export const metadata: Metadata = {
   title: "DTLP Quiz",
@@ -114,6 +116,18 @@ export default async function QuizList({ searchParams }: Props) {
         </h2>
         <div className="px-2">
           <QuizFileList pathInfos={latest_path_infos_full_path} currentPath={[]} />
+        </div>
+      </div>
+
+      <div>
+        <h2 className="scroll-m-20 pt-5 pb-2 text-lg font-semibold tracking-tight">
+          <p>通知設定</p>
+        </h2>
+        <div className="px-2">
+          <Link href="/global/notifications" className="inline-flex items-center text-lg hover:underline">
+            <Settings className="w-4 h-4 mr-2" />
+            <p>通知設定を管理する</p>
+          </Link>
         </div>
       </div>
 
