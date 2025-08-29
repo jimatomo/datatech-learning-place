@@ -57,7 +57,7 @@ export function NotificationSettingsClient({
     )) {
       setCurrentSettings(initialSettings)
     }
-  }, [initialSettings])
+  }, [initialSettings, currentSettings.enabled, currentSettings.selectedTags, currentSettings.notificationTime])
 
   // useNotificationManagerの設定と同期を取る
   useEffect(() => {
@@ -68,7 +68,7 @@ export function NotificationSettingsClient({
     )) {
       setCurrentSettings(settings)
     }
-  }, [settings])
+  }, [settings, currentSettings.enabled, currentSettings.selectedTags, currentSettings.notificationTime])
 
   // 時間の選択肢を生成（10分単位）
   const timeOptions = []
