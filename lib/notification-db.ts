@@ -290,4 +290,94 @@ export function reconstructPushSubscription(subscription: NotificationSubscripti
   };
 }
 
+// 通知設定を取得するための高レベルな関数（API用）
+export interface GetNotificationSettingsResult {
+  success: boolean;
+  hasSubscription: boolean;
+  message?: string;
+  error?: string;
+  settings?: {
+    enabled: boolean;
+    selectedTags: string[];
+    notificationTime: string;
+  };
+}
+
+export async function getNotificationSettings(userId: string): Promise<GetNotificationSettingsResult> {
+  try {
+    if (!userId) {
+      return {
+        success: true,
+        hasSubscription: false,
+        message: "認証されていません"
+      };
+    }
+
+    // DynamoDBから購読情報を取得
+    const subscriptionData = await getNotificationSubscription(userId);
+
+    if (!subscriptionData) {
+      return {
+        success: true,
+        hasSubscription: false,
+        message: "通知設定が見つかりません"
+      };
+    }
+
+    return {
+      success: true,
+      hasSubscription: true,
+      settings: {
+        enabled: subscriptionData.enabled,
+        selectedTags: subscriptionData.selected_tags,
+        notificationTime: subscriptionData.notification_time
+      }
+    };
+  } catch (error) {
+    console.error("通知設定の取得エラー:", error);
+
+    return {
+      success: false,
+      hasSubscription: false,
+      error: "通知設定の取得に失敗しました"
+    };
+  }
+}
+
+// 認証に依存しない純粋な通知設定取得関数（クライアントサイド用）
+export async function getNotificationSettingsPure(userId: string): Promise<{
+  hasSubscription: boolean;
+  settings?: {
+    enabled: boolean;
+    selectedTags: string[];
+    notificationTime: string;
+  };
+} | null> {
+  try {
+    if (!userId) {
+      return null;
+    }
+
+    const subscriptionData = await getNotificationSubscription(userId);
+    
+    if (!subscriptionData) {
+      return {
+        hasSubscription: false
+      };
+    }
+
+    return {
+      hasSubscription: true,
+      settings: {
+        enabled: subscriptionData.enabled,
+        selectedTags: subscriptionData.selected_tags,
+        notificationTime: subscriptionData.notification_time
+      }
+    };
+  } catch (error) {
+    console.error("通知設定の取得エラー:", error);
+    return null;
+  }
+}
+
 

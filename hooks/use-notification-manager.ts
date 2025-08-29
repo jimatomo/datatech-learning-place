@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState } from "react"
 
 export interface NotificationSettings {
   enabled: boolean
@@ -6,15 +6,29 @@ export interface NotificationSettings {
   notificationTime: string // HH:MM format
 }
 
-export function useNotificationManager() {
+interface UseNotificationManagerProps {
+  initialSettings?: NotificationSettings
+}
+
+export function useNotificationManager({ initialSettings }: UseNotificationManagerProps = {}) {
   const [isSupported, setIsSupported] = useState(false)
   const [subscription, setSubscription] = useState<PushSubscription | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [settings, setSettings] = useState<NotificationSettings>({
-    enabled: false,
-    selectedTags: [],
-    notificationTime: "09:00"
-  })
+  const [settings, setSettings] = useState<NotificationSettings>(
+    initialSettings || {
+      enabled: false,
+      selectedTags: [],
+      notificationTime: "09:00"
+    }
+  )
+
+  // 初期設定が変更された場合に状態を更新
+  useEffect(() => {
+    if (initialSettings) {
+      console.log('useNotificationManager - 初期設定を適用:', initialSettings)
+      setSettings(initialSettings)
+    }
+  }, [initialSettings])
 
   // Service Workerの登録
   const registerServiceWorker = async () => {
@@ -47,58 +61,12 @@ export function useNotificationManager() {
     }
   }
 
-  // 設定をサーバーから読み込み
-  const loadSettings = useCallback(async () => {
-    try {
-      const response = await fetch('/api/notifications/get-settings')
-      if (response.ok) {
-        const data = await response.json()
-        console.log('サーバー設定レスポンス:', data)
-        if (data.success && data.hasSubscription) {
-          const serverSettings = {
-            enabled: data.settings.enabled,
-            selectedTags: data.settings.selectedTags,
-            notificationTime: data.settings.notificationTime
-          }
-          console.log('サーバーから設定を取得しました:', serverSettings)
-          setSettings(serverSettings)
-          return
-        } else {
-          console.log('サーバーに設定が見つかりません:', data)
-          // サーバーに設定がない場合はデフォルト設定を使用
-          setSettings({
-            enabled: false,
-            selectedTags: [],
-            notificationTime: "09:00"
-          })
-        }
-      } else {
-        console.log('サーバー設定取得失敗:', response.status)
-        // ネットワークエラーの場合もデフォルト設定
-        setSettings({
-          enabled: false,
-          selectedTags: [],
-          notificationTime: "09:00"
-        })
-      }
-    } catch (error) {
-      console.error('サーバーから設定を取得できませんでした:', error)
-      // エラーの場合はデフォルト設定を使用
-      setSettings({
-        enabled: false,
-        selectedTags: [],
-        notificationTime: "09:00"
-      })
-    }
-  }, [])
-
   useEffect(() => {
     if ("serviceWorker" in navigator && "PushManager" in window) {
       setIsSupported(true)
       registerServiceWorker()
-      loadSettings() // 非同期関数だが、awaitしない
     }
-  }, [loadSettings])
+  }, [])
 
   // 設定を状態に保存（サーバー同期は各API呼び出しで行う）
   const saveSettings = (newSettings: NotificationSettings) => {
