@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { sendTestNotification as sendTestNotificationAction } from "@/lib/notifications"
 
 export interface NotificationSettings {
   enabled: boolean
@@ -234,18 +235,18 @@ export function useNotificationManager({ initialSettings }: UseNotificationManag
         throw new Error("通知の購読が必要です")
       }
 
-      const response = await fetch("/api/notifications/test", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          subscription: subscription,
-        }),
-      })
-
-      if (!response.ok) {
-        const result = await response.json()
+      // PushSubscriptionオブジェクトをシリアライズ可能な形式に変換
+      const subscriptionData = {
+        endpoint: subscription.endpoint,
+        keys: {
+          p256dh: btoa(String.fromCharCode(...new Uint8Array(subscription.getKey('p256dh')!))),
+          auth: btoa(String.fromCharCode(...new Uint8Array(subscription.getKey('auth')!)))
+        }
+      }
+      
+      const result = await sendTestNotificationAction(subscriptionData)
+      
+      if (!result.success) {
         throw new Error(result.error || "テスト通知の送信に失敗しました")
       }
 
