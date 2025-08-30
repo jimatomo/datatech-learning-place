@@ -16,7 +16,16 @@ interface NotificationSettingsClientProps {
   className?: string
   initialSettings: NotificationSettings
   userId?: string
-  updateSettingsOnServer: (settings: NotificationSettings) => Promise<{ success: boolean; error?: string }>
+  updateSettingsOnServer: (settings: NotificationSettings & {
+    subscription?: {
+      endpoint: string;
+      keys: {
+        p256dh: string;
+        auth: string;
+      };
+    };
+    action: 'update' | 'subscribe' | 'unsubscribe';
+  }) => Promise<{ success: boolean; error?: string }>
 }
 
 export function NotificationSettingsClient({ 
@@ -61,10 +70,20 @@ export function NotificationSettingsClient({
   const generalTags = tags.filter(tag => !weeklyTags.includes(tag))
 
   // サーバーサイドでの設定更新処理
-  const handleSettingsUpdate = async (newSettings: NotificationSettings) => {
+  const handleSettingsUpdate = async (newSettings: NotificationSettings, action: 'update' | 'subscribe' | 'unsubscribe' = 'update', subscription?: PushSubscription) => {
     try {
       // サーバーサイドで設定を更新
-      const result = await updateSettingsOnServer(newSettings)
+      const result = await updateSettingsOnServer({
+        ...newSettings,
+        action,
+        subscription: subscription ? {
+          endpoint: subscription.endpoint,
+          keys: {
+            p256dh: btoa(String.fromCharCode(...new Uint8Array(subscription.getKey('p256dh')!))),
+            auth: btoa(String.fromCharCode(...new Uint8Array(subscription.getKey('auth')!)))
+          }
+        } : undefined
+      })
       
       if (!result.success) {
         setError(result.error || "設定の更新に失敗しました")

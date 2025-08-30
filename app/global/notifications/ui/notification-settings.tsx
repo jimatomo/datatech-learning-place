@@ -1,5 +1,10 @@
 import { getSession } from '@auth0/nextjs-auth0'
-import { getNotificationSettingsPure, updateNotificationSettings } from '@/lib/notification-db'
+import { 
+  getNotificationSettingsPure, 
+  updateNotificationSettings, 
+  saveNotificationSubscription,
+  deleteNotificationSubscription
+} from '@/lib/notification-db'
 import { NotificationSettingsClient } from './notification-settings-client'
 
 interface NotificationSettingsProps {
@@ -33,11 +38,19 @@ export async function NotificationSettingsComponent({ className }: NotificationS
     }
   }
 
-  // サーバーサイドでの通知設定更新処理
+  // サーバーサイドでの通知設定更新処理（統合版）
   async function updateSettingsOnServer(newSettings: {
     enabled: boolean;
     selectedTags: string[];
     notificationTime: string;
+    subscription?: {
+      endpoint: string;
+      keys: {
+        p256dh: string;
+        auth: string;
+      };
+    };
+    action: 'update' | 'subscribe' | 'unsubscribe';
   }) {
     'use server'
     
@@ -46,23 +59,52 @@ export async function NotificationSettingsComponent({ className }: NotificationS
     }
 
     try {
-      // DynamoDBの設定を更新
       const dbSettings = {
         enabled: newSettings.enabled,
         selected_tags: newSettings.selectedTags,
         notification_time: newSettings.notificationTime
       }
-      
-      const success = await updateNotificationSettings(userId, dbSettings)
+
+      let success = false
+
+      switch (newSettings.action) {
+        case 'subscribe':
+          if (newSettings.subscription) {
+            // 新規購読
+            success = await saveNotificationSubscription(
+              userId,
+              newSettings.subscription,
+              dbSettings
+            )
+          }
+          break
+
+        case 'unsubscribe':
+          // 購読解除
+          success = await deleteNotificationSubscription(userId)
+          break
+
+        case 'update':
+        default:
+          // 設定更新
+          success = await updateNotificationSettings(userId, dbSettings)
+          break
+      }
       
       if (!success) {
-        return { success: false, error: "通知設定の更新に失敗しました" }
+        return { 
+          success: false, 
+          error: `通知設定の${newSettings.action === 'subscribe' ? '購読' : newSettings.action === 'unsubscribe' ? '解除' : '更新'}に失敗しました` 
+        }
       }
 
       return { success: true }
     } catch (error) {
-      console.error("通知設定の更新エラー:", error)
-      return { success: false, error: "通知設定の更新に失敗しました" }
+      console.error("通知設定の処理エラー:", error)
+      return { 
+        success: false, 
+        error: "通知設定の処理に失敗しました" 
+      }
     }
   }
 

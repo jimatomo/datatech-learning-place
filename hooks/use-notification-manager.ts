@@ -9,9 +9,19 @@ export interface NotificationSettings {
 
 interface UseNotificationManagerProps {
   initialSettings?: NotificationSettings
+  updateSettingsOnServer?: (settings: NotificationSettings & {
+    subscription?: {
+      endpoint: string;
+      keys: {
+        p256dh: string;
+        auth: string;
+      };
+    };
+    action: 'update' | 'subscribe' | 'unsubscribe';
+  }) => Promise<{ success: boolean; error?: string }>
 }
 
-export function useNotificationManager({ initialSettings }: UseNotificationManagerProps = {}) {
+export function useNotificationManager({ initialSettings, updateSettingsOnServer }: UseNotificationManagerProps = {}) {
   const [isSupported, setIsSupported] = useState(false)
   const [subscription, setSubscription] = useState<PushSubscription | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -109,17 +119,21 @@ export function useNotificationManager({ initialSettings }: UseNotificationManag
       })
       setSubscription(sub)
 
-      // サーバーにサブスクリプション情報を送信
-      await fetch("/api/notifications/subscribe", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          subscription: sub,
-          settings: settings
-        }),
-      })
+      // サーバーサイドでの処理に統一するため、ここでは状態のみ更新
+      // 実際のデータベース操作はサーバーコンポーネントで行う
+      if (updateSettingsOnServer) {
+        await updateSettingsOnServer({
+          ...settings,
+          action: 'subscribe',
+          subscription: {
+            endpoint: sub.endpoint,
+            keys: {
+              p256dh: btoa(String.fromCharCode(...new Uint8Array(sub.getKey('p256dh')!))),
+              auth: btoa(String.fromCharCode(...new Uint8Array(sub.getKey('auth')!)))
+            }
+          }
+        })
+      }
 
       return true
     } catch (error) {
@@ -135,16 +149,14 @@ export function useNotificationManager({ initialSettings }: UseNotificationManag
     try {
       if (!subscription) return
 
-      // サーバーからサブスクリプション情報を削除
-      await fetch("/api/notifications/unsubscribe", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          subscription: subscription
-        }),
-      })
+      // サーバーサイドでの処理に統一するため、ここでは状態のみ更新
+      // 実際のデータベース操作はサーバーコンポーネントで行う
+      if (updateSettingsOnServer) {
+        await updateSettingsOnServer({
+          ...settings,
+          action: 'unsubscribe'
+        })
+      }
 
       await subscription.unsubscribe()
       setSubscription(null)
@@ -182,41 +194,20 @@ export function useNotificationManager({ initialSettings }: UseNotificationManag
         }
       }
       
-      // 購読中の場合は設定をサーバーに更新
-      if (subscription && newSettings.enabled) {
-        const response = await fetch("/api/notifications/update-settings", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            subscription: subscription,
-            settings: newSettings
-          }),
-        })
-        
-        if (!response.ok) {
-          // サーバーに設定がない場合は、新規登録として扱う
-          if (response.status === 404 || response.status === 500) {
-            console.log("サーバーに設定がないため、新規登録します")
-            const subscribeResponse = await fetch("/api/notifications/subscribe", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                subscription: subscription,
-                settings: newSettings
-              }),
-            })
-            
-            if (!subscribeResponse.ok) {
-              throw new Error("設定の保存に失敗しました")
+      // サーバーサイドでの処理に統一するため、ここでは状態のみ更新
+      // 実際のデータベース操作はサーバーコンポーネントで行う
+      if (updateSettingsOnServer && subscription && newSettings.enabled) {
+        await updateSettingsOnServer({
+          ...newSettings,
+          action: 'update',
+          subscription: {
+            endpoint: subscription.endpoint,
+            keys: {
+              p256dh: btoa(String.fromCharCode(...new Uint8Array(subscription.getKey('p256dh')!))),
+              auth: btoa(String.fromCharCode(...new Uint8Array(subscription.getKey('auth')!)))
             }
-          } else {
-            throw new Error("設定の更新に失敗しました")
           }
-        }
+        })
       }
       
       return true
