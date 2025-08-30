@@ -265,6 +265,7 @@ export function useNotificationManager({ initialSettings }: UseNotificationManag
     settings,
     error,
     setError,
+    setSettings,
     subscribeToPush,
     unsubscribeFromPush,
     updateSettings,

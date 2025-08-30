@@ -1,5 +1,5 @@
 import { getSession } from '@auth0/nextjs-auth0'
-import { getNotificationSettingsPure } from '@/lib/notification-db'
+import { getNotificationSettingsPure, updateNotificationSettings } from '@/lib/notification-db'
 import { NotificationSettingsClient } from './notification-settings-client'
 
 interface NotificationSettingsProps {
@@ -33,11 +33,45 @@ export async function NotificationSettingsComponent({ className }: NotificationS
     }
   }
 
+  // サーバーサイドでの通知設定更新処理
+  async function updateSettingsOnServer(newSettings: {
+    enabled: boolean;
+    selectedTags: string[];
+    notificationTime: string;
+  }) {
+    'use server'
+    
+    if (!userId) {
+      return { success: false, error: "認証が必要です" }
+    }
+
+    try {
+      // DynamoDBの設定を更新
+      const dbSettings = {
+        enabled: newSettings.enabled,
+        selected_tags: newSettings.selectedTags,
+        notification_time: newSettings.notificationTime
+      }
+      
+      const success = await updateNotificationSettings(userId, dbSettings)
+      
+      if (!success) {
+        return { success: false, error: "通知設定の更新に失敗しました" }
+      }
+
+      return { success: true }
+    } catch (error) {
+      console.error("通知設定の更新エラー:", error)
+      return { success: false, error: "通知設定の更新に失敗しました" }
+    }
+  }
+
   return (
     <NotificationSettingsClient 
       className={className} 
       initialSettings={settings}
       userId={userId}
+      updateSettingsOnServer={updateSettingsOnServer}
     />
   )
 }

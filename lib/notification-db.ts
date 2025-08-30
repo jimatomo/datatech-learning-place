@@ -134,7 +134,7 @@ export async function updateNotificationSettings(
       Item: updatedItem
     }));
 
-    console.log('通知設定を更新しました:', { userId, settings });
+    // console.log('通知設定を更新しました:', { userId, settings });
     return true;
   } catch (error) {
     console.error('通知設定の更新エラー:', error);

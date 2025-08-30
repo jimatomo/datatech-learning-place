@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useNotificationManager, NotificationSettings } from "@/hooks/use-notification-manager"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
@@ -16,12 +16,14 @@ interface NotificationSettingsClientProps {
   className?: string
   initialSettings: NotificationSettings
   userId?: string
+  updateSettingsOnServer: (settings: NotificationSettings) => Promise<{ success: boolean; error?: string }>
 }
 
 export function NotificationSettingsClient({ 
   className, 
   initialSettings, 
-  userId 
+  userId,
+  updateSettingsOnServer
 }: NotificationSettingsClientProps) {
   const {
     isSupported,
@@ -29,46 +31,12 @@ export function NotificationSettingsClient({
     settings,
     error,
     setError,
-    updateSettings,
+    setSettings,
     sendTestNotification,
   } = useNotificationManager({ initialSettings })
 
   const [isLoading, setIsLoading] = useState(false)
   const [testSuccess, setTestSuccess] = useState(false)
-  
-  // 初期設定を確実に適用
-  const [currentSettings, setCurrentSettings] = useState<NotificationSettings>(() => {
-    if (initialSettings && initialSettings.enabled !== undefined) {
-      return initialSettings
-    }
-    return {
-      enabled: false,
-      selectedTags: [],
-      notificationTime: "09:00"
-    }
-  })
-
-  // 初期設定が変更された場合に現在の設定を更新
-  useEffect(() => {
-    if (initialSettings && (
-      initialSettings.enabled !== currentSettings.enabled ||
-      JSON.stringify(initialSettings.selectedTags) !== JSON.stringify(currentSettings.selectedTags) ||
-      initialSettings.notificationTime !== currentSettings.notificationTime
-    )) {
-      setCurrentSettings(initialSettings)
-    }
-  }, [initialSettings, currentSettings.enabled, currentSettings.selectedTags, currentSettings.notificationTime])
-
-  // useNotificationManagerの設定と同期を取る
-  useEffect(() => {
-    if (settings && (
-      settings.enabled !== currentSettings.enabled || 
-      JSON.stringify(settings.selectedTags) !== JSON.stringify(currentSettings.selectedTags) || 
-      settings.notificationTime !== currentSettings.notificationTime
-    )) {
-      setCurrentSettings(settings)
-    }
-  }, [settings, currentSettings.enabled, currentSettings.selectedTags, currentSettings.notificationTime])
 
   // 時間の選択肢を生成（10分単位）
   const timeOptions = []
@@ -92,21 +60,42 @@ export function NotificationSettingsClient({
   
   const generalTags = tags.filter(tag => !weeklyTags.includes(tag))
 
+  // サーバーサイドでの設定更新処理
+  const handleSettingsUpdate = async (newSettings: NotificationSettings) => {
+    try {
+      // サーバーサイドで設定を更新
+      const result = await updateSettingsOnServer(newSettings)
+      
+      if (!result.success) {
+        setError(result.error || "設定の更新に失敗しました")
+        return false
+      }
+      
+      // 成功時はuseNotificationManagerの状態を更新
+      setSettings({ ...newSettings })
+      
+      // エラーをクリア
+      setError(null)
+      
+      return true
+    } catch (error) {
+      console.error('設定更新エラー:', error)
+      setError("設定の更新に失敗しました")
+      return false
+    }
+  }
+
   const handleToggle = async (enabled: boolean) => {
     setIsLoading(true)
     setError(null)
     
     const newSettings: NotificationSettings = {
-      ...currentSettings,
+      ...settings,
       enabled
     }
     
-    setCurrentSettings(newSettings)
-    
-    const success = await updateSettings(newSettings)
+    const success = await handleSettingsUpdate(newSettings)
     if (!success) {
-      // エラーの場合は元の状態に戻す
-      setCurrentSettings(currentSettings)
       setIsLoading(false)
       return
     }
@@ -118,7 +107,7 @@ export function NotificationSettingsClient({
     setIsLoading(true)
     setError(null)
     
-    const currentTags = currentSettings.selectedTags || []
+    const currentTags = settings.selectedTags || []
     let newTags: string[]
     if (checked) {
       newTags = [...currentTags, tag]
@@ -127,12 +116,11 @@ export function NotificationSettingsClient({
     }
     
     const newSettings: NotificationSettings = {
-      ...currentSettings,
+      ...settings,
       selectedTags: newTags
     }
     
-    setCurrentSettings(newSettings)
-    await updateSettings(newSettings)
+    await handleSettingsUpdate(newSettings)
     setIsLoading(false)
   }
 
@@ -141,12 +129,11 @@ export function NotificationSettingsClient({
     setError(null)
     
     const newSettings: NotificationSettings = {
-      ...currentSettings,
+      ...settings,
       notificationTime: time
     }
     
-    setCurrentSettings(newSettings)
-    await updateSettings(newSettings)
+    await handleSettingsUpdate(newSettings)
     setIsLoading(false)
   }
 
@@ -169,12 +156,11 @@ export function NotificationSettingsClient({
     setError(null)
     
     const newSettings: NotificationSettings = {
-      ...currentSettings,
+      ...settings,
       selectedTags: [...tags]
     }
     
-    setCurrentSettings(newSettings)
-    await updateSettings(newSettings)
+    await handleSettingsUpdate(newSettings)
     setIsLoading(false)
   }
 
@@ -183,12 +169,11 @@ export function NotificationSettingsClient({
     setError(null)
     
     const newSettings: NotificationSettings = {
-      ...currentSettings,
+      ...settings,
       selectedTags: []
     }
     
-    setCurrentSettings(newSettings)
-    await updateSettings(newSettings)
+    await handleSettingsUpdate(newSettings)
     setIsLoading(false)
   }
 
@@ -262,17 +247,17 @@ export function NotificationSettingsClient({
           <div className="space-y-0.5">
             <Label className="text-base">プッシュ通知</Label>
             <div className="text-sm text-muted-foreground">
-              クイズ投稿時の通知を{currentSettings?.enabled ? '有効' : '無効'}にする
+              クイズ投稿時の通知を{settings?.enabled ? '有効' : '無効'}にする
             </div>
           </div>
           <Switch
-            checked={currentSettings?.enabled || false}
+            checked={settings?.enabled || false}
             onCheckedChange={handleToggle}
             disabled={isLoading}
           />
         </div>
 
-        {currentSettings?.enabled && (
+        {settings?.enabled && (
           <>
             {/* 通知時間設定 */}
             <div className="space-y-3">
@@ -280,7 +265,7 @@ export function NotificationSettingsClient({
                 <Clock className="h-4 w-4" />
                 通知時間
               </Label>
-              <Select value={currentSettings?.notificationTime || "09:00"} onValueChange={handleTimeChange}>
+              <Select value={settings?.notificationTime || "09:00"} onValueChange={handleTimeChange}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="通知時間を選択" />
                 </SelectTrigger>
@@ -331,7 +316,7 @@ export function NotificationSettingsClient({
                     <div key={tag} className="flex items-center space-x-2">
                       <Checkbox
                         id={`weekly-tag-${tag}`}
-                        checked={currentSettings?.selectedTags?.includes(tag) || false}
+                        checked={settings?.selectedTags?.includes(tag) || false}
                         onCheckedChange={(checked) => handleTagToggle(tag, checked as boolean)}
                         disabled={isLoading}
                       />
@@ -354,7 +339,7 @@ export function NotificationSettingsClient({
                     <div key={tag} className="flex items-center space-x-2">
                       <Checkbox
                         id={`general-tag-${tag}`}
-                        checked={currentSettings?.selectedTags?.includes(tag) || false}
+                        checked={settings?.selectedTags?.includes(tag) || false}
                         onCheckedChange={(checked) => handleTagToggle(tag, checked as boolean)}
                         disabled={isLoading}
                       />
