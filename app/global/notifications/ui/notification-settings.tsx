@@ -33,6 +33,7 @@ export async function NotificationSettingsComponent({ className }: NotificationS
           notificationTime: result.settings.notificationTime
         }
       }
+      // 通知設定が存在しない場合は、デフォルト値を使用（enabled: false, selectedTags: [], notificationTime: "09:00"）
     } catch (error) {
       console.error('通知設定の取得エラー:', error)
     }

@@ -41,6 +41,7 @@ export function NotificationSettingsClient({
     error,
     setError,
     setSettings,
+    setSubscription,
     sendTestNotification,
   } = useNotificationManager({ initialSettings })
 
@@ -113,7 +114,43 @@ export function NotificationSettingsClient({
       enabled
     }
     
-    const success = await handleSettingsUpdate(newSettings)
+    // 通知設定が無い状態で初回に通知を有効にする場合は、subscribeアクションを使用
+    const action = enabled && (!settings.enabled && settings.selectedTags.length === 0) ? 'subscribe' : 'update'
+    
+    // subscribeアクションの場合は、現在のsubscriptionまたは新しく作成する
+    let currentSubscription = subscription
+    if (action === 'subscribe' && !currentSubscription) {
+      try {
+        // 通知許可を要求
+        const permission = await Notification.requestPermission()
+        if (permission !== "granted") {
+          setError("通知の許可が得られませんでした")
+          setIsLoading(false)
+          return
+        }
+        
+        // Service Workerの準備
+        const registration = await navigator.serviceWorker.ready
+        
+        // 新しい購読を作成
+        currentSubscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: new Uint8Array(
+            atob(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!).split('').map(char => char.charCodeAt(0))
+          ),
+        })
+        
+        // useNotificationManagerの状態も更新
+        setSubscription(currentSubscription)
+      } catch (error) {
+        console.error('購読作成エラー:', error)
+        setError("通知の購読に失敗しました")
+        setIsLoading(false)
+        return
+      }
+    }
+    
+    const success = await handleSettingsUpdate(newSettings, action, currentSubscription || undefined)
     if (!success) {
       setIsLoading(false)
       return

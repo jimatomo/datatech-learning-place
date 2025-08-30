@@ -257,6 +257,7 @@ export function useNotificationManager({ initialSettings, updateSettingsOnServer
     error,
     setError,
     setSettings,
+    setSubscription,
     subscribeToPush,
     unsubscribeFromPush,
     updateSettings,
