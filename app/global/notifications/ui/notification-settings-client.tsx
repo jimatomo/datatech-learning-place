@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useNotificationManager, NotificationSettings } from "@/app/global/notifications/lib/use-notification-manager"
+import { NotificationActionRequest, NotificationActionResponse } from "@/app/global/notifications/lib/notification-actions"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -15,16 +16,7 @@ interface NotificationSettingsClientProps {
   className?: string
   initialSettings: NotificationSettings
   userId?: string
-  updateSettingsOnServer: (settings: NotificationSettings & {
-    subscription?: {
-      endpoint: string;
-      keys: {
-        p256dh: string;
-        auth: string;
-      };
-    };
-    action: 'update' | 'subscribe' | 'unsubscribe';
-  }) => Promise<{ success: boolean; error?: string }>
+  updateSettingsOnServer: (settings: NotificationActionRequest) => Promise<NotificationActionResponse>
 }
 
 export function NotificationSettingsClient({ 
@@ -79,9 +71,10 @@ export function NotificationSettingsClient({
   const handleSettingsUpdate = async (newSettings: NotificationSettings, action: 'update' | 'subscribe' | 'unsubscribe' = 'update', subscription?: PushSubscription) => {
     try {
       console.log('設定更新開始:', { action, newSettings, hasSubscription: !!subscription })
+      console.log('updateSettingsOnServer関数の型:', typeof updateSettingsOnServer)
       
       // サーバーサイドで設定を更新
-      const result = await updateSettingsOnServer({
+      const requestData = {
         ...newSettings,
         action,
         subscription: subscription ? {
@@ -91,7 +84,11 @@ export function NotificationSettingsClient({
             auth: btoa(String.fromCharCode(...new Uint8Array(subscription.getKey('auth')!)))
           }
         } : undefined
-      })
+      }
+      
+      console.log('サーバーに送信するデータ:', requestData)
+      
+      const result = await updateSettingsOnServer(requestData)
       
       console.log('サーバー応答:', result)
       
@@ -116,6 +113,11 @@ export function NotificationSettingsClient({
       return true
     } catch (error) {
       console.error('設定更新エラー:', error)
+      console.error('エラーの詳細:', {
+        name: error instanceof Error ? error.name : 'Unknown',
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : 'No stack trace'
+      })
       setError(`設定の更新に失敗しました: ${error instanceof Error ? error.message : '不明なエラー'}`)
       return false
     }
