@@ -1,8 +1,13 @@
+// クイズ通知の送信を行うファイル
 import webpush from "web-push"
-import { getSubscribersForTags, reconstructPushSubscription, deleteNotificationSubscription } from '@/lib/notification-db'
-import { transformQuizIdToUrl } from '@/contents/quiz'
 import path from 'path'
-import fs from 'fs'
+import {
+  getSubscribersForTags,
+  reconstructPushSubscription,
+  deleteNotificationSubscription
+} from '@/lib/notification-db'
+import { getQuizFiles } from '@/app/quiz/lib/get-files'
+import { getPathInfos } from '@/app/quiz/lib/get-path-info'
 
 // VAPIDの設定
 webpush.setVapidDetails(
@@ -15,7 +20,7 @@ export interface QuizNotificationRequest {
   quizTitle: string
   quizTags: string[]
   quizDate: string
-  quizId: string
+  quizPath: string
 }
 
 export interface QuizNotificationResult {
@@ -52,17 +57,17 @@ function shouldSendNotificationNow(notificationTime: string): boolean {
 }
 
 export async function sendQuizNotification(params: QuizNotificationRequest): Promise<QuizNotificationResult> {
-  const { quizTitle, quizTags, quizDate, quizId } = params
+  const { quizTitle, quizTags, quizDate, quizPath } = params
 
-  if (!quizTitle || !quizTags || !quizDate || !quizId) {
-    throw new Error("quizTitle, quizTags, quizDate, quizId は必須です")
+  if (!quizTitle || !quizTags || !quizDate || !quizPath) {
+    throw new Error("quizTitle, quizTags, quizDate, quizPath は必須です")
   }
 
   // console.log("クイズ通知を送信します:", {
   //   title: quizTitle,
   //   tags: quizTags,
   //   date: quizDate,
-  //   id: quizId,
+  //   path: quizPath,
   //   currentJSTTime: getJSTNow().toISOString()
   // })
 
@@ -110,10 +115,6 @@ export async function sendQuizNotification(params: QuizNotificationRequest): Pro
       // PushSubscriptionオブジェクトを再構築
       const pushSubscription = reconstructPushSubscription(subscriber)
       
-      // 通知用のURLを生成
-      const notificationUrl = transformQuizIdToUrl(quizId);
-      console.log(`通知URL生成: quizId=${quizId}, generatedUrl=${notificationUrl}`);
-      
       await webpush.sendNotification(
         pushSubscription,
         JSON.stringify({
@@ -122,8 +123,7 @@ export async function sendQuizNotification(params: QuizNotificationRequest): Pro
           icon: "/icon-192x192.png",
           badge: "/icon-192x192.png",
           data: {
-            url: notificationUrl,
-            quizId: quizId,
+            url: quizPath,
             tags: quizTags
           }
         })
@@ -163,70 +163,7 @@ export async function sendQuizNotification(params: QuizNotificationRequest): Pro
   }
 }
 
-// クイズファイルの内容を解析してメタデータを取得する関数
-async function getQuizMetadata(filePath: string) {
-  try {
-    // ファイルパスからクイズIDを生成（既存のライブラリを使用）
-    const fileName = path.basename(filePath, '.tsx')
-    const filePathParts = filePath.split(path.sep)
-    
-    // パスから年、月、日を抽出
-    // より堅牢な方法：quizディレクトリを探してその後の部分を取得
-    const quizIndex = filePathParts.findIndex(part => part === 'quiz');
-    if (quizIndex === -1) {
-      console.error('quizディレクトリが見つかりません:', filePath);
-      return null;
-    }
-    
-    const year = filePathParts[quizIndex + 1];
-    const month = filePathParts[quizIndex + 2];
-    const day = fileName
-    
-    // console.log('ファイルパス解析:', {
-    //   filePath,
-    //   fileName,
-    //   filePathParts,
-    //   year,
-    //   month,
-    //   day,
-    //   pathLength: filePathParts.length
-    // });
-    
-    // 既存のgenerateQuizId関数のロジックに合わせてIDを生成
-    // パスから日付部分を抽出してIDを生成
-    const id = `Q${year}${month}${day}`
-    
-    // console.log('生成されたID:', id);
-    
-    // ファイルの内容を読み込み
-    const fileContent = fs.readFileSync(filePath, 'utf-8')
-    
-    // 既存のQuizクラスの構造に合わせてメタデータを抽出
-    const titleMatch = fileContent.match(/title:\s*['"`]([^'"`]+)['"`]/)
-    const tagsMatch = fileContent.match(/tags:\s*\[([^\]]+)\]/)
-    const createdAtMatch = fileContent.match(/created_at:\s*new\s+Date\(['"`]([^'"`]+)['"`]\)/)
-    
-    if (!titleMatch) {
-      console.log(`クイズファイルのメタデータが不完全: ${filePath}`)
-      return null
-    }
-    
-    const title = titleMatch[1]
-    const tags = tagsMatch ? tagsMatch[1].split(',').map(tag => tag.trim().replace(/['"`]/g, '')) : []
-    const created_at = createdAtMatch ? new Date(createdAtMatch[1]) : new Date()
-    
-    return {
-      id,
-      title,
-      tags,
-      created_at,
-      file_path: filePath
-    }
-  } catch (error) {
-    console.error(`クイズファイルの読み込みエラー: ${filePath}`, error)
-    return null
-  }
-}
+
 
 // 今日作成されたクイズをチェックする関数
 async function getTodaysQuizzes() {
@@ -237,30 +174,25 @@ async function getTodaysQuizzes() {
   
   // console.log('今日の日付情報:', { year, month, day, today: today.toISOString() });
   
-  const quizDir = path.join(process.cwd(), 'contents', 'quiz', year.toString(), month)
-  const quizFilePath = path.join(quizDir, `${day}.tsx`)
+  // クイズディレクトリのパスを取得 (contents/quiz)
+  const quizDir = path.join(process.cwd(), 'contents', 'quiz')
   
-  // console.log('クイズファイルパス:', {
-  //   quizDir,
-  //   quizFilePath,
-  //   cwd: process.cwd()
-  // });
-  
-  // ファイルが存在するかチェック
-  if (!fs.existsSync(quizFilePath)) {
-    console.log('クイズファイルが存在しません:', quizFilePath);
-    return []
-  }
-  
-  // console.log('クイズファイルが見つかりました:', quizFilePath);
+  // getQuizFilesを使用してファイル名ソートで最新の14件のクイズファイルを取得
+  const quizFiles = await getQuizFiles({
+    dir: quizDir,
+    limit_count: 14
+  })
   
   try {
-    // クイズメタデータを取得
-    const metadata = await getQuizMetadata(quizFilePath)
+    // getPathInfosを使用してクイズのメタデータを取得
+    const pathInfos = await getPathInfos(quizFiles, [], true, null)
     
-    if (metadata) {
-      // console.log('取得されたメタデータ:', metadata);
-      return [metadata]
+    if (pathInfos.length > 0) {
+      // created_atが今日の日付になっているクイズを取得
+      const todayQuizInfo = pathInfos.filter(info => info.created_at && info.created_at.toISOString().split('T')[0] === `${year}-${month}-${day}`)
+      
+      // console.log('取得されたメタデータ:', todayQuizInfo);
+      return todayQuizInfo
     }
   } catch (error) {
     console.error('クイズメタデータの取得エラー:', error)
@@ -275,7 +207,7 @@ export async function processDailyQuizNotifications(): Promise<{
   message: string
   quizzesFound: number
   notificationResults: Array<{
-    quizId: string
+    quizPath: string
     success: boolean
     message: string
   }>
@@ -309,20 +241,20 @@ export async function processDailyQuizNotifications(): Promise<{
       const result = await sendQuizNotification({
         quizTitle: quiz.title,
         quizTags: quiz.tags,
-        quizDate: quiz.created_at.toISOString().split('T')[0],
-        quizId: quiz.id
+        quizDate: quiz.created_at?.toISOString().split('T')[0] || '',
+        quizPath: quiz.path
       })
       
       notificationResults.push({
-        quizId: quiz.id,
+        quizPath: quiz.path,
         success: result.success,
         message: result.message
       })
       
     } catch (error) {
-      console.error(`クイズ ${quiz.id} の通知送信エラー:`, error)
+      console.error(`クイズ ${quiz.path} の通知送信エラー:`, error)
       notificationResults.push({
-        quizId: quiz.id,
+        quizPath: quiz.path,
         success: false,
         message: "通知送信に失敗しました"
       })

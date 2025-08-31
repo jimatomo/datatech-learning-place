@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Bell, Clock, Tag, AlertCircle, CheckCircle } from "lucide-react"
+import { Bell, Clock, Tag, AlertCircle } from "lucide-react"
 import { tags } from "@/app/quiz/lib/tags"
 
 interface NotificationSettingsClientProps {
@@ -42,11 +42,11 @@ export function NotificationSettingsClient({
     setError,
     setSettings,
     setSubscription,
-    sendTestNotification,
+
   } = useNotificationManager({ initialSettings })
 
   const [isLoading, setIsLoading] = useState(false)
-  const [testSuccess, setTestSuccess] = useState(false)
+
 
   // 時間の選択肢を生成（10分単位）
   const timeOptions = []
@@ -193,19 +193,6 @@ export function NotificationSettingsClient({
     setIsLoading(false)
   }
 
-  const handleTestNotification = async () => {
-    setIsLoading(true)
-    setError(null)
-    setTestSuccess(false)
-    
-    const success = await sendTestNotification()
-    if (success) {
-      setTestSuccess(true)
-      setTimeout(() => setTestSuccess(false), 3000)
-    }
-    
-    setIsLoading(false)
-  }
 
   const handleSelectAllTags = async () => {
     setIsLoading(true)
@@ -291,12 +278,7 @@ export function NotificationSettingsClient({
           </Alert>
         )}
 
-        {testSuccess && (
-          <Alert>
-            <CheckCircle className="h-4 w-4" />
-            <AlertDescription>テスト通知を送信しました！</AlertDescription>
-          </Alert>
-        )}
+
 
         {/* 通知の有効/無効 */}
         <div className="flex items-center justify-between">
@@ -415,29 +397,7 @@ export function NotificationSettingsClient({
               </div>
             </div>
 
-            {/* テスト通知 */}
-            {subscription && (
-              <div className="pt-4 border-t space-y-3">
-                <div className="space-y-2">
-                  <Button
-                    variant="outline"
-                    onClick={handleTestNotification}
-                    disabled={isLoading}
-                    className="w-full"
-                  >
-                    {isLoading ? "送信中..." : "テスト通知を送信"}
-                  </Button>
-                  {testSuccess && (
-                    <Alert>
-                      <CheckCircle className="h-4 w-4" />
-                      <AlertDescription>
-                        テスト通知が送信されました！
-                      </AlertDescription>
-                    </Alert>
-                  )}
-                </div>
-              </div>
-            )}
+
           </>
         )}
       </CardContent>

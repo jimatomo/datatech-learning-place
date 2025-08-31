@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import { sendTestNotification as sendTestNotificationAction } from "@/lib/notifications"
 
 export interface NotificationSettings {
   enabled: boolean
@@ -219,36 +218,7 @@ export function useNotificationManager({ initialSettings, updateSettingsOnServer
     }
   }
 
-  // テスト通知の送信
-  const sendTestNotification = async () => {
-    try {
-      if (!subscription) {
-        throw new Error("通知の購読が必要です")
-      }
 
-      // PushSubscriptionオブジェクトをシリアライズ可能な形式に変換
-      const subscriptionData = {
-        endpoint: subscription.endpoint,
-        keys: {
-          p256dh: btoa(String.fromCharCode(...new Uint8Array(subscription.getKey('p256dh')!))),
-          auth: btoa(String.fromCharCode(...new Uint8Array(subscription.getKey('auth')!)))
-        }
-      }
-      
-      const result = await sendTestNotificationAction(subscriptionData)
-      
-      if (!result.success) {
-        throw new Error(result.error || "テスト通知の送信に失敗しました")
-      }
-
-      return true
-    } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message)
-      }
-      return false
-    }
-  }
 
   return {
     isSupported,
@@ -261,6 +231,5 @@ export function useNotificationManager({ initialSettings, updateSettingsOnServer
     subscribeToPush,
     unsubscribeFromPush,
     updateSettings,
-    sendTestNotification,
   }
 }
