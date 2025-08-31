@@ -72,6 +72,7 @@ export function NotificationSettingsClient({
     try {
       console.log('設定更新開始:', { action, newSettings, hasSubscription: !!subscription })
       console.log('updateSettingsOnServer関数の型:', typeof updateSettingsOnServer)
+      console.log('updateSettingsOnServer関数名:', updateSettingsOnServer.name)
       
       // サーバーサイドで設定を更新
       const requestData = {
@@ -87,8 +88,16 @@ export function NotificationSettingsClient({
       }
       
       console.log('サーバーに送信するデータ:', requestData)
+      console.log('サーバーアクション呼び出し開始')
       
-      const result = await updateSettingsOnServer(requestData)
+      let result
+      try {
+        result = await updateSettingsOnServer(requestData)
+        console.log('サーバーアクション呼び出し完了')
+      } catch (callError) {
+        console.error('サーバーアクション呼び出しエラー:', callError)
+        throw callError
+      }
       
       console.log('サーバー応答:', result)
       
