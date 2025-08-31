@@ -137,12 +137,28 @@ export function NotificationSettingsClient({
         // Service Workerの準備
         const registration = await navigator.serviceWorker.ready
         
+        // VAPID公開キーの存在チェック
+        const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+        if (!vapidPublicKey) {
+          throw new Error('VAPID公開キーが設定されていません')
+        }
+
+        // VAPID公開キーを安全にデコード
+        let applicationServerKey: Uint8Array
+        try {
+          // Base64URLからBase64に変換（必要に応じて）
+          const base64Key = vapidPublicKey.replace(/-/g, '+').replace(/_/g, '/')
+          const binaryString = atob(base64Key)
+          applicationServerKey = new Uint8Array(binaryString.split('').map(char => char.charCodeAt(0)))
+        } catch (decodeError) {
+          console.error('VAPID公開キーのデコードエラー:', decodeError)
+          throw new Error('VAPID公開キーの形式が正しくありません')
+        }
+
         // 新しい購読を作成
         currentSubscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
-          applicationServerKey: new Uint8Array(
-            atob(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!).split('').map(char => char.charCodeAt(0))
-          ),
+          applicationServerKey,
         })
         
         // useNotificationManagerの状態も更新

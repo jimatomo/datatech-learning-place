@@ -85,18 +85,23 @@ export function useNotificationManager({ initialSettings, updateSettingsOnServer
 
   // Base64文字列をUint8Arrayに変換
   function urlBase64ToUint8Array(base64String: string) {
-    const padding = "=".repeat((4 - (base64String.length % 4)) % 4)
-    const base64 = (base64String + padding)
-      .replace(/-/g, "+")
-      .replace(/_/g, "/")
+    try {
+      const padding = "=".repeat((4 - (base64String.length % 4)) % 4)
+      const base64 = (base64String + padding)
+        .replace(/-/g, "+")
+        .replace(/_/g, "/")
 
-    const rawData = window.atob(base64)
-    const outputArray = new Uint8Array(rawData.length)
+      const rawData = window.atob(base64)
+      const outputArray = new Uint8Array(rawData.length)
 
-    for (let i = 0; i < rawData.length; ++i) {
-      outputArray[i] = rawData.charCodeAt(i)
+      for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i)
+      }
+      return outputArray
+    } catch (error) {
+      console.error('VAPID公開キーのデコードエラー:', error)
+      throw new Error('VAPID公開キーの形式が正しくありません')
     }
-    return outputArray
   }
 
   // 通知の購読
@@ -108,14 +113,18 @@ export function useNotificationManager({ initialSettings, updateSettingsOnServer
         throw new Error("通知の許可が得られませんでした")
       }
 
+      // VAPID公開キーの存在チェック
+      const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+      if (!vapidPublicKey) {
+        throw new Error('VAPID公開キーが設定されていません')
+      }
+
       // Service Worker の準備
       const registration = await navigator.serviceWorker.ready
 
       const sub = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(
-          process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!
-        ),
+        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
       })
       setSubscription(sub)
 
