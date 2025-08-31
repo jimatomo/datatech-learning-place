@@ -48,6 +48,8 @@ export async function saveNotificationSubscription(
   settings: NotificationSettings
 ): Promise<boolean> {
   try {
+    console.log('saveNotificationSubscription開始:', { userId, settings })
+    
     const now = new Date().toISOString();
     
     const item: NotificationSubscription = {
@@ -63,6 +65,15 @@ export async function saveNotificationSubscription(
       updated_at: now
     };
 
+    console.log('DynamoDBに保存するアイテム:', { 
+      user_id: item.user_id, 
+      setting_type: item.setting_type,
+      endpoint: item.endpoint?.substring(0, 50) + '...',
+      enabled: item.enabled,
+      selected_tags: item.selected_tags,
+      notification_time: item.notification_time
+    })
+
     await ddbDocClient.send(new PutCommand({
       TableName: TABLE_NAME,
       Item: item
@@ -72,6 +83,9 @@ export async function saveNotificationSubscription(
     return true;
   } catch (error) {
     console.error('通知設定の保存エラー:', error);
+    if (error instanceof Error) {
+      console.error('エラー詳細:', error.message, error.stack)
+    }
     return false;
   }
 }
@@ -102,12 +116,21 @@ export async function updateNotificationSettings(
   settings: NotificationSettings
 ): Promise<boolean> {
   try {
+    console.log('updateNotificationSettings開始:', { userId, settings })
+    
     const existingSubscription = await getNotificationSubscription(userId);
     
     if (!existingSubscription) {
       console.error('更新対象の通知設定が見つかりません:', userId);
       return false;
     }
+
+    console.log('既存の購読情報:', { 
+      user_id: existingSubscription.user_id,
+      enabled: existingSubscription.enabled,
+      selected_tags: existingSubscription.selected_tags,
+      notification_time: existingSubscription.notification_time
+    })
 
     const updatedItem: NotificationSubscription = {
       ...existingSubscription,
@@ -117,14 +140,25 @@ export async function updateNotificationSettings(
       updated_at: new Date().toISOString()
     };
 
+    console.log('更新するアイテム:', { 
+      user_id: updatedItem.user_id,
+      enabled: updatedItem.enabled,
+      selected_tags: updatedItem.selected_tags,
+      notification_time: updatedItem.notification_time
+    })
+
     await ddbDocClient.send(new PutCommand({
       TableName: TABLE_NAME,
       Item: updatedItem
     }));
 
+    console.log('通知設定を更新しました:', { userId });
     return true;
   } catch (error) {
     console.error('通知設定の更新エラー:', error);
+    if (error instanceof Error) {
+      console.error('エラー詳細:', error.message, error.stack)
+    }
     return false;
   }
 }
@@ -132,6 +166,8 @@ export async function updateNotificationSettings(
 // 通知設定を削除（購読解除）
 export async function deleteNotificationSubscription(userId: string): Promise<boolean> {
   try {
+    console.log('deleteNotificationSubscription開始:', { userId })
+    
     await ddbDocClient.send(new DeleteCommand({
       TableName: TABLE_NAME,
       Key: {
@@ -144,6 +180,9 @@ export async function deleteNotificationSubscription(userId: string): Promise<bo
     return true;
   } catch (error) {
     console.error('通知設定の削除エラー:', error);
+    if (error instanceof Error) {
+      console.error('エラー詳細:', error.message, error.stack)
+    }
     return false;
   }
 }

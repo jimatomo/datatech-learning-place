@@ -78,6 +78,8 @@ export function NotificationSettingsClient({
   // サーバーサイドでの設定更新処理
   const handleSettingsUpdate = async (newSettings: NotificationSettings, action: 'update' | 'subscribe' | 'unsubscribe' = 'update', subscription?: PushSubscription) => {
     try {
+      console.log('設定更新開始:', { action, newSettings, hasSubscription: !!subscription })
+      
       // サーバーサイドで設定を更新
       const result = await updateSettingsOnServer({
         ...newSettings,
@@ -90,6 +92,15 @@ export function NotificationSettingsClient({
           }
         } : undefined
       })
+      
+      console.log('サーバー応答:', result)
+      
+      // resultがundefinedの場合の処理
+      if (!result) {
+        console.error('サーバーから応答がありません')
+        setError("サーバーからの応答がありません")
+        return false
+      }
       
       if (!result.success) {
         setError(result.error || "設定の更新に失敗しました")
@@ -105,7 +116,7 @@ export function NotificationSettingsClient({
       return true
     } catch (error) {
       console.error('設定更新エラー:', error)
-      setError("設定の更新に失敗しました")
+      setError(`設定の更新に失敗しました: ${error instanceof Error ? error.message : '不明なエラー'}`)
       return false
     }
   }
