@@ -62,9 +62,6 @@ export async function sendQuizNotification(params: QuizNotificationRequest): Pro
   const mins = roundedTime.getMinutes().toString().padStart(2, '0')
   const currentTime10Minutes = `${hours}:${mins}`
 
-  // デバッグようにログを出力
-  console.log('10分間隔の時間:', currentTime10Minutes)
-  
   // DynamoDBから対象の購読者を取得（時間をベースにクエリ）
   const subscribers = await getSubscribersForNotificationTime(currentTime10Minutes)
   

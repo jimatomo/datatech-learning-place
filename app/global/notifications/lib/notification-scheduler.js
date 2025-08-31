@@ -55,7 +55,7 @@ export class NotificationScheduler {
 
         if (result.success) {
           if (result.quizzesFound > 0) {
-            console.log(`✅ ${result.quizzesFound}件のクイズ通知を送信しました`)
+            console.log(`✅ ${result.notificationResults.notificationsSent}件のクイズ通知を送信しました`)
           } else {
             console.log('ℹ️  クイズ通知はありませんでした')
           }
