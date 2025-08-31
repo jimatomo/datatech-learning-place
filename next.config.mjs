@@ -1,5 +1,6 @@
 import withPWA from 'next-pwa';
-import { NotificationScheduler } from './app/global/notifications/lib/notification-scheduler.js';
+// 通知スケジューラーは本番環境ではrun.shで初期化されるため、これはローカル開発時のみコメントアウトする
+// import { NotificationScheduler } from './app/global/notifications/lib/notification-scheduler.js';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -28,11 +29,12 @@ const nextConfig = {
   },
 };
 
-// サーバー起動時の処理
-if (typeof window === 'undefined') {
-  console.log('サーバー起動時の処理を実行中...')
-  new NotificationScheduler()
-}
+// 注意: 通知スケジューラーの初期化は本番環境ではrun.shで行われるため、
+// ここでは実行しない（開発環境でのみnext.config.mjsで実行される場合がある）
+// if (typeof window === 'undefined') {
+//   console.log('サーバー起動時の処理を実行中...')
+//   new NotificationScheduler()
+// }
 
 const pwaConfig = withPWA({
   dest: 'public',
