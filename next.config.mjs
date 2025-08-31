@@ -12,6 +12,20 @@ const nextConfig = {
       },
     ],
   },
+  // Server Actionsのセキュリティ設定
+  experimental: {
+    serverActions: {
+      allowedOrigins: [
+        'datatech-learning-place.net',
+        'uccqrxjd84.execute-api.ap-northeast-1.amazonaws.com',
+        // 環境変数から追加のオリジンを取得
+        ...(process.env.SERVER_ACTIONS_ALLOWED_ORIGINS 
+          ? process.env.SERVER_ACTIONS_ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+          : []
+        )
+      ],
+    },
+  },
 };
 
 // サーバー起動時の処理
