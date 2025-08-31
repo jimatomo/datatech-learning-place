@@ -46,14 +46,22 @@ export function NotificationSettingsClient({
 
   const [isLoading, setIsLoading] = useState(false)
 
+  // 時間と分の選択肢を生成
+  const hourOptions = Array.from({ length: 24 }, (_, i) => ({
+    value: i.toString().padStart(2, '0'),
+    label: i.toString().padStart(2, '0')
+  }))
 
-  // 時間の選択肢を生成（10分単位）
-  const timeOptions = []
-  for (let hour = 0; hour < 24; hour++) {
-    for (let minute = 0; minute < 60; minute += 10) {
-      const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
-      timeOptions.push(timeString)
-    }
+  const minuteOptions = Array.from({ length: 6 }, (_, i) => ({
+    value: (i * 10).toString().padStart(2, '0'),
+    label: (i * 10).toString().padStart(2, '0')
+  }))
+
+  // 現在の通知時間を時間と分に分解
+  const getCurrentTimeParts = () => {
+    const currentTime = settings?.notificationTime || "09:00"
+    const [hour, minute] = currentTime.split(':')
+    return { hour, minute }
   }
 
   // 曜日別タグと一般タグを分離
@@ -177,19 +185,23 @@ export function NotificationSettingsClient({
     setIsLoading(false)
   }
 
-  const handleTimeChange = async (time: string) => {
+  const handleTimeChange = async (type: 'hour' | 'minute', value: string) => {
     setIsLoading(true)
     setError(null)
     
+    const currentParts = getCurrentTimeParts()
+    const newTime = type === 'hour' 
+      ? `${value}:${currentParts.minute}`
+      : `${currentParts.hour}:${value}`
+    
     const newSettings: NotificationSettings = {
       ...settings,
-      notificationTime: time
+      notificationTime: newTime
     }
     
     await handleSettingsUpdate(newSettings)
     setIsLoading(false)
   }
-
 
   const handleSelectAllTags = async () => {
     setIsLoading(true)
@@ -259,6 +271,8 @@ export function NotificationSettingsClient({
     )
   }
 
+  const currentTimeParts = getCurrentTimeParts()
+
   return (
     <Card className={className}>
       <CardHeader>
@@ -274,8 +288,6 @@ export function NotificationSettingsClient({
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
-
-
 
         {/* 通知の有効/無効 */}
         <div className="flex items-center justify-between">
@@ -300,18 +312,39 @@ export function NotificationSettingsClient({
                 <Clock className="h-4 w-4" />
                 通知時間
               </Label>
-              <Select value={settings?.notificationTime || "09:00"} onValueChange={handleTimeChange}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="通知時間を選択" />
-                </SelectTrigger>
-                <SelectContent>
-                  {timeOptions.map((time) => (
-                    <SelectItem key={time} value={time}>
-                      {time}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex items-center gap-1">
+                <Select 
+                  value={currentTimeParts.hour} 
+                  onValueChange={(value) => handleTimeChange('hour', value)}
+                >
+                  <SelectTrigger className="w-20">
+                    <SelectValue placeholder="00" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {hourOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <span className="text-lg font-medium">:</span>
+                <Select 
+                  value={currentTimeParts.minute} 
+                  onValueChange={(value) => handleTimeChange('minute', value)}
+                >
+                  <SelectTrigger className="w-20">
+                    <SelectValue placeholder="00" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {minuteOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="text-sm text-muted-foreground">
                 選択した時間にクイズ投稿の通知が送信されます
               </div>
@@ -370,7 +403,6 @@ export function NotificationSettingsClient({
                 選択したタグが含まれるクイズが投稿されたときに通知が送信されます
               </div>
             </div>
-
 
           </>
         )}
