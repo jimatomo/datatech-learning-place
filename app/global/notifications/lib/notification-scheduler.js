@@ -55,7 +55,11 @@ export class NotificationScheduler {
 
         if (result.success) {
           if (result.quizzesFound > 0) {
-            console.log(`✅ ${result.notificationResults.notificationsSent}件のクイズ通知を送信しました`)
+            // notificationResultsは配列なので、各要素のnotificationsSentを合計する
+            const totalNotificationsSent = result.notificationResults.reduce((total, notification) => {
+              return total + (notification.notificationsSent || 0)
+            }, 0)
+            console.log(`✅ ${totalNotificationsSent}件のクイズ通知を送信しました`)
           } else {
             console.log('ℹ️  クイズ通知はありませんでした')
           }
