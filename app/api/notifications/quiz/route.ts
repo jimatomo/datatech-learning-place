@@ -7,13 +7,13 @@ import { randomBytes } from 'crypto'
 // 環境変数で上書き可能（本番環境での固定化用）
 const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || randomBytes(32).toString('hex')
 
-// サーバー起動時のログ出力
-if (!process.env.INTERNAL_API_KEY) {
-  console.log(`🔑 自動生成されたAPIキー: ${INTERNAL_API_KEY}`)
-  console.log('⚠️  本番環境では環境変数 INTERNAL_API_KEY を設定することを推奨します')
-} else {
-  console.log('🔑 環境変数からAPIキーを読み込みました')
-}
+// APIキーのログ出力
+// if (!process.env.INTERNAL_API_KEY) {
+//   console.log(`🔑 自動生成されたAPIキー: ${INTERNAL_API_KEY}`)
+//   console.log('⚠️  本番環境では環境変数 INTERNAL_API_KEY を設定することを推奨します')
+// } else {
+//   console.log('🔑 環境変数からAPIキーを読み込みました')
+// }
 
 // セキュリティチェック関数
 function validateInternalRequest(request: Request): { isValid: boolean; error?: string } {
@@ -49,10 +49,13 @@ export async function POST(request: Request) {
       )
     }
 
-    console.log('内部API呼び出しを検証: 有効なAPIキーでリクエスト')
+    // console.log('内部API呼び出しを検証: 有効なAPIキーでリクエスト')
 
     // 主な処理をライブラリ関数に委譲
     const result = await processDailyQuizNotifications()
+
+    // デバッグようにログを出す
+    // console.log('日次クイズ通知スケジューリング結果:', result)
     
     if (result.success) {
       return NextResponse.json(result)

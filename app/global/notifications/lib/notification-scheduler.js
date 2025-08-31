@@ -1,3 +1,4 @@
+// クイズ通知のスケジューラー（このファイルはnext.config.mjsで呼び出されるのでtypescriptではなくjavascriptで記述）
 import * as cron from 'node-cron'
 
 // 10分間隔で実行する通知スケジューラー

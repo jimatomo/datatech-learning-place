@@ -1,11 +1,16 @@
 // 通知設定のDynamoDBの操作を集約したファイル
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, PutCommand, GetCommand, DeleteCommand, ScanCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, PutCommand, GetCommand, DeleteCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 
 const client = new DynamoDBClient({ region: 'ap-northeast-1' });
 const ddbDocClient = DynamoDBDocumentClient.from(client);
 
 const TABLE_NAME = 'user_settings';
+const SETTING_TYPE = 'push_notification';
+
+// テーブル構造の定義
+// パーティションキー: setting_type
+// ソートキー: notification_time
 
 interface PushSubscriptionKeys {
   p256dh: string;
@@ -36,8 +41,6 @@ export interface NotificationSettings {
   notification_time: string;
 }
 
-
-
 // 通知設定を保存
 export async function saveNotificationSubscription(
   userId: string,
@@ -49,7 +52,7 @@ export async function saveNotificationSubscription(
     
     const item: NotificationSubscription = {
       user_id: userId,
-      setting_type: 'push_notification',
+      setting_type: SETTING_TYPE,
       endpoint: subscription.endpoint,
       p256dh_key: subscription.keys.p256dh,
       auth_key: subscription.keys.auth,
@@ -82,19 +85,9 @@ export async function getNotificationSubscription(userId: string): Promise<Notif
       TableName: TABLE_NAME,
       Key: {
         user_id: userId,
-        setting_type: 'push_notification'
+        setting_type: SETTING_TYPE
       }
     }));
-
-    // console.log('DynamoDB取得結果:', {
-    //   hasItem: !!result.Item,
-    //   item: result.Item ? {
-    //     user_id: result.Item.user_id,
-    //     notification_time: result.Item.notification_time,
-    //     enabled: result.Item.enabled,
-    //     selected_tags: result.Item.selected_tags?.length || 0
-    //   } : null
-    // })
 
     return result.Item as NotificationSubscription || null;
   } catch (error) {
@@ -109,16 +102,12 @@ export async function updateNotificationSettings(
   settings: NotificationSettings
 ): Promise<boolean> {
   try {
-    // console.log('updateNotificationSettings開始:', { userId, settings })
-    
     const existingSubscription = await getNotificationSubscription(userId);
     
     if (!existingSubscription) {
       console.error('更新対象の通知設定が見つかりません:', userId);
       return false;
     }
-
-    // console.log('既存の設定:', existingSubscription)
 
     const updatedItem: NotificationSubscription = {
       ...existingSubscription,
@@ -128,14 +117,11 @@ export async function updateNotificationSettings(
       updated_at: new Date().toISOString()
     };
 
-    // console.log('更新予定のアイテム:', updatedItem)
-
     await ddbDocClient.send(new PutCommand({
       TableName: TABLE_NAME,
       Item: updatedItem
     }));
 
-    // console.log('通知設定を更新しました:', { userId, settings });
     return true;
   } catch (error) {
     console.error('通知設定の更新エラー:', error);
@@ -150,7 +136,7 @@ export async function deleteNotificationSubscription(userId: string): Promise<bo
       TableName: TABLE_NAME,
       Key: {
         user_id: userId,
-        setting_type: 'push_notification'
+        setting_type: SETTING_TYPE
       }
     }));
 
@@ -162,122 +148,45 @@ export async function deleteNotificationSubscription(userId: string): Promise<bo
   }
 }
 
-// 有効な通知購読者を全て取得（GSIなしの最適化戦略）
-export async function getActiveNotificationSubscribers(): Promise<NotificationSubscription[]> {
+// 特定の時刻に通知すべき購読者を取得（完全一致版）
+export async function getSubscribersForNotificationTime(targetTime: string): Promise<NotificationSubscription[]> {
   try {
-    // パーティションキーを活用した効率的なクエリ戦略
-    // 1. まず全てのユーザーIDを取得（ユーザー管理テーブルから、または既存の通知設定から）
-    // 2. 各ユーザーIDに対して個別にクエリを実行
-    // 3. 結果をフィルタリングして有効な購読者のみを返す
-    
-    // 既存の通知設定からユーザーIDのリストを取得
-    const allSubscriptions = await getAllNotificationSubscriptions();
-    
-    // 有効な購読者のみをフィルタリング
-    const activeSubscribers = allSubscriptions.filter(sub => 
-      sub.enabled && sub.setting_type === 'push_notification'
-    );
-    
-    return activeSubscribers;
-  } catch (error: unknown) {
-    console.error('購読者の取得エラー:', error);
-    return [];
-  }
-}
-
-// 全ての通知設定を取得（効率的なバッチ処理）
-async function getAllNotificationSubscriptions(): Promise<NotificationSubscription[]> {
-  try {
-    // ScanCommandを使用して全ての通知設定を取得
-    // フィルタリングはアプリケーションレベルで行う
-    const result = await ddbDocClient.send(new ScanCommand({
+    // setting_typeをパーティションキー、notification_timeをソートキーとして使用
+    // notification_timeは文字列なので完全一致でクエリ
+    const result = await ddbDocClient.send(new QueryCommand({
       TableName: TABLE_NAME,
-      FilterExpression: 'setting_type = :setting_type',
+      IndexName: 'setting_type-notification_time-index', // GSIを使用
+      KeyConditionExpression: 'setting_type = :setting_type AND notification_time = :notification_time',
+      FilterExpression: 'enabled = :enabled',
       ExpressionAttributeValues: {
-        ':setting_type': 'push_notification'
+        ':setting_type': SETTING_TYPE,
+        ':notification_time': targetTime,
+        ':enabled': true
       }
     }));
     
     return (result.Items as NotificationSubscription[]) || [];
-  } catch (error) {
-    console.error('通知設定の一括取得エラー:', error);
-    return [];
-  }
-}
-
-// 特定の時間帯の通知購読者を取得（時間ベースの最適化）
-export async function getSubscribersForTimeRange(startTime: string, endTime: string): Promise<NotificationSubscription[]> {
-  try {
-    const allSubscriptions = await getAllNotificationSubscriptions();
-    
-    // 時間範囲内で有効な購読者をフィルタリング
-    return allSubscriptions.filter(sub => {
-      if (!sub.enabled || sub.setting_type !== 'push_notification') {
-        return false;
-      }
-      
-      // 通知時刻が指定された時間範囲内かチェック
-      const notificationTime = sub.notification_time;
-      return notificationTime >= startTime && notificationTime <= endTime;
-    });
-  } catch (error) {
-    console.error('時間範囲での購読者取得エラー:', error);
-    return [];
-  }
-}
-
-// 特定のタグに興味がある購読者を取得（最適化版）
-export async function getSubscribersForTags(tags: string[]): Promise<NotificationSubscription[]> {
-  try {
-    const allSubscribers = await getActiveNotificationSubscribers();
-    
-    return allSubscribers.filter(subscriber => {
-      // selected_tagsが存在しない、またはnull/undefinedの場合は空配列として扱う
-      const selectedTags = subscriber.selected_tags || [];
-      
-      // 選択タグが空の場合は全てのクイズで通知
-      if (selectedTags.length === 0) {
-        return true;
-      }
-      
-      // 指定されたタグのいずれかが購読者の選択タグに含まれているか
-      return tags.some(tag => selectedTags.includes(tag));
-    });
-  } catch (error) {
-    console.error('タグ別購読者の取得エラー:', error);
-    return [];
-  }
-}
-
-// 特定の時刻に通知すべき購読者を取得（通知スケジューリング用）
-export async function getSubscribersForNotificationTime(targetTime: string, timeWindowMinutes: number = 5): Promise<NotificationSubscription[]> {
-  try {
-    const allSubscriptions = await getAllNotificationSubscriptions();
-    
-    // 指定された時刻の前後±timeWindowMinutes分の範囲内で有効な購読者をフィルタリング
-    return allSubscriptions.filter(sub => {
-      if (!sub.enabled || sub.setting_type !== 'push_notification') {
-        return false;
-      }
-      
-      const notificationTime = sub.notification_time;
-      const targetMinutes = timeToMinutes(targetTime);
-      const notificationMinutes = timeToMinutes(notificationTime);
-      
-      // 時間範囲内かチェック（±timeWindowMinutes分）
-      const diff = Math.abs(targetMinutes - notificationMinutes);
-      return diff <= timeWindowMinutes;
-    });
   } catch (error) {
     console.error('時刻別購読者の取得エラー:', error);
     return [];
   }
 }
 
-// 時刻文字列（HH:MM）を分単位の数値に変換するヘルパー関数
-function timeToMinutes(timeString: string): number {
-  const [hours, minutes] = timeString.split(':').map(Number);
-  return hours * 60 + minutes;
+// タグで絞り込んだ購読者を取得する関数
+export function filterSubscribersByTags(subscribers: NotificationSubscription[], quizTags: string[]): NotificationSubscription[] {
+  return subscribers.filter(subscriber => {
+    // 購読者がタグを選択していない場合は全てのクイズに通知
+    if (!subscriber.selected_tags || subscriber.selected_tags.length === 0) {
+      return true;
+    }
+    
+    // クイズのタグと購読者の選択タグに重複があるかチェック
+    const hasMatchingTag = quizTags.some(quizTag => 
+      subscriber.selected_tags.includes(quizTag)
+    );
+    
+    return hasMatchingTag;
+  });
 }
 
 // PushSubscriptionオブジェクトを再構築
@@ -345,6 +254,7 @@ export async function getNotificationSettings(userId: string): Promise<GetNotifi
   }
 }
 
+// TODO: 認証に依存しない純粋な通知設定取得関数（クライアントサイド用）は必要性を見直して削除したい
 // 認証に依存しない純粋な通知設定取得関数（クライアントサイド用）
 export async function getNotificationSettingsPure(userId: string): Promise<{
   hasSubscription: boolean;

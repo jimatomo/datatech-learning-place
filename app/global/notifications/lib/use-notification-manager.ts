@@ -102,12 +102,13 @@ export function useNotificationManager({ initialSettings, updateSettingsOnServer
   // 通知の購読
   const subscribeToPush = async () => {
     try {
-      // 通知許可を要求
+      // 通知許可を要求（ブラウザの共通機能）
       const permission = await Notification.requestPermission()
       if (permission !== "granted") {
         throw new Error("通知の許可が得られませんでした")
       }
 
+      // Service Worker の準備
       const registration = await navigator.serviceWorker.ready
 
       const sub = await registration.pushManager.subscribe({

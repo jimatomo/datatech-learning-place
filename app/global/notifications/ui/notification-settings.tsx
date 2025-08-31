@@ -4,7 +4,7 @@ import {
   updateNotificationSettings, 
   saveNotificationSubscription,
   deleteNotificationSubscription
-} from '@/lib/notification-db'
+} from '@/app/global/notifications/lib/notification-db'
 import { NotificationSettingsClient } from './notification-settings-client'
 
 interface NotificationSettingsProps {

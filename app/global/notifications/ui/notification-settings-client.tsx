@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useNotificationManager, NotificationSettings } from "@/hooks/use-notification-manager"
+import { useNotificationManager, NotificationSettings } from "@/app/global/notifications/lib/use-notification-manager"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"

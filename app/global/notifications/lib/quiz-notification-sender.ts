@@ -2,10 +2,11 @@
 import webpush from "web-push"
 import path from 'path'
 import {
-  getSubscribersForTags,
+  getSubscribersForNotificationTime,
+  filterSubscribersByTags,
   reconstructPushSubscription,
-  deleteNotificationSubscription
-} from '@/lib/notification-db'
+  deleteNotificationSubscription,
+} from '@/app/global/notifications/lib/notification-db'
 import { getQuizFiles } from '@/app/quiz/lib/get-files'
 import { getPathInfos } from '@/app/quiz/lib/get-path-info'
 
@@ -40,22 +41,7 @@ function getJSTNow(): Date {
   return new Date(now.getTime() + (9 * 60 * 60 * 1000));
 }
 
-// 通知時刻をチェックする関数
-function shouldSendNotificationNow(notificationTime: string): boolean {
-  const now = getJSTNow();
-  const currentHour = now.getHours();
-  const currentMinute = now.getMinutes();
-  
-  const [targetHour, targetMinute] = notificationTime.split(':').map(Number);
-  
-  // 現在時刻が設定時刻と一致するかチェック（±5分の許容範囲）
-  const currentTimeInMinutes = currentHour * 60 + currentMinute;
-  const targetTimeInMinutes = targetHour * 60 + targetMinute;
-  const timeDifference = Math.abs(currentTimeInMinutes - targetTimeInMinutes);
-  
-  return timeDifference <= 5; // 5分以内なら送信可能
-}
-
+// クイズ通知のリクエストを受け取り、クイズ通知を送信する処理を呼び出す関数
 export async function sendQuizNotification(params: QuizNotificationRequest): Promise<QuizNotificationResult> {
   const { quizTitle, quizTags, quizDate, quizPath } = params
 
@@ -63,16 +49,24 @@ export async function sendQuizNotification(params: QuizNotificationRequest): Pro
     throw new Error("quizTitle, quizTags, quizDate, quizPath は必須です")
   }
 
-  // console.log("クイズ通知を送信します:", {
-  //   title: quizTitle,
-  //   tags: quizTags,
-  //   date: quizDate,
-  //   path: quizPath,
-  //   currentJSTTime: getJSTNow().toISOString()
-  // })
+  // 現在の時刻に一番近い10分間隔の時間を生成する
+  const currentTime = getJSTNow()
+  const minutes = currentTime.getMinutes()
+  const roundedMinutes = Math.round(minutes / 10) * 10
 
-  // DynamoDBから対象の購読者を取得
-  const subscribers = await getSubscribersForTags(quizTags)
+  const roundedTime = getJSTNow()
+  roundedTime.setMinutes(roundedMinutes, 0, 0) // 秒とミリ秒を0にリセット
+  
+  // HH:mm形式で時間を生成
+  const hours = roundedTime.getHours().toString().padStart(2, '0')
+  const mins = roundedTime.getMinutes().toString().padStart(2, '0')
+  const currentTime10Minutes = `${hours}:${mins}`
+
+  // デバッグようにログを出力
+  console.log('10分間隔の時間:', currentTime10Minutes)
+  
+  // DynamoDBから対象の購読者を取得（時間をベースにクエリ）
+  const subscribers = await getSubscribersForNotificationTime(currentTime10Minutes)
   
   if (subscribers.length === 0) {
     return {
@@ -80,20 +74,14 @@ export async function sendQuizNotification(params: QuizNotificationRequest): Pro
       message: "通知対象の購読者が見つかりませんでした",
       notificationsSent: 0,
       errors: 0,
-      totalSubscribers: 0,
+      totalSubscribers: subscribers.length,
       eligibleSubscribers: 0,
       currentJSTTime: getJSTNow().toISOString()
     }
   }
 
-  // 時刻チェックを行い、送信対象の購読者をフィルタリング
-  const eligibleSubscribers = subscribers.filter(subscriber => {
-    const shouldSend = shouldSendNotificationNow(subscriber.notification_time);
-    if (!shouldSend) {
-      console.log(`時刻外のため通知をスキップ: ${subscriber.user_id}, 設定時刻: ${subscriber.notification_time}, 現在時刻: ${new Date().toLocaleTimeString('ja-JP', { timeZone: 'Asia/Tokyo' })}`);
-    }
-    return shouldSend;
-  });
+  // タグで絞り込みを行い、最終的な送信対象の購読者を決定
+  const eligibleSubscribers = filterSubscribersByTags(subscribers, quizTags);
 
   if (eligibleSubscribers.length === 0) {
     return {
@@ -102,7 +90,7 @@ export async function sendQuizNotification(params: QuizNotificationRequest): Pro
       notificationsSent: 0,
       errors: 0,
       totalSubscribers: subscribers.length,
-      eligibleSubscribers: 0,
+      eligibleSubscribers: eligibleSubscribers.length,
       currentJSTTime: getJSTNow().toISOString()
     }
   }
@@ -123,7 +111,7 @@ export async function sendQuizNotification(params: QuizNotificationRequest): Pro
           icon: "/icon-192x192.png",
           badge: "/icon-192x192.png",
           data: {
-            url: quizPath,
+            url: `/quiz/${quizPath}`,
             tags: quizTags
           }
         })
@@ -154,7 +142,7 @@ export async function sendQuizNotification(params: QuizNotificationRequest): Pro
 
   return {
     success: true,
-    message: "クイズ通知を送信しました",
+    message: `クイズ通知を送信しました（タグ: ${quizTags.join(', ')}）`,
     notificationsSent: successCount,
     errors: errorCount,
     totalSubscribers: subscribers.length,
@@ -237,7 +225,7 @@ export async function processDailyQuizNotifications(): Promise<{
   
   for (const quiz of todaysQuizzes) {
     try {
-      // 直接ライブラリ関数を呼び出し
+      // クイズ通知対象を取得し、クイズ通知を送信する関数を呼び出す
       const result = await sendQuizNotification({
         quizTitle: quiz.title,
         quizTags: quiz.tags,
@@ -248,7 +236,12 @@ export async function processDailyQuizNotifications(): Promise<{
       notificationResults.push({
         quizPath: quiz.path,
         success: result.success,
-        message: result.message
+        message: result.message,
+        notificationsSent: result.notificationsSent,
+        errors: result.errors,
+        totalSubscribers: result.totalSubscribers,
+        eligibleSubscribers: result.eligibleSubscribers,
+        currentJSTTime: result.currentJSTTime
       })
       
     } catch (error) {
