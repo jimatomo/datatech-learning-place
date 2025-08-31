@@ -15,7 +15,7 @@ source .env.production.local
 # 通知スケジューラーを初期化（API経由）
 echo "🚀 通知スケジューラーを初期化中..."
 if [ -n "$INTERNAL_API_KEY" ]; then
-  response=$(curl -s -X POST $AUTH0_BASE_URL/api/init-scheduler \
+  response=$(curl -s -X POST ${AUTH0_BASE_URL}api/init-scheduler \
     -H "Content-Type: application/json" \
     -H "X-Internal-Key: $INTERNAL_API_KEY")
   echo "📋 レスポンス: $response"
