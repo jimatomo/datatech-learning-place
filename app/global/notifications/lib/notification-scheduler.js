@@ -26,6 +26,8 @@ export class NotificationScheduler {
       return
     }
 
+    console.log('🚀 通知スケジューラーを開始します（10分間隔）')
+
     // 10分間隔で実行
     const job = cron.schedule('*/10 * * * *', async () => {
       try {
@@ -48,7 +50,17 @@ export class NotificationScheduler {
 
         const result = await response.json()
 
-        if (!result.success) {
+        if (result.success) {
+          if (result.quizzesFound > 0) {
+            // notificationResultsは配列なので、各要素のnotificationsSentを合計する
+            const totalNotificationsSent = result.notificationResults.reduce((total, notification) => {
+              return total + (notification.notificationsSent || 0)
+            }, 0)
+            console.log(`✅ ${totalNotificationsSent}件のクイズ通知を送信しました`)
+          } else {
+            console.log('ℹ️  クイズ通知はありませんでした')
+          }
+        } else {
           console.error('❌ 通知スケジューリングエラー:', result.error)
         }
 
