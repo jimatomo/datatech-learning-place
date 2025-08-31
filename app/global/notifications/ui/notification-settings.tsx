@@ -20,9 +20,7 @@ export async function NotificationSettingsComponent({ className }: NotificationS
 
   if (userId) {
     try {
-      console.log('通知設定取得開始:', { userId })
       const result = await getNotificationSettingsPure(userId)
-      console.log('通知設定取得結果:', result)
       
       if (result && result.hasSubscription && result.settings) {
         settings = {
@@ -30,16 +28,11 @@ export async function NotificationSettingsComponent({ className }: NotificationS
           selectedTags: result.settings.selectedTags,
           notificationTime: result.settings.notificationTime
         }
-        console.log('通知設定を適用:', settings)
-      } else {
-        console.log('通知設定が存在しないため、デフォルト値を使用')
       }
       // 通知設定が存在しない場合は、デフォルト値を使用（enabled: false, selectedTags: [], notificationTime: "09:00"）
     } catch (error) {
       console.error('通知設定の取得エラー:', error)
     }
-  } else {
-    console.log('ユーザーIDが取得できませんでした')
   }
 
   return (

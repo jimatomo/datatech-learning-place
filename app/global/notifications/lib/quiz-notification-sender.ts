@@ -118,7 +118,6 @@ export async function sendQuizNotification(params: QuizNotificationRequest): Pro
       )
       
       successCount++
-      console.log(`通知送信成功: ${subscriber.user_id}`)
       
     } catch (error) {
       errorCount++
@@ -126,13 +125,9 @@ export async function sendQuizNotification(params: QuizNotificationRequest): Pro
       
       // 410 Gone エラーの場合は無効なサブスクリプションなので削除を検討
       if (error instanceof webpush.WebPushError && error.statusCode === 410) {
-        console.log(`無効なサブスクリプションを検出: ${subscriber.user_id}`)
         // 無効なサブスクリプションをDynamoDBから削除
         try {
-          const deleteSuccess = await deleteNotificationSubscription(subscriber.user_id)
-          if (deleteSuccess) {
-            console.log(`無効なサブスクリプション削除完了: ${subscriber.user_id}`)
-          }
+          await deleteNotificationSubscription(subscriber.user_id)
         } catch (deleteError) {
           console.error(`無効なサブスクリプション削除エラー: ${subscriber.user_id}`, deleteError)
         }

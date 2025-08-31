@@ -70,10 +70,6 @@ export function NotificationSettingsClient({
   // サーバーサイドでの設定更新処理
   const handleSettingsUpdate = async (newSettings: NotificationSettings, action: 'update' | 'subscribe' | 'unsubscribe' = 'update', subscription?: PushSubscription) => {
     try {
-      console.log('設定更新開始:', { action, newSettings, hasSubscription: !!subscription })
-      console.log('updateSettingsOnServer関数の型:', typeof updateSettingsOnServer)
-      console.log('updateSettingsOnServer関数名:', updateSettingsOnServer.name)
-      
       // サーバーサイドで設定を更新
       const requestData = {
         ...newSettings,
@@ -87,19 +83,13 @@ export function NotificationSettingsClient({
         } : undefined
       }
       
-      console.log('サーバーに送信するデータ:', requestData)
-      console.log('サーバーアクション呼び出し開始')
-      
       let result
       try {
         result = await updateSettingsOnServer(requestData)
-        console.log('サーバーアクション呼び出し完了')
       } catch (callError) {
         console.error('サーバーアクション呼び出しエラー:', callError)
         throw callError
       }
-      
-      console.log('サーバー応答:', result)
       
       // resultがundefinedの場合の処理
       if (!result) {
@@ -122,11 +112,6 @@ export function NotificationSettingsClient({
       return true
     } catch (error) {
       console.error('設定更新エラー:', error)
-      console.error('エラーの詳細:', {
-        name: error instanceof Error ? error.name : 'Unknown',
-        message: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : 'No stack trace'
-      })
       setError(`設定の更新に失敗しました: ${error instanceof Error ? error.message : '不明なエラー'}`)
       return false
     }

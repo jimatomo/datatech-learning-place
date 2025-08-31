@@ -35,7 +35,6 @@ export function useNotificationManager({ initialSettings, updateSettingsOnServer
   // 初期設定が変更された場合に状態を更新
   useEffect(() => {
     if (initialSettings) {
-      console.log('useNotificationManager - 初期設定を適用:', initialSettings)
       setSettings(initialSettings)
     }
   }, [initialSettings])
@@ -56,7 +55,6 @@ export function useNotificationManager({ initialSettings, updateSettingsOnServer
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
               // 新しいService Workerが利用可能
-              console.log('新しいService Workerが利用可能です')
             }
           })
         }
