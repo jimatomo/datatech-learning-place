@@ -12,6 +12,7 @@ import {
   CreditCard,
   LogOut,
   ChevronLeft,
+  Bell,
 } from "lucide-react"
 
 import {
@@ -64,16 +65,6 @@ const items = [
 
 const footerItems = [
   {
-    title: "Account",
-    url: "/global/account",
-    icon: User2,
-  },
-  {
-    title: "Billing",
-    url: "/global/billing",
-    icon: CreditCard,
-  },
-  {
     title: "Terms",
     url: "/global/terms",
     icon: Book,
@@ -82,6 +73,21 @@ const footerItems = [
     title: "Privacy",
     url: "/global/privacy",
     icon: Book,
+  },
+  {
+    title: "Account",
+    url: "/global/account",
+    icon: User2,
+  },
+  {
+    title: "Notifications",
+    url: "/global/notifications",
+    icon: Bell,
+  },
+  {
+    title: "Billing",
+    url: "/global/billing",
+    icon: CreditCard,
   },
 ]
 
