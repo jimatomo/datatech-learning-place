@@ -10,7 +10,6 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Bell, Clock, Tag, AlertCircle } from "lucide-react"
-import { tags } from "@/app/quiz/lib/tags"
 
 interface NotificationSettingsClientProps {
   className?: string
@@ -67,8 +66,6 @@ export function NotificationSettingsClient({
     "Data Management",
     "Datatech News"
   ]
-  
-  const generalTags = tags.filter(tag => !weeklyTags.includes(tag))
 
   // サーバーサイドでの設定更新処理
   const handleSettingsUpdate = async (newSettings: NotificationSettings, action: 'update' | 'subscribe' | 'unsubscribe' = 'update', subscription?: PushSubscription) => {
@@ -200,7 +197,7 @@ export function NotificationSettingsClient({
     
     const newSettings: NotificationSettings = {
       ...settings,
-      selectedTags: [...tags]
+      selectedTags: [...weeklyTags]
     }
     
     await handleSettingsUpdate(newSettings)
@@ -360,29 +357,6 @@ export function NotificationSettingsClient({
                       />
                       <Label
                         htmlFor={`weekly-tag-${tag}`}
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        {tag}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* 一般タグ */}
-              <div className="space-y-3">
-                <div className="text-sm font-medium">一般タグ</div>
-                <div className="grid grid-cols-1 gap-3 max-h-48 overflow-y-auto">
-                  {generalTags.map((tag) => (
-                    <div key={tag} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`general-tag-${tag}`}
-                        checked={settings?.selectedTags?.includes(tag) || false}
-                        onCheckedChange={(checked) => handleTagToggle(tag, checked as boolean)}
-                        disabled={isLoading}
-                      />
-                      <Label
-                        htmlFor={`general-tag-${tag}`}
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
                         {tag}

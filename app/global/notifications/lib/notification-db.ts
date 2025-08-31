@@ -175,11 +175,11 @@ export async function getSubscribersForNotificationTime(targetTime: string): Pro
 // タグで絞り込んだ購読者を取得する関数
 export function filterSubscribersByTags(subscribers: NotificationSubscription[], quizTags: string[]): NotificationSubscription[] {
   return subscribers.filter(subscriber => {
-    // 購読者がタグを選択していない場合は全てのクイズに通知
+    // 購読者がタグを選択していない場合は通知はしない
     if (!subscriber.selected_tags || subscriber.selected_tags.length === 0) {
-      return true;
+      return false;
     }
-    
+
     // クイズのタグと購読者の選択タグに重複があるかチェック
     const hasMatchingTag = quizTags.some(quizTag => 
       subscriber.selected_tags.includes(quizTag)

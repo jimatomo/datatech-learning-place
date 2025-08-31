@@ -1,5 +1,5 @@
 import withPWA from 'next-pwa';
-import { NotificationScheduler } from './lib/notification-scheduler.js';
+import { NotificationScheduler } from './app/global/notifications/lib/notification-scheduler.js';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
