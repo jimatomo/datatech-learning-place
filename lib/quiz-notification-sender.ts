@@ -58,13 +58,13 @@ export async function sendQuizNotification(params: QuizNotificationRequest): Pro
     throw new Error("quizTitle, quizTags, quizDate, quizId は必須です")
   }
 
-  console.log("クイズ通知を送信します:", {
-    title: quizTitle,
-    tags: quizTags,
-    date: quizDate,
-    id: quizId,
-    currentJSTTime: getJSTNow().toISOString()
-  })
+  // console.log("クイズ通知を送信します:", {
+  //   title: quizTitle,
+  //   tags: quizTags,
+  //   date: quizDate,
+  //   id: quizId,
+  //   currentJSTTime: getJSTNow().toISOString()
+  // })
 
   // DynamoDBから対象の購読者を取得
   const subscribers = await getSubscribersForTags(quizTags)
@@ -182,21 +182,21 @@ async function getQuizMetadata(filePath: string) {
     const month = filePathParts[quizIndex + 2];
     const day = fileName
     
-    console.log('ファイルパス解析:', {
-      filePath,
-      fileName,
-      filePathParts,
-      year,
-      month,
-      day,
-      pathLength: filePathParts.length
-    });
+    // console.log('ファイルパス解析:', {
+    //   filePath,
+    //   fileName,
+    //   filePathParts,
+    //   year,
+    //   month,
+    //   day,
+    //   pathLength: filePathParts.length
+    // });
     
     // 既存のgenerateQuizId関数のロジックに合わせてIDを生成
     // パスから日付部分を抽出してIDを生成
     const id = `Q${year}${month}${day}`
     
-    console.log('生成されたID:', id);
+    // console.log('生成されたID:', id);
     
     // ファイルの内容を読み込み
     const fileContent = fs.readFileSync(filePath, 'utf-8')
@@ -235,16 +235,16 @@ async function getTodaysQuizzes() {
   const month = (today.getMonth() + 1).toString().padStart(2, '0')
   const day = today.getDate().toString().padStart(2, '0')
   
-  console.log('今日の日付情報:', { year, month, day, today: today.toISOString() });
+  // console.log('今日の日付情報:', { year, month, day, today: today.toISOString() });
   
   const quizDir = path.join(process.cwd(), 'contents', 'quiz', year.toString(), month)
   const quizFilePath = path.join(quizDir, `${day}.tsx`)
   
-  console.log('クイズファイルパス:', {
-    quizDir,
-    quizFilePath,
-    cwd: process.cwd()
-  });
+  // console.log('クイズファイルパス:', {
+  //   quizDir,
+  //   quizFilePath,
+  //   cwd: process.cwd()
+  // });
   
   // ファイルが存在するかチェック
   if (!fs.existsSync(quizFilePath)) {
@@ -252,14 +252,14 @@ async function getTodaysQuizzes() {
     return []
   }
   
-  console.log('クイズファイルが見つかりました:', quizFilePath);
+  // console.log('クイズファイルが見つかりました:', quizFilePath);
   
   try {
     // クイズメタデータを取得
     const metadata = await getQuizMetadata(quizFilePath)
     
     if (metadata) {
-      console.log('取得されたメタデータ:', metadata);
+      // console.log('取得されたメタデータ:', metadata);
       return [metadata]
     }
   } catch (error) {
@@ -282,10 +282,10 @@ export async function processDailyQuizNotifications(): Promise<{
   currentJSTTime: string
 }> {
   const jstNow = getJSTNow()
-  console.log('日次クイズ通知スケジューリング開始:', {
-    currentJSTTime: jstNow.toISOString(),
-    currentJSTLocal: new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })
-  })
+  // console.log('日次クイズ通知スケジューリング開始:', {
+  //   currentJSTTime: jstNow.toISOString(),
+  //   currentJSTLocal: new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })
+  // })
   
   // 今日作成されたクイズを取得
   const todaysQuizzes = await getTodaysQuizzes()

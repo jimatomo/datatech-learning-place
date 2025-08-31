@@ -9,7 +9,7 @@ const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || randomBytes(32).toStrin
 
 // レートリミット用の変数
 let lastCallTime: number = 0
-const RATE_LIMIT_WINDOW = 10 * 60 * 1000 // 10分（ミリ秒）
+const RATE_LIMIT_WINDOW = 9 * 60 * 1000 // 9分（ミリ秒）
 
 // サーバー起動時のログ出力
 if (!process.env.INTERNAL_API_KEY) {
