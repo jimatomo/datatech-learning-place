@@ -108,7 +108,7 @@ export default async function QuizList({ searchParams }: Props) {
   return (
     <div>
       <div className="text-sm">
-        <p>Quizの間違いを見つけた際にはGitHubのIssueもしくはPull Requestを作成してください。</p>
+        <p>間違いを見つけた際には各クイズページのフィードバックボタン（吹き出し）からお知らせ下さい</p>
       </div>
       <div>
         <h2 className="scroll-m-20 pt-5 pb-2 text-lg font-semibold tracking-tight">
