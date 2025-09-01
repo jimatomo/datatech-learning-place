@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react"
 
+// グローバルウィンドウオブジェクトの型拡張
+declare global {
+  interface Window {
+    updateServiceWorker?: () => Promise<void>
+  }
+}
+
 export interface NotificationSettings {
   enabled: boolean
   selectedTags: string[]
@@ -55,10 +62,36 @@ export function useNotificationManager({ initialSettings, updateSettingsOnServer
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
               // 新しいService Workerが利用可能
+              console.log('新しいService Workerが利用可能です')
             }
           })
         }
       })
+      
+      // 手動更新機能を追加
+      const updateServiceWorker = async () => {
+        try {
+          console.log('Service Workerを手動更新中...')
+          
+          // 強制的にキャッシュをバイパスして更新
+          await registration.update()
+          
+          // 更新後、ページをリロードして新しいService Workerを有効化
+          if (registration.waiting) {
+            registration.waiting.postMessage({ action: 'skipWaiting' })
+            window.location.reload()
+          }
+          
+          console.log('Service Workerの更新が完了しました')
+        } catch (error) {
+          console.error('Service Workerの更新に失敗:', error)
+        }
+      }
+      
+      // グローバルに更新関数を公開（デバッグ用）
+      if (typeof window !== 'undefined') {
+        window.updateServiceWorker = updateServiceWorker
+      }
       
       const sub = await registration.pushManager.getSubscription()
       setSubscription(sub)
