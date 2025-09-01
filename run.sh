@@ -6,7 +6,7 @@
 exec node server.js &
 
 # サーバーが起動するまで少し待機
-sleep 30
+sleep 60
 
 # 環境変数を読み込み
 echo "🔧 環境変数を読み込み中..."
