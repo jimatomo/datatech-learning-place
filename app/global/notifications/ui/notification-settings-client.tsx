@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Bell, Clock, Tag, AlertCircle, Smartphone, Download } from "lucide-react"
+import { Bell, Clock, Tag, AlertCircle, Smartphone } from "lucide-react"
 
 interface NotificationSettingsClientProps {
   className?: string
@@ -37,14 +37,6 @@ export function NotificationSettingsClient({
   } = useNotificationManager({ initialSettings })
 
   const [isLoading, setIsLoading] = useState(false)
-
-  // iOSデバイスを検出する関数
-  const isIOSDevice = () => {
-    if (typeof window === 'undefined') return false
-    
-    // 既存のPWAインストールプロンプトと同じ検出ロジックを使用
-    return /iPad|iPhone|iPod/.test(navigator.userAgent)
-  }
 
   // PWAがインストールされているかチェック
   const isPWAInstalled = () => {
@@ -346,18 +338,18 @@ export function NotificationSettingsClient({
 
         {settings?.enabled && (
           <>
-            {/* iOS PWAインストール促進 */}
-            {isIOSDevice() && !isPWAInstalled() && (
-              <Alert className="border-blue-200 bg-blue-50">
-                <Smartphone className="h-4 w-4 text-blue-600" />
-                <AlertDescription className="text-blue-800">
+            {/* サポートしていないブラウザ向けPWAアプリ化促進 */}
+            {!isSupported && !isPWAInstalled() && (
+              <Alert className="border-orange-200 bg-orange-50">
+                <Smartphone className="h-4 w-4 text-orange-600" />
+                <AlertDescription className="text-orange-800">
                   <div className="space-y-2">
-                    <div className="font-medium">より良い通知体験のために</div>
+                    <div className="font-medium">通知機能を利用するには</div>
                     <div className="text-sm">
-                      Safariでこのページをホーム画面に追加すると、より確実に通知を受け取ることができます。
+                      このブラウザでは通知機能がサポートされていません。より良い体験のために、このページをアプリとしてインストールすることをお勧めします。
                     </div>
                     <div className="text-sm font-medium">
-                      手順：Safariの共有ボタン（<Download className="inline h-3 w-3" />）→「ホーム画面に追加」
+                      手順：ブラウザのメニューから「ホーム画面に追加」または「アプリとしてインストール」を選択
                     </div>
                   </div>
                 </AlertDescription>
