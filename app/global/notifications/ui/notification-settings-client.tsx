@@ -41,15 +41,18 @@ export function NotificationSettingsClient({
   // iOSデバイスを検出する関数
   const isIOSDevice = () => {
     if (typeof window === 'undefined') return false
-    return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+    
+    // 既存のPWAインストールプロンプトと同じ検出ロジックを使用
+    return /iPad|iPhone|iPod/.test(navigator.userAgent)
   }
 
   // PWAがインストールされているかチェック
   const isPWAInstalled = () => {
     if (typeof window === 'undefined') return false
-    return window.matchMedia('(display-mode: standalone)').matches ||
-           ('standalone' in window.navigator && (window.navigator as { standalone: boolean }).standalone === true)
+    
+    // 既存のPWAインストールプロンプトと同じ検出ロジックを使用
+    return window.matchMedia('(display-mode: standalone)').matches || 
+           ('standalone' in window.navigator && (window.navigator as Navigator & { standalone?: boolean }).standalone === true)
   }
 
   // 時間と分の選択肢を生成
