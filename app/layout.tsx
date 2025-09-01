@@ -18,6 +18,7 @@ import { AuthStatus } from "@/components/auth-status"
 import { AuthDialog } from "@/components/auth-dialog"
 import ConsentManager from "@/components/ConsentManager"
 import { PWAInstallPrompt } from "@/components/pwa-install-prompt"
+import { NotificationHandler } from "@/components/actions/notification-handler"
 
 export const metadata: Metadata = {
   title: "Datatech Learning Place",
@@ -109,6 +110,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </div>
           </SidebarProvider>
           <PWAInstallPrompt />
+          <NotificationHandler />
         </ThemeProvider>
       </body>
       </UserProvider>

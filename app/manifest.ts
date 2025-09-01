@@ -7,6 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: 'データ技術を学ぶためのオンライン学習プラットフォーム',
     start_url: '/',
     display: 'standalone',
+    scope: '/',
+    orientation: 'portrait-primary',
     icons: [
       {
         src: '/icon-192x192.png',

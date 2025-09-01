@@ -70,35 +70,66 @@ self.addEventListener('notificationclick', function(event) {
   }
   
   event.waitUntil(
-    clients.matchAll({
-      type: 'window',
-      includeUncontrolled: true
-    }).then(function(clientList) {
-      // iOS Safari PWA対応: 常に新しいウィンドウを開く
-      // 既存のタブを再利用せず、確実に新しいページを開く
-      if (clients.openWindow) {
-        return clients.openWindow(targetUrl);
-      } else {
-        // フォールバック: メッセージでナビゲーションを指示
-        if (clientList.length > 0) {
-          const client = clientList[0];
-          return client.focus().then(() => {
-            return client.postMessage({
-              action: 'navigate',
-              url: targetUrl
-            });
-          });
-        }
-      }
-    }).catch(function(error) {
-      console.error('通知クリック処理エラー:', error);
-      // エラー時のフォールバック
-      if (clients.openWindow) {
-        return clients.openWindow('/quiz');
-      }
-    })
+    handleNotificationClick(targetUrl)
   );
 });
+
+// iOS PWA対応の通知クリック処理関数
+async function handleNotificationClick(targetUrl) {
+  try {
+    const clientList = await clients.matchAll({
+      type: 'window',
+      includeUncontrolled: true
+    });
+    
+    console.log('アクティブクライアント数:', clientList.length);
+    
+    // PWAクライアントを探す
+    let pwaClient = null;
+    for (const client of clientList) {
+      if (client.url.includes(self.location.origin)) {
+        pwaClient = client;
+        break;
+      }
+    }
+    
+    if (pwaClient) {
+      console.log('既存PWAクライアント使用:', pwaClient.url);
+      
+      // フォーカス後にナビゲーション
+      await pwaClient.focus();
+      
+      // iOS対策：複数回試行
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          await new Promise(resolve => setTimeout(resolve, 100 * (attempt + 1)));
+          
+          pwaClient.postMessage({
+            type: 'NOTIFICATION_NAVIGATE',
+            url: targetUrl,
+            timestamp: Date.now(),
+            attempt: attempt + 1
+          });
+          
+          break; // 成功したらループを抜ける
+        } catch (error) {
+          console.warn(`ナビゲーション試行 ${attempt + 1} 失敗:`, error);
+        }
+      }
+    } else {
+      console.log('新しいウィンドウを開きます');
+      await clients.openWindow(targetUrl);
+    }
+  } catch (error) {
+    console.error('通知処理エラー:', error);
+    // 最後の手段として新しいウィンドウを開く
+    try {
+      await clients.openWindow(targetUrl);
+    } catch (fallbackError) {
+      console.error('フォールバック処理も失敗:', fallbackError);
+    }
+  }
+}
 
 // 通知が閉じられた時の処理
 self.addEventListener('notificationclose', function(event) {
