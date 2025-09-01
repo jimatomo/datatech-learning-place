@@ -74,26 +74,27 @@ self.addEventListener('notificationclick', function(event) {
       type: 'window',
       includeUncontrolled: true
     }).then(function(clientList) {
-      // 既に開いているタブがあるかチェック
-      for (let i = 0; i < clientList.length; i++) {
-        const client = clientList[i];
-        if (client.url.includes(self.location.origin) && 'focus' in client) {
+      // iOS Safari PWA対応: 常に新しいウィンドウを開く
+      // 既存のタブを再利用せず、確実に新しいページを開く
+      if (clients.openWindow) {
+        return clients.openWindow(targetUrl);
+      } else {
+        // フォールバック: メッセージでナビゲーションを指示
+        if (clientList.length > 0) {
+          const client = clientList[0];
           return client.focus().then(() => {
-            if ('navigate' in client) {
-              return client.navigate(targetUrl);
-            } else {
-              return client.postMessage({
-                action: 'navigate',
-                url: targetUrl
-              });
-            }
+            return client.postMessage({
+              action: 'navigate',
+              url: targetUrl
+            });
           });
         }
       }
-      
-      // 開いているタブがない場合は新しいウィンドウを開く
+    }).catch(function(error) {
+      console.error('通知クリック処理エラー:', error);
+      // エラー時のフォールバック
       if (clients.openWindow) {
-        return clients.openWindow(targetUrl);
+        return clients.openWindow('/quiz');
       }
     })
   );
