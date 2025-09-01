@@ -38,14 +38,7 @@ export function NotificationSettingsClient({
 
   const [isLoading, setIsLoading] = useState(false)
 
-  // PWAがインストールされているかチェック
-  const isPWAInstalled = () => {
-    if (typeof window === 'undefined') return false
-    
-    // 既存のPWAインストールプロンプトと同じ検出ロジックを使用
-    return window.matchMedia('(display-mode: standalone)').matches || 
-           ('standalone' in window.navigator && (window.navigator as Navigator & { standalone?: boolean }).standalone === true)
-  }
+
 
   // 時間と分の選択肢を生成
   const hourOptions = Array.from({ length: 24 }, (_, i) => ({
@@ -292,10 +285,18 @@ export function NotificationSettingsClient({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Alert>
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              お使いのブラウザはプッシュ通知をサポートしていません。
+          <Alert className="border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950">
+            <Smartphone className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+            <AlertDescription className="text-orange-800 dark:text-orange-200">
+              <div className="space-y-2">
+                <div className="font-medium">通知機能を利用するには</div>
+                <div className="text-sm">
+                  このブラウザでは通知機能がサポートされていません。より良い体験のために、このページをアプリとしてインストールすることをお勧めします。
+                </div>
+                <div className="text-sm font-medium">
+                  手順：ブラウザのメニューから「ホーム画面に追加」または「アプリとしてインストール」を選択
+                </div>
+              </div>
             </AlertDescription>
           </Alert>
         </CardContent>
@@ -338,23 +339,6 @@ export function NotificationSettingsClient({
 
         {settings?.enabled && (
           <>
-            {/* サポートしていないブラウザ向けPWAアプリ化促進 */}
-            {!isSupported && !isPWAInstalled() && (
-              <Alert className="border-orange-200 bg-orange-50">
-                <Smartphone className="h-4 w-4 text-orange-600" />
-                <AlertDescription className="text-orange-800">
-                  <div className="space-y-2">
-                    <div className="font-medium">通知機能を利用するには</div>
-                    <div className="text-sm">
-                      このブラウザでは通知機能がサポートされていません。より良い体験のために、このページをアプリとしてインストールすることをお勧めします。
-                    </div>
-                    <div className="text-sm font-medium">
-                      手順：ブラウザのメニューから「ホーム画面に追加」または「アプリとしてインストール」を選択
-                    </div>
-                  </div>
-                </AlertDescription>
-              </Alert>
-            )}
 
             {/* 通知時間設定 */}
             <div className="space-y-3">
