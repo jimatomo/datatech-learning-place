@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Bell, Clock, Tag, AlertCircle } from "lucide-react"
+import { Bell, Clock, Tag, AlertCircle, Smartphone, Download } from "lucide-react"
 
 interface NotificationSettingsClientProps {
   className?: string
@@ -37,6 +37,20 @@ export function NotificationSettingsClient({
   } = useNotificationManager({ initialSettings })
 
   const [isLoading, setIsLoading] = useState(false)
+
+  // iOSデバイスを検出する関数
+  const isIOSDevice = () => {
+    if (typeof window === 'undefined') return false
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  }
+
+  // PWAがインストールされているかチェック
+  const isPWAInstalled = () => {
+    if (typeof window === 'undefined') return false
+    return window.matchMedia('(display-mode: standalone)').matches ||
+           ('standalone' in window.navigator && (window.navigator as { standalone: boolean }).standalone === true)
+  }
 
   // 時間と分の選択肢を生成
   const hourOptions = Array.from({ length: 24 }, (_, i) => ({
@@ -329,6 +343,24 @@ export function NotificationSettingsClient({
 
         {settings?.enabled && (
           <>
+            {/* iOS PWAインストール促進 */}
+            {isIOSDevice() && !isPWAInstalled() && (
+              <Alert className="border-blue-200 bg-blue-50">
+                <Smartphone className="h-4 w-4 text-blue-600" />
+                <AlertDescription className="text-blue-800">
+                  <div className="space-y-2">
+                    <div className="font-medium">より良い通知体験のために</div>
+                    <div className="text-sm">
+                      Safariでこのページをホーム画面に追加すると、より確実に通知を受け取ることができます。
+                    </div>
+                    <div className="text-sm font-medium">
+                      手順：Safariの共有ボタン（<Download className="inline h-3 w-3" />）→「ホーム画面に追加」
+                    </div>
+                  </div>
+                </AlertDescription>
+              </Alert>
+            )}
+
             {/* 通知時間設定 */}
             <div className="space-y-3">
               <Label className="text-base flex items-center gap-2">
