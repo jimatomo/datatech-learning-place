@@ -100,8 +100,8 @@ export async function sendQuizNotification(params: QuizNotificationRequest): Pro
       // PushSubscriptionオブジェクトを再構築
       const pushSubscription = reconstructPushSubscription(subscriber)
 
-      // デバッグようにログを出力
-      // console.log('PushSubscription:', pushSubscription)
+      // デバッグ用にログを出力
+      console.log('📢 通知送信対象:', subscriber.user_id)
       
       await webpush.sendNotification(
         pushSubscription,
