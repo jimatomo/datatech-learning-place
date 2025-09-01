@@ -252,41 +252,4 @@ export async function getNotificationSettings(userId: string): Promise<GetNotifi
   }
 }
 
-// TODO: 認証に依存しない純粋な通知設定取得関数（クライアントサイド用）は必要性を見直して削除したい
-// 認証に依存しない純粋な通知設定取得関数（クライアントサイド用）
-export async function getNotificationSettingsPure(userId: string): Promise<{
-  hasSubscription: boolean;
-  settings?: {
-    enabled: boolean;
-    selectedTags: string[];
-    notificationTime: string;
-  };
-} | null> {
-  try {
-    if (!userId) {
-      return null;
-    }
-
-    const subscriptionData = await getNotificationSubscription(userId);
-    
-    if (!subscriptionData) {
-      return {
-        hasSubscription: false
-      };
-    }
-
-    return {
-      hasSubscription: true,
-      settings: {
-        enabled: subscriptionData.enabled,
-        selectedTags: subscriptionData.selected_tags,
-        notificationTime: subscriptionData.notification_time
-      }
-    };
-  } catch (error) {
-    console.error("通知設定の取得エラー:", error);
-    return null;
-  }
-}
-
 

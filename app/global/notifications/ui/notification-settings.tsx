@@ -1,5 +1,5 @@
 import { getSession } from '@auth0/nextjs-auth0'
-import { getNotificationSettingsPure } from '@/app/global/notifications/lib/notification-db'
+import { getNotificationSettings } from '@/app/global/notifications/lib/notification-db'
 import { updateNotificationSettingsAction } from '@/app/global/notifications/lib/notification-actions'
 import { NotificationSettingsClient } from './notification-settings-client'
 
@@ -20,9 +20,9 @@ export async function NotificationSettingsComponent({ className }: NotificationS
 
   if (userId) {
     try {
-      const result = await getNotificationSettingsPure(userId)
+      const result = await getNotificationSettings(userId)
       
-      if (result && result.hasSubscription && result.settings) {
+      if (result.success && result.hasSubscription && result.settings) {
         settings = {
           enabled: result.settings.enabled,
           selectedTags: result.settings.selectedTags,
