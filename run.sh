@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash -e
 
 [ ! -d '/tmp/cache' ] && mkdir -p /tmp/cache
 
