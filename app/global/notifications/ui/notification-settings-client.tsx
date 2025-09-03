@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Bell, Clock, Tag, AlertCircle, Smartphone } from "lucide-react"
+import { Bell, Clock, Tag, AlertCircle, Smartphone, Trash2 } from "lucide-react"
 
 interface NotificationSettingsClientProps {
   className?: string
@@ -254,6 +254,51 @@ export function NotificationSettingsClient({
     setIsLoading(false)
   }
 
+  const handleCompleteUnsubscribe = async () => {
+    if (!window.confirm('通知設定を完全に削除しますか？この操作は元に戻せません。')) {
+      return
+    }
+    
+    setIsLoading(true)
+    setError(null)
+    
+    try {
+      // 現在のPush購読を解除
+      if (subscription) {
+        await subscription.unsubscribe()
+        setSubscription(null)
+      }
+      
+      // サーバーサイドで完全削除
+      const result = await updateSettingsOnServer({
+        enabled: false,
+        selectedTags: [],
+        notificationTime: "09:00",
+        action: 'unsubscribe'
+      })
+      
+      if (!result.success) {
+        setError(result.error || "設定の削除に失敗しました")
+        setIsLoading(false)
+        return
+      }
+      
+      // クライアント側の状態をリセット
+      setSettings({
+        enabled: false,
+        selectedTags: [],
+        notificationTime: "09:00"
+      })
+      
+      setError(null)
+    } catch (error) {
+      console.error('完全削除エラー:', error)
+      setError("設定の削除に失敗しました")
+    }
+    
+    setIsLoading(false)
+  }
+
   if (!userId) {
     return (
       <Card className={className}>
@@ -435,6 +480,29 @@ export function NotificationSettingsClient({
 
               <div className="text-sm text-muted-foreground">
                 選択したタグが含まれるクイズが投稿されたときに通知が送信されます
+              </div>
+            </div>
+
+            {/* 完全削除ボタン */}
+            <div className="pt-4 border-t border-border">
+              <div className="space-y-3">
+                <Label className="text-base flex items-center gap-2 text-destructive">
+                  <Trash2 className="h-4 w-4" />
+                  通知設定の完全削除
+                </Label>
+                <div className="text-sm text-muted-foreground">
+                  通知設定を完全に削除して、他の端末で新たに設定できるようにします。
+                </div>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleCompleteUnsubscribe}
+                  disabled={isLoading}
+                  className="w-full sm:w-auto"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  通知設定を完全削除
+                </Button>
               </div>
             </div>
 

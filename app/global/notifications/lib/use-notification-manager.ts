@@ -259,6 +259,42 @@ export function useNotificationManager({ initialSettings, updateSettingsOnServer
     }
   }
 
+  // 完全なunsubscribe（設定とレコードを完全削除）
+  const completeUnsubscribe = async () => {
+    try {
+      // 現在のPush購読を解除
+      if (subscription) {
+        await subscription.unsubscribe()
+        setSubscription(null)
+      }
+      
+      // サーバーサイドで完全削除
+      if (updateSettingsOnServer) {
+        await updateSettingsOnServer({
+          enabled: false,
+          selectedTags: [],
+          notificationTime: "09:00",
+          action: 'unsubscribe'
+        })
+      }
+      
+      // クライアント側の状態をデフォルトにリセット
+      setSettings({
+        enabled: false,
+        selectedTags: [],
+        notificationTime: "09:00"
+      })
+      
+      setError(null)
+      return true
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message)
+      }
+      return false
+    }
+  }
+
 
 
   return {
@@ -272,5 +308,6 @@ export function useNotificationManager({ initialSettings, updateSettingsOnServer
     subscribeToPush,
     unsubscribeFromPush,
     updateSettings,
+    completeUnsubscribe,
   }
 }
