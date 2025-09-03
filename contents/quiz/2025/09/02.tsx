@@ -18,7 +18,7 @@ export default function QuizContent() {
       0: "snowsql -a account -u user -p mypassword --mfa-passcode 123456",
       1: "snowsql -a account -u user -p mypassword123456 --mfa-passcode-in-password",
       2: "snowsql -a account -u user -p mypassword -M",
-      3: "上記すべてが正しい",
+      3: "すべてが正しい",
     },
     answers: [3],
     explanation_jsx: <QuizExplanation />,
@@ -49,7 +49,7 @@ function QuizExplanation() {
         SnowSQLでは、MFA（多要素認証）を実行するために複数の方法が提供されています。Snowflake 8.24以降では、管理者がすべての接続に対してMFAを必須にすることができます。
       </p>
       <br />
-      <p className="font-semibold text-green-600">正解の選択肢（上記すべてが正しい）:</p>
+      <p className="font-semibold text-green-600">正解の選択肢（すべてが正しい）:</p>
       <ul className="list-disc pl-4 py-2">
         <li>
           <strong><code>--mfa-passcode</code> パラメータ</strong>: コマンドラインでMFAトークンを直接指定する方法です。例：<code>snowsql -a account -u user -p mypassword --mfa-passcode 123456</code>
