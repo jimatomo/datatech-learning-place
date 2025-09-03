@@ -55,7 +55,7 @@ export default function QuizFileListTagFiltered({
 
   return (
     <div>
-      <div className="flex flex-row items-center justify-start mb-4 mx-2 gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-start mb-4 mx-2 gap-2">
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button

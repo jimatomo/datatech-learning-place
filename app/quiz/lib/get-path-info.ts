@@ -11,6 +11,7 @@ export interface PathInfo {
   author: string | null;
   is_correct: boolean | null;
   is_liked: boolean | null;
+  quiz_id: string | null;
 }
 
 export async function getPathInfos(
@@ -29,6 +30,7 @@ export async function getPathInfos(
     let is_endpoint = false;
     let is_correct: boolean | null = null;
     let is_liked: boolean | null = null;
+    let quiz_id: string | null = null;
     if (find_full_path) {
       path = file;
       is_endpoint = true;
@@ -46,6 +48,7 @@ export async function getPathInfos(
         created_at = quiz.getCreatedAt();
         updated_at = quiz.getUpdatedAt();
         author = quiz.getAuthor();
+        quiz_id = quiz.getId();
         // ログイン済みユーザーの場合のみクイズ結果を取得
         if (userId) {
           const quizResult = await getQuizResult(userId, quiz.getId());
@@ -69,7 +72,8 @@ export async function getPathInfos(
       updated_at,
       author,
       is_correct,
-      is_liked
+      is_liked,
+      quiz_id
     };
   }));
 }
