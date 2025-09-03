@@ -35,7 +35,9 @@ export default function NotificationSettingsPage() {
         通知設定
       </h1>
       
-      <NotificationSettingsComponent />
+      <div className="max-w-2xl mx-auto">
+        <NotificationSettingsComponent />
+      </div>
     </div>
   )
 }

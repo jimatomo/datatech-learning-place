@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Bell, Clock, Tag, AlertCircle, Smartphone, Trash2 } from "lucide-react"
+import { Bell, Clock, Tag, AlertCircle, Smartphone, Trash2, ArrowDown } from "lucide-react"
 
 interface NotificationSettingsClientProps {
   className?: string
@@ -351,6 +351,27 @@ export function NotificationSettingsClient({
 
   const currentTimeParts = getCurrentTimeParts()
 
+  // 通知が未設定かどうかを判定
+  const isNotificationNotConfigured = !settings?.enabled
+
+  // 通知設定ガイドコンポーネント（ツールチップ風）
+  const NotificationGuide = () => {
+    if (!isNotificationNotConfigured) return null
+
+    return (
+              <>
+          <div className="absolute -top-16 right-0 z-10">
+            <div className="bg-blue-200 dark:bg-blue-900 text-sm px-3 py-2 rounded-lg shadow-lg">
+              <span className="whitespace-nowrap">🔔 通知をオンにするにはこちら</span>
+            </div>
+          </div>
+          <div className="absolute -top-8 right-2 z-10">
+            <ArrowDown className="h-8 w-7 text-blue-400 dark:text-blue-800" />
+          </div>
+        </>
+    )
+  }
+
   return (
     <Card className={className}>
       <CardHeader>
@@ -372,14 +393,18 @@ export function NotificationSettingsClient({
           <div className="space-y-0.5">
             <Label className="text-base">プッシュ通知</Label>
             <div className="text-sm text-muted-foreground">
-              クイズ投稿時の通知を{settings?.enabled ? '有効' : '無効'}にする
+              クイズ投稿時の通知は{settings?.enabled ? '有効' : '無効'}です
             </div>
           </div>
-          <Switch
-            checked={settings?.enabled || false}
-            onCheckedChange={handleToggle}
-            disabled={isLoading}
-          />
+          <div className="relative">
+            {/* 通知設定ガイド */}
+            <NotificationGuide />
+            <Switch
+              checked={settings?.enabled || false}
+              onCheckedChange={handleToggle}
+              disabled={isLoading}
+            />
+          </div>
         </div>
 
         {settings?.enabled && (
