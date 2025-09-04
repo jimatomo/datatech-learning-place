@@ -44,6 +44,7 @@ export const tags = [
   'Data Quality',
   'Knowledge Graph',
   'Master Data Mgmt',
+  'Semantic Layer',
   'IaC',
   'Security',
   'Governance',
