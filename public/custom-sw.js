@@ -84,46 +84,16 @@ async function handleNotificationClick(targetUrl) {
     
     console.log('アクティブクライアント数:', clientList.length);
     
-    // PWAクライアントを探す
-    let pwaClient = null;
-    for (const client of clientList) {
-      if (client.url.includes(self.location.origin)) {
-        pwaClient = client;
-        break;
-      }
-    }
+    // iOS Safari PWA対策：アプリが起動中でも常に新しいウィンドウで開く
+    // これにより、通知からの遷移が確実に動作する
+    console.log('iOS PWA対策で新しいウィンドウを開きます:', targetUrl);
+    await clients.openWindow(targetUrl);
     
-    if (pwaClient) {
-      console.log('既存PWAクライアント使用:', pwaClient.url);
-      
-      // フォーカス後にナビゲーション
-      await pwaClient.focus();
-      
-      // iOS対策：複数回試行
-      for (let attempt = 0; attempt < 3; attempt++) {
-        try {
-          await new Promise(resolve => setTimeout(resolve, 100 * (attempt + 1)));
-          
-          pwaClient.postMessage({
-            type: 'NOTIFICATION_NAVIGATE',
-            url: targetUrl,
-            timestamp: Date.now(),
-            attempt: attempt + 1
-          });
-          
-          break; // 成功したらループを抜ける
-        } catch (error) {
-          console.warn(`ナビゲーション試行 ${attempt + 1} 失敗:`, error);
-        }
-      }
-    } else {
-      console.log('新しいウィンドウを開きます');
-      await clients.openWindow(targetUrl);
-    }
   } catch (error) {
     console.error('通知処理エラー:', error);
-    // 最後の手段として新しいウィンドウを開く
+    // フォールバック処理
     try {
+      console.log('フォールバック：新しいウィンドウを開きます');
       await clients.openWindow(targetUrl);
     } catch (fallbackError) {
       console.error('フォールバック処理も失敗:', fallbackError);
