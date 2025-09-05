@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { useNotificationManager, NotificationSettings } from "@/app/global/notifications/lib/use-notification-manager"
 import { NotificationActionRequest, NotificationActionResponse } from "@/app/global/notifications/lib/notification-actions"
 import { Switch } from "@/components/ui/switch"
@@ -38,18 +38,20 @@ export function NotificationSettingsClient({
 
   const [isLoading, setIsLoading] = useState(false)
 
+  // 時間と分の選択肢を生成（useMemoで最適化）
+  const hourOptions = useMemo(() => 
+    Array.from({ length: 24 }, (_, i) => ({
+      value: i.toString().padStart(2, '0'),
+      label: i.toString().padStart(2, '0')
+    })), []
+  )
 
-
-  // 時間と分の選択肢を生成
-  const hourOptions = Array.from({ length: 24 }, (_, i) => ({
-    value: i.toString().padStart(2, '0'),
-    label: i.toString().padStart(2, '0')
-  }))
-
-  const minuteOptions = Array.from({ length: 6 }, (_, i) => ({
-    value: (i * 10).toString().padStart(2, '0'),
-    label: (i * 10).toString().padStart(2, '0')
-  }))
+  const minuteOptions = useMemo(() => 
+    Array.from({ length: 6 }, (_, i) => ({
+      value: (i * 10).toString().padStart(2, '0'),
+      label: (i * 10).toString().padStart(2, '0')
+    })), []
+  )
 
   // 現在の通知時間を時間と分に分解
   const getCurrentTimeParts = () => {
@@ -58,8 +60,8 @@ export function NotificationSettingsClient({
     return { hour, minute }
   }
 
-  // 曜日別タグと一般タグを分離
-  const weeklyTags = [
+  // 曜日別タグと一般タグを分離（useMemoで最適化）
+  const weeklyTags = useMemo(() => [
     "Snowflake Basic",
     "Snowflake Advanced", 
     "Data Modeling",
@@ -67,7 +69,7 @@ export function NotificationSettingsClient({
     "Data Application",
     "Data Management",
     "Datatech News"
-  ]
+  ], [])
 
   // サーバーサイドでの設定更新処理
   const handleSettingsUpdate = async (newSettings: NotificationSettings, action: 'update' | 'subscribe' | 'unsubscribe' = 'update', subscription?: PushSubscription) => {

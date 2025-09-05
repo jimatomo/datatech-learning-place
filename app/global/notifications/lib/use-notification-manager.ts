@@ -5,6 +5,9 @@ declare global {
   interface Window {
     updateServiceWorker?: () => Promise<void>
   }
+  interface ServiceWorkerRegistration {
+    _updateListenerAdded?: boolean
+  }
 }
 
 export interface NotificationSettings {
@@ -46,56 +49,73 @@ export function useNotificationManager({ initialSettings, updateSettingsOnServer
     }
   }, [initialSettings])
 
-  // Service Workerの登録
+  // Service Workerの登録（最適化版）
   const registerServiceWorker = async () => {
     try {
-      // カスタムService Workerを登録
-      const registration = await navigator.serviceWorker.register("/custom-sw.js", {
-        scope: "/",
-        updateViaCache: "none",
-      })
+      // 既存のService Workerをチェック
+      const existingRegistration = await navigator.serviceWorker.getRegistration()
+      let registration = existingRegistration
       
-      // Service Workerの更新をチェック
-      registration.addEventListener('updatefound', () => {
-        const newWorker = registration.installing
-        if (newWorker) {
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              // 新しいService Workerが利用可能
-              console.log('新しいService Workerが利用可能です')
-            }
-          })
-        }
-      })
-      
-      // 手動更新機能を追加
-      const updateServiceWorker = async () => {
-        try {
-          console.log('Service Workerを手動更新中...')
-          
-          // 強制的にキャッシュをバイパスして更新
-          await registration.update()
-          
-          // 更新後、ページをリロードして新しいService Workerを有効化
-          if (registration.waiting) {
-            registration.waiting.postMessage({ action: 'skipWaiting' })
-            window.location.reload()
-          }
-          
-          console.log('Service Workerの更新が完了しました')
-        } catch (error) {
-          console.error('Service Workerの更新に失敗:', error)
-        }
+      if (!existingRegistration) {
+        // カスタムService Workerを登録
+        registration = await navigator.serviceWorker.register("/custom-sw.js", {
+          scope: "/",
+          updateViaCache: "none",
+        })
       }
       
-      // グローバルに更新関数を公開（デバッグ用）
-      if (typeof window !== 'undefined') {
+      if (!registration) {
+        throw new Error('Service Worker の登録に失敗しました')
+      }
+      
+      // Service Workerの更新をチェック（一度だけ設定）
+      if (!registration._updateListenerAdded) {
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing
+          if (newWorker) {
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                console.log('新しいService Workerが利用可能です')
+              }
+            })
+          }
+        })
+        registration._updateListenerAdded = true
+      }
+      
+      // 手動更新機能を追加（グローバルに一度だけ設定）
+      if (typeof window !== 'undefined' && !window.updateServiceWorker) {
+        const updateServiceWorker = async () => {
+          try {
+            console.log('Service Workerを手動更新中...')
+            await registration.update()
+            
+            if (registration.waiting) {
+              registration.waiting.postMessage({ action: 'skipWaiting' })
+              window.location.reload()
+            }
+            
+            console.log('Service Workerの更新が完了しました')
+          } catch (error) {
+            console.error('Service Workerの更新に失敗:', error)
+          }
+        }
+        
         window.updateServiceWorker = updateServiceWorker
       }
       
-      const sub = await registration.pushManager.getSubscription()
-      setSubscription(sub)
+      // プッシュサブスクリプションの取得を非同期で実行
+      setTimeout(async () => {
+        try {
+          const sub = await registration.pushManager.getSubscription()
+          setSubscription(sub)
+        } catch (error) {
+          console.warn('プッシュサブスクリプションの取得に失敗:', error)
+        }
+      }, 100)
+      
     } catch (error) {
+      console.error('Service Worker登録エラー:', error)
       if (error instanceof Error) {
         setError(error.message)
       }
@@ -105,9 +125,12 @@ export function useNotificationManager({ initialSettings, updateSettingsOnServer
   useEffect(() => {
     if ("serviceWorker" in navigator && "PushManager" in window) {
       setIsSupported(true)
-      registerServiceWorker()
+      // Service Workerの登録を遅延実行してUIブロックを防ぐ
+      setTimeout(() => {
+        registerServiceWorker()
+      }, 0)
     }
-  }, [])
+  }, []) // 初回マウント時のみ実行
 
   // 設定を状態に保存（サーバー同期は各API呼び出しで行う）
   const saveSettings = (newSettings: NotificationSettings) => {
