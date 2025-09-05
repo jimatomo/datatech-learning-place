@@ -1,5 +1,4 @@
 import { Quiz, generateQuizId, generateFilePath } from "@/contents/quiz";
-import { CodeBlock } from "@/components/ui/code-block";
 
 export default function QuizContent() {
   const quiz = new Quiz({
@@ -47,7 +46,7 @@ function QuizExplanation() {
       <p className="py-2">
         「MetricFlowはdbtの組み込み関数やJinjaを使用するパッケージを完全にサポートしており、複雑なマクロも利用できる」は誤りです。公式ドキュメントには下記のように記載されており、dbtの組み込み関数やパッケージはサポートされていません。
       </p>
-      <CodeBlock code={"MetricFlow doesn't support dbt builtin functions or packages at this time, however, support is planned for the future."} showLineNumbers={false} />
+      <p>MetricFlow doesn&apos;t support dbt builtin functions or packages at this time, however, support is planned for the future.</p>
 
       <p className="font-semibold text-green-600 pt-2">正しい記述:</p>
       <ul className="list-disc pl-4 py-2">
