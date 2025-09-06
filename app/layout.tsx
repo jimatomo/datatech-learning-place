@@ -85,10 +85,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <main className="flex-1">
                 {/* スマホ対応の固定ヘッダー */}
                 <div className="sticky top-0 z-40 flex items-center px-4 py-2 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border/40">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
                     <SidebarTrigger className="w-10" />
                     <Separator orientation="vertical" className="h-4" />
-                    <BreadcrumbCollapsed />
+                    <div className="min-w-0 flex-1">
+                      <BreadcrumbCollapsed />
+                    </div>
                   </div>
                   <div className="ml-auto">
                     <ModeToggle />

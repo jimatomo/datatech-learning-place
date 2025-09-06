@@ -15,7 +15,7 @@ export function AuthStatus() {
       <div>
         <a href={loginUrl}
           className="inline-flex items-center justify-center
-            text-sm rounded-md h-9 px-3 py-2
+            text-xs sm:text-sm rounded-md h-9 px-3 py-2 text-nowrap
             hover:bg-primary/75 bg-primary text-primary-foreground"
         >
           Sign in

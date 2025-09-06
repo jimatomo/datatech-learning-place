@@ -11,6 +11,15 @@ body {
     text-wrap: balance;
   }
   
+  /* スクロールバーを隠すユーティリティクラス */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Safari and Chrome */
+  }
+  
   /* PWA対応: セーフエリア対応のユーティリティクラス */
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom);
