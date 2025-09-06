@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
 
 type Props = {
   quizId: string
@@ -101,6 +100,7 @@ export function FeedbackWidget({ quizId, isOpen, onOpenChange, hideTrigger }: Pr
             onClick={() => setOpen(!open)}
             aria-expanded={open}
             aria-controls="feedback-panel"
+            className="text-xs sm:text-sm"
           >
             {open ? "フィードバックを閉じる" : "フィードバック"}
           </Button>
@@ -109,30 +109,30 @@ export function FeedbackWidget({ quizId, isOpen, onOpenChange, hideTrigger }: Pr
       {open && (
         <Card id="feedback-panel" className="mt-2">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-base">フィードバック</CardTitle>
+            <CardTitle className="text-sm sm:text-base">フィードバック</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              <Label htmlFor="feedback">気づき・改善提案などがあれば教えてください</Label>
               <Textarea
                 id="feedback"
                 placeholder="例: 選択肢の説明が分かりにくい、間違っている、リンクが切れている、など"
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
                 maxLength={1000}
+                className="text-xs sm:text-sm placeholder:text-xs sm:placeholder:text-base"
               />
               {submitted === "success" && (
-                <p className="text-sm text-green-600">送信しました。ありがとうございます！</p>
+                <p className="text-xs sm:text-sm text-green-600">送信しました。ありがとうございます！</p>
               )}
               {submitted === "error" && (
-                <p className="text-sm text-red-600">送信に失敗しました。時間をおいて再度お試しください。</p>
+                <p className="text-xs sm:text-sm text-red-600">送信に失敗しました。時間をおいて再度お試しください。</p>
               )}
               <div className="pt-2">
-                <p className="text-sm text-muted-foreground mb-1">直近のフィードバック</p>
+                <p className="text-xs sm:text-sm text-muted-foreground mb-1">直近のフィードバック</p>
                 {isLoadingMessages ? (
-                  <p className="text-sm text-muted-foreground">読み込み中...</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">読み込み中...</p>
                 ) : messages.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">まだフィードバックはありません</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">まだフィードバックはありません</p>
                 ) : (
                   <ul className="space-y-2">
                     {messages.map((m, idx) => {
@@ -140,14 +140,14 @@ export function FeedbackWidget({ quizId, isOpen, onOpenChange, hideTrigger }: Pr
                       const canDelete = Boolean(m.can_delete && m.record_type)
                       const isDeleting = deletingKey === m.record_type
                       return (
-                        <li key={key} className="text-sm border rounded p-2 bg-muted/30">
+                        <li key={key} className="text-xs sm:text-sm border rounded p-2 bg-muted/30">
                           <div className="flex items-start justify-between gap-2">
                             <div className="whitespace-pre-wrap break-words flex-1">{m.message}</div>
                             {canDelete && (
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="text-red-600 hover:text-red-700"
+                                className="text-xs sm:text-sm text-red-600 hover:text-red-700"
                                 onClick={() => handleDelete(m.record_type)}
                                 disabled={isDeleting}
                                 aria-label="このフィードバックを削除"
@@ -172,10 +172,11 @@ export function FeedbackWidget({ quizId, isOpen, onOpenChange, hideTrigger }: Pr
               variant="ghost"
               size="sm"
               onClick={() => setOpen(false)}
+              className="text-xs sm:text-sm"
             >
               キャンセル
             </Button>
-            <Button onClick={handleSubmit} disabled={isSubmitting || !feedback.trim()} size="sm">
+            <Button onClick={handleSubmit} disabled={isSubmitting || !feedback.trim()} size="sm" className="text-xs sm:text-sm">
               {isSubmitting ? "送信中..." : "送信"}
             </Button>
           </CardFooter>
