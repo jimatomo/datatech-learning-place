@@ -42,7 +42,7 @@ export default function ConsentManager() {
     <>
       {consentGiven === "true" && <GoogleTagManager gtmId="GTM-56ZBLFZR" />}
       {consentGiven === "undefined" && (
-        <div className="fixed bottom-0 z-50 w-full text-secondary-foreground bg-zinc-800 p-4 text-sm">
+        <div className="fixed bottom-0 z-50 w-full bg-zinc-50 dark:text-secondary-foreground dark:bg-zinc-800 p-4 text-sm">
           <p>このサイトでは、利便性、品質維持・向上を目的に、Google Tag Manager (GTM) を使用して利用者の情報を収集しています。GTM による情報の収集に同意しますか？</p>
           <div className="flex justify-end gap-2 pt-2">
             <button onClick={handleConsent}
