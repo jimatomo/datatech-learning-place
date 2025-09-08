@@ -112,7 +112,9 @@ export async function sendQuizNotification(params: QuizNotificationRequest): Pro
           badge: "/icon-192x192.png",
           data: {
             url: `/quiz/${quizPath}`,
-            tags: quizTags
+            tags: quizTags,
+            quizDate: quizDate,
+            timestamp: getJSTNow().toISOString()
           }
         })
       )

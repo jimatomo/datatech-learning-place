@@ -8,6 +8,10 @@ declare global {
   interface ServiceWorkerRegistration {
     _updateListenerAdded?: boolean
   }
+  interface Navigator {
+    setAppBadge?: (contents?: number) => Promise<void>
+    clearAppBadge?: () => Promise<void>
+  }
 }
 
 export interface NotificationSettings {
@@ -34,6 +38,7 @@ export function useNotificationManager({ initialSettings, updateSettingsOnServer
   const [isSupported, setIsSupported] = useState(false)
   const [subscription, setSubscription] = useState<PushSubscription | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [badgeCount, setBadgeCount] = useState(0)
   const [settings, setSettings] = useState<NotificationSettings>(
     initialSettings || {
       enabled: false,
@@ -282,6 +287,53 @@ export function useNotificationManager({ initialSettings, updateSettingsOnServer
     }
   }
 
+  // バッジをクリア
+  const clearBadge = async () => {
+    try {
+      if ('serviceWorker' in navigator) {
+        const registration = await navigator.serviceWorker.ready
+        if (registration.active) {
+          registration.active.postMessage({ action: 'clearBadge' })
+          setBadgeCount(0)
+        }
+      }
+      
+      // 直接Badge APIを使用する場合のフォールバック
+      if ('clearAppBadge' in navigator) {
+        await navigator.clearAppBadge?.()
+      }
+      
+      return true
+    } catch (error) {
+      console.warn('バッジクリアに失敗:', error)
+      return false
+    }
+  }
+
+  // バッジ数を取得
+  const getBadgeCount = async (): Promise<number> => {
+    try {
+      if ('serviceWorker' in navigator) {
+        const registration = await navigator.serviceWorker.ready
+        if (registration.active) {
+          return new Promise((resolve) => {
+            const channel = new MessageChannel()
+            channel.port1.onmessage = (event) => {
+              const count = event.data.badgeCount || 0
+              setBadgeCount(count)
+              resolve(count)
+            }
+            registration.active!.postMessage({ action: 'getBadgeCount' }, [channel.port2])
+          })
+        }
+      }
+      return 0
+    } catch (error) {
+      console.warn('バッジ数取得に失敗:', error)
+      return 0
+    }
+  }
+
   // 完全なunsubscribe（設定とレコードを完全削除）
   const completeUnsubscribe = async () => {
     try {
@@ -290,6 +342,9 @@ export function useNotificationManager({ initialSettings, updateSettingsOnServer
         await subscription.unsubscribe()
         setSubscription(null)
       }
+      
+      // バッジもクリア
+      await clearBadge()
       
       // サーバーサイドで完全削除
       if (updateSettingsOnServer) {
@@ -320,11 +375,40 @@ export function useNotificationManager({ initialSettings, updateSettingsOnServer
 
 
 
+  // アプリがアクティブになった時にバッジを初期化
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        // アプリがアクティブになったらバッジをクリア
+        clearBadge()
+      }
+    }
+
+    const handleFocus = () => {
+      // ウィンドウがフォーカスされたらバッジをクリア
+      clearBadge()
+    }
+
+    // 初回マウント時にバッジ数を取得
+    if (isSupported) {
+      getBadgeCount()
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    window.addEventListener('focus', handleFocus)
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      window.removeEventListener('focus', handleFocus)
+    }
+  }, [isSupported])
+
   return {
     isSupported,
     subscription,
     settings,
     error,
+    badgeCount,
     setError,
     setSettings,
     setSubscription,
@@ -332,5 +416,7 @@ export function useNotificationManager({ initialSettings, updateSettingsOnServer
     unsubscribeFromPush,
     updateSettings,
     completeUnsubscribe,
+    clearBadge,
+    getBadgeCount,
   }
 }

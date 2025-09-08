@@ -1,5 +1,51 @@
 // カスタムService Worker for プッシュ通知
 
+// 未読通知数を管理するためのキー
+const UNREAD_COUNT_KEY = 'unreadNotificationCount';
+
+// 未読通知数を取得
+async function getUnreadCount() {
+  try {
+    const count = await self.caches.open('badge-cache').then(cache => 
+      cache.match(UNREAD_COUNT_KEY).then(response => 
+        response ? response.text().then(text => parseInt(text) || 0) : 0
+      )
+    );
+    return count;
+  } catch (error) {
+    console.warn('未読通知数の取得に失敗:', error);
+    return 0;
+  }
+}
+
+// 未読通知数を保存
+async function setUnreadCount(count) {
+  try {
+    const cache = await self.caches.open('badge-cache');
+    await cache.put(UNREAD_COUNT_KEY, new Response(count.toString()));
+  } catch (error) {
+    console.warn('未読通知数の保存に失敗:', error);
+  }
+}
+
+// バッジを更新
+async function updateBadge(count) {
+  // Badge APIの対応確認
+  if (navigator.setAppBadge) {
+    try {
+      if (count > 0) {
+        await navigator.setAppBadge(count);
+        console.log('バッジを更新しました:', count);
+      } else {
+        await navigator.clearAppBadge();
+        console.log('バッジをクリアしました');
+      }
+    } catch (error) {
+      console.warn('バッジの更新に失敗:', error);
+    }
+  }
+}
+
 // プッシュイベントを受信した時の処理
 self.addEventListener('push', function(event) {
   console.log('プッシュ通知を受信しました:', event);
@@ -30,18 +76,37 @@ self.addEventListener('push', function(event) {
       };
 
       event.waitUntil(
-        self.registration.showNotification(data.title, options)
+        Promise.all([
+          // 通知を表示
+          self.registration.showNotification(data.title, options),
+          // 未読通知数を増加してバッジを更新
+          (async () => {
+            const currentCount = await getUnreadCount();
+            const newCount = currentCount + 1;
+            await setUnreadCount(newCount);
+            await updateBadge(newCount);
+          })()
+        ])
       );
     } catch (error) {
       console.error('プッシュ通知データの解析エラー:', error);
       
       // エラーが発生した場合のフォールバック通知
       event.waitUntil(
-        self.registration.showNotification('新しいクイズが投稿されました', {
-          body: 'DTLP - Datatech Learning Place',
-          icon: '/icon-192x192.png',
-          badge: '/icon-192x192.png'
-        })
+        Promise.all([
+          self.registration.showNotification('新しいクイズが投稿されました', {
+            body: 'DTLP - Datatech Learning Place',
+            icon: '/icon-192x192.png',
+            badge: '/icon-192x192.png'
+          }),
+          // フォールバック時もバッジを更新
+          (async () => {
+            const currentCount = await getUnreadCount();
+            const newCount = currentCount + 1;
+            await setUnreadCount(newCount);
+            await updateBadge(newCount);
+          })()
+        ])
       );
     }
   }
@@ -57,6 +122,15 @@ self.addEventListener('notificationclick', function(event) {
   const data = event.notification.data || {};
   
   if (action === 'close') {
+    // 閉じるボタンがクリックされた場合もバッジを減少
+    event.waitUntil(
+      (async () => {
+        const currentCount = await getUnreadCount();
+        const newCount = Math.max(0, currentCount - 1);
+        await setUnreadCount(newCount);
+        await updateBadge(newCount);
+      })()
+    );
     return;
   }
   
@@ -70,7 +144,16 @@ self.addEventListener('notificationclick', function(event) {
   }
   
   event.waitUntil(
-    handleNotificationClick(targetUrl)
+    Promise.all([
+      handleNotificationClick(targetUrl),
+      // 通知をクリックした場合もバッジを減少
+      (async () => {
+        const currentCount = await getUnreadCount();
+        const newCount = Math.max(0, currentCount - 1);
+        await setUnreadCount(newCount);
+        await updateBadge(newCount);
+      })()
+    ])
   );
 });
 
@@ -118,7 +201,21 @@ self.addEventListener('install', function() {
 // Service Workerがアクティブになった時の処理
 self.addEventListener('activate', function(event) {
   console.log('Custom Service Worker がアクティブになりました');
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    Promise.all([
+      self.clients.claim(),
+      // アクティブ時にバッジ状態を初期化
+      (async () => {
+        try {
+          const count = await getUnreadCount();
+          await updateBadge(count);
+          console.log('バッジ状態を初期化しました:', count);
+        } catch (error) {
+          console.warn('バッジ初期化に失敗:', error);
+        }
+      })()
+    ])
+  );
 });
 
 // メッセージを受信した時の処理（クライアントからの操作）
@@ -128,5 +225,37 @@ self.addEventListener('message', function(event) {
   if (event.data && event.data.action === 'skipWaiting') {
     self.skipWaiting();
   }
+  
+  // バッジ関連の操作
+  if (event.data && event.data.action === 'clearBadge') {
+    event.waitUntil(
+      (async () => {
+        await setUnreadCount(0);
+        await updateBadge(0);
+        console.log('クライアントからの要求でバッジをクリアしました');
+      })()
+    );
+  }
+  
+  if (event.data && event.data.action === 'getBadgeCount') {
+    event.waitUntil(
+      (async () => {
+        const count = await getUnreadCount();
+        event.ports[0]?.postMessage({ badgeCount: count });
+      })()
+    );
+  }
+});
+
+// アプリがフォーカスされた時にバッジをクリア（visibilitychange対応）
+self.addEventListener('focus', function() {
+  console.log('アプリがフォーカスされました - バッジをクリア');
+  setUnreadCount(0).then(() => updateBadge(0));
+});
+
+// クライアントがアクティブになった時の処理
+self.addEventListener('windowclient', function() {
+  console.log('クライアントがアクティブになりました - バッジをクリア');
+  setUnreadCount(0).then(() => updateBadge(0));
 });
 
