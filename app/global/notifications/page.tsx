@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 
 export default function NotificationSettingsPage() {
   return (
-    <div>
+    <div className="p-6">
       <div className="mb-4">
         <Link href="/quiz" className="inline-flex items-center text-sm text-muted-foreground hover:underline">
           <ArrowLeft className="w-4 h-4 mr-1" />

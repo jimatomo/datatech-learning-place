@@ -101,12 +101,19 @@ export function AppSidebar() {
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     const clickedPath = e.currentTarget.getAttribute('href') ?? '';
     
-    handleTrackEvent({
-      user_id: user?.sub?.toString() ?? '',
-      path: pathname,
-      event_name: 'sidebar_link_click',
-      properties: {link_path: clickedPath},
-    });
+    // イベントトラッキングを非同期で実行してUIをブロックしない
+    setTimeout(async () => {
+      try {
+        await handleTrackEvent({
+          user_id: user?.sub?.toString() ?? '',
+          path: pathname,
+          event_name: 'sidebar_link_click',
+          properties: {link_path: clickedPath},
+        });
+      } catch (error) {
+        console.error('イベントトラッキングエラー:', error);
+      }
+    }, 0);
 
     if (window.innerWidth < 768) {
       toggleSidebar()
@@ -176,7 +183,7 @@ export function AppSidebar() {
                     className="w-[--radix-popper-anchor-width]"
                   >
                     {footerItems.map((item) => (
-                      <DropdownMenuItem key={item.title}>
+                      <DropdownMenuItem key={item.title} asChild>
                         <Link
                           href={item.url}
                           className="flex items-center gap-2 w-full"
