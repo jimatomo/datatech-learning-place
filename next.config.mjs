@@ -1,6 +1,6 @@
 import withPWA from 'next-pwa';
 // 通知スケジューラーは本番環境ではrun.shで初期化されるため、これはローカル開発時のみコメントアウトする
-// import { NotificationScheduler } from './app/global/notifications/lib/notification-scheduler.js';
+// import { NotificationScheduler } from './app/notifications/lib/notification-scheduler.js';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {

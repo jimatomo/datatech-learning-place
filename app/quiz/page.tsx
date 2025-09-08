@@ -215,7 +215,7 @@ export default async function QuizList({ searchParams }: Props) {
               <p className="text-sm sm:text-base text-green-700 dark:text-green-300 leading-relaxed">新しいクイズの通知を受け取って学習を継続しましょう</p>
             </div>
             <Link 
-              href="/global/notifications" 
+              href="/notifications/settings" 
               className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition-colors text-sm sm:text-base font-medium min-w-fit"
             >
               <Settings className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 flex-shrink-0" />

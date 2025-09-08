@@ -1,15 +1,15 @@
 import { Metadata } from "next"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
-import { NotificationSettingsComponent } from "@/app/global/notifications/ui/notification-settings"
+import { NotificationSettingsComponent } from "./ui/notification-settings"
 
 export const metadata: Metadata = {
-  title: "通知設定 - DTLP Global",
+  title: "通知設定 - DTLP",
   description: "Datatech Learning Placeの通知設定ページです。プッシュ通知の設定を管理できます。",
   openGraph: {
-    title: "通知設定 - DTLP Global",
+    title: "通知設定 - DTLP",
     description: "Datatech Learning Placeの通知設定ページです。プッシュ通知の設定を管理できます。",
-    url: "https://datatech-learning-place.net/global/notifications",
+    url: "https://datatech-learning-place.net/notifications/settings",
     siteName: "Datatech Learning Place",
     images: [
       {
@@ -23,11 +23,11 @@ export const metadata: Metadata = {
 
 export default function NotificationSettingsPage() {
   return (
-    <div className="p-6">
+    <div className="p-2 pt-6 sm:p-6">
       <div className="mb-4">
-        <Link href="/quiz" className="inline-flex items-center text-sm text-muted-foreground hover:underline">
+        <Link href="/notifications" className="inline-flex items-center text-sm text-muted-foreground hover:underline">
           <ArrowLeft className="w-4 h-4 mr-1" />
-          クイズページに戻る
+          通知ページに戻る
         </Link>
       </div>
       

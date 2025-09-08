@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { processDailyQuizNotifications } from '@/app/global/notifications/lib/quiz-notification-sender'
+import { processDailyQuizNotifications } from '@/app/notifications/lib/quiz-notification-sender'
 import { headers } from 'next/headers'
 import { randomBytes } from 'crypto'
 

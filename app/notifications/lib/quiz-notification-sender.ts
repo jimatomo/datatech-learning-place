@@ -6,7 +6,7 @@ import {
   filterSubscribersByTags,
   reconstructPushSubscription,
   deleteNotificationSubscription,
-} from '@/app/global/notifications/lib/notification-db'
+} from '@/app/notifications/lib/notification-db'
 import { getQuizFiles } from '@/app/quiz/lib/get-files'
 import { getPathInfos } from '@/app/quiz/lib/get-path-info'
 

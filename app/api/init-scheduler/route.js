@@ -1,4 +1,4 @@
-import { NotificationScheduler } from '@/app/global/notifications/lib/notification-scheduler.js';
+import { NotificationScheduler } from '@/app/notifications/lib/notification-scheduler.js';
 
 export async function POST(request) {
   try {

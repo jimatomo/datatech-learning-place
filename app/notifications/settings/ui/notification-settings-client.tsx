@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { useNotificationManager, NotificationSettings } from "@/app/global/notifications/lib/use-notification-manager"
-import { NotificationActionRequest, NotificationActionResponse } from "@/app/global/notifications/lib/notification-actions"
+import { useNotificationManager, NotificationSettings } from "@/app/notifications/lib/use-notification-manager"
+import { NotificationActionRequest, NotificationActionResponse } from "@/app/notifications/lib/notification-actions"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"

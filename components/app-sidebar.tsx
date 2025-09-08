@@ -61,6 +61,11 @@ const items = [
     url: "/harvor",
     icon: Flag,
   },
+  {
+    title: "Notifications",
+    url: "/notifications",
+    icon: Bell,
+  },
 ]
 
 const footerItems = [
@@ -78,11 +83,6 @@ const footerItems = [
     title: "Account",
     url: "/global/account",
     icon: User2,
-  },
-  {
-    title: "Notifications",
-    url: "/global/notifications",
-    icon: Bell,
   },
   {
     title: "Billing",

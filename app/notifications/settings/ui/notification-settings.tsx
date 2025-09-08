@@ -1,6 +1,6 @@
 import { getSession } from '@auth0/nextjs-auth0'
-import { getNotificationSettings } from '@/app/global/notifications/lib/notification-db'
-import { updateNotificationSettingsAction } from '@/app/global/notifications/lib/notification-actions'
+import { getNotificationSettings } from '@/app/notifications/lib/notification-db'
+import { updateNotificationSettingsAction } from '@/app/notifications/lib/notification-actions'
 import { NotificationSettingsClient } from './notification-settings-client'
 
 interface NotificationSettingsProps {

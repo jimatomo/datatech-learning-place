@@ -3,6 +3,42 @@
 // 未読通知数を管理するためのキー
 const UNREAD_COUNT_KEY = 'unreadNotificationCount';
 
+// 通知履歴のIndexedDB操作
+const HISTORY_DB_NAME = 'NotificationHistoryDB';
+const HISTORY_DB_VERSION = 1;
+const HISTORY_STORE_NAME = 'notifications';
+
+// 通知履歴をIndexedDBに保存
+async function saveNotificationToHistory(notification) {
+  try {
+    const db = await openHistoryDB();
+    const transaction = db.transaction([HISTORY_STORE_NAME], 'readwrite');
+    const store = transaction.objectStore(HISTORY_STORE_NAME);
+    await store.put(notification);
+    console.log('通知履歴を保存しました:', notification.title);
+  } catch (error) {
+    console.error('通知履歴の保存に失敗:', error);
+  }
+}
+
+// IndexedDBを開く
+function openHistoryDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(HISTORY_DB_NAME, HISTORY_DB_VERSION);
+    
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+    
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains(HISTORY_STORE_NAME)) {
+        const store = db.createObjectStore(HISTORY_STORE_NAME, { keyPath: 'id' });
+        store.createIndex('timestamp', 'timestamp', { unique: false });
+      }
+    };
+  });
+}
+
 // 未読通知数を取得
 async function getUnreadCount() {
   try {
@@ -85,7 +121,18 @@ self.addEventListener('push', function(event) {
             const newCount = currentCount + 1;
             await setUnreadCount(newCount);
             await updateBadge(newCount);
-          })()
+          })(),
+          // 通知履歴をIndexedDBに保存
+          saveNotificationToHistory({
+            id: `notification_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            title: data.title,
+            body: data.body,
+            timestamp: Date.now(),
+            read: false,
+            url: data.data?.url,
+            quizId: data.data?.quizId,
+            icon: data.icon || '/icon-192x192.png'
+          })
         ])
       );
     } catch (error) {
@@ -105,7 +152,16 @@ self.addEventListener('push', function(event) {
             const newCount = currentCount + 1;
             await setUnreadCount(newCount);
             await updateBadge(newCount);
-          })()
+          })(),
+          // フォールバック通知も履歴に保存
+          saveNotificationToHistory({
+            id: `fallback_notification_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            title: '新しいクイズが投稿されました',
+            body: 'DTLP - Datatech Learning Place',
+            timestamp: Date.now(),
+            read: false,
+            icon: '/icon-192x192.png'
+          })
         ])
       );
     }
@@ -184,9 +240,20 @@ async function handleNotificationClick(targetUrl) {
   }
 }
 
-// 通知が閉じられた時の処理
+// 通知が閉じられた時の処理（スワイプで削除など）
 self.addEventListener('notificationclose', function(event) {
-  console.log('通知が閉じられました:', event);
+  console.log('通知が閉じられました（削除）:', event);
+  
+  // 通知が無視/削除された場合もバッジを減少
+  event.waitUntil(
+    (async () => {
+      const currentCount = await getUnreadCount();
+      const newCount = Math.max(0, currentCount - 1);
+      await setUnreadCount(newCount);
+      await updateBadge(newCount);
+      console.log('通知削除によりバッジを減少:', newCount);
+    })()
+  );
   
   // 必要に応じて分析データを送信
   // analytics.track('notification_closed', event.notification.data);
