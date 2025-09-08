@@ -18,7 +18,7 @@ export function PWAInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [showPrompt, setShowPrompt] = useState(false)
   const [isIOS, setIsIOS] = useState(false)
-  const [isMacOS, setIsMacOS] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const [isStandalone, setIsStandalone] = useState(false)
   const [mounted, setMounted] = useState(false)
 
@@ -30,9 +30,11 @@ export function PWAInstallPrompt() {
       const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
       setIsIOS(iOS)
 
-      // macOS検知
-      const macOS = /Mac|Macintosh/.test(navigator.userAgent)
-      setIsMacOS(macOS)
+      // モバイルデバイス検知（スマートフォン・タブレット）
+      const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/.test(navigator.userAgent) || 
+                     window.innerWidth <= 768 || // 画面幅でも判定
+                     'ontouchstart' in window // タッチデバイス検知
+      setIsMobile(mobile)
 
       // スタンドアロンモード（PWAとしてインストール済み）検知
       const standalone = window.matchMedia('(display-mode: standalone)').matches || 
@@ -42,8 +44,6 @@ export function PWAInstallPrompt() {
 
       // ブラウザ検知
       const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent)
-      const isChrome = /Chrome/.test(navigator.userAgent)
-      const isEdge = /Edg/.test(navigator.userAgent)
 
       // ユーザーが以前にプロンプトを閉じたかどうかをチェック
       const promptDismissed = localStorage.getItem('pwa-prompt-dismissed')
@@ -68,6 +68,11 @@ export function PWAInstallPrompt() {
         return
       }
 
+      // モバイルデバイスでない場合は表示しない（PCでの表示を無効化）
+      if (!mobile) {
+        return
+      }
+
       // beforeinstallprompt イベントリスナー（Chrome、Edge用）
       const handleBeforeInstallPrompt = (e: Event) => {
         e.preventDefault()
@@ -81,22 +86,9 @@ export function PWAInstallPrompt() {
 
       window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
 
-      // Safari用の表示ロジック（iOS Safari と macOS Safari）
-      if ((iOS || macOS) && isSafari && !sessionDismissed) {
+      // Safari用の表示ロジック（iOS Safariのみ、macOS Safariは除外）
+      if (iOS && isSafari && !sessionDismissed) {
         setShowPrompt(true)
-      }
-
-      // MacOS Chrome/Edge用のフォールバック機能
-      if (macOS && (isChrome || isEdge) && !standalone && !sessionDismissed) {
-        // beforeinstallpromptが発生しない場合のフォールバック
-        const fallbackTimer = setTimeout(() => {
-          setShowPrompt(true)
-        }, 2000)
-        
-        return () => {
-          window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-          clearTimeout(fallbackTimer)
-        }
       }
 
       return () => {
@@ -132,8 +124,8 @@ export function PWAInstallPrompt() {
     return null
   }
 
-  // PWAとしてインストール済み、またはプロンプトを表示しない場合は何も表示しない
-  if (isStandalone || !showPrompt) {
+  // PWAとしてインストール済み、プロンプトを表示しない、またはモバイルデバイスでない場合は何も表示しない
+  if (isStandalone || !showPrompt || !isMobile) {
     return null
   }
 
@@ -175,20 +167,6 @@ export function PWAInstallPrompt() {
                 Safari で「共有」→「ホーム画面に追加」をタップしてください
               </p>
             </div>
-          ) : isMacOS && !deferredPrompt ? (
-            <div className="space-y-2">
-              <Button 
-                className="w-full text-sm" 
-                size="sm"
-                onClick={handleDismiss}
-              >
-                <Download className="h-4 w-4 mr-2" />
-                手順を確認しました
-              </Button>
-              <p className="text-xs text-muted-foreground">
-                Safari で「Dock にアプリを追加」または Chrome でアドレスバーのインストールアイコンをクリックしてください
-              </p>
-            </div>
           ) : (
             <div className="space-y-2">
               <Button 
@@ -201,7 +179,7 @@ export function PWAInstallPrompt() {
                 今すぐインストール
               </Button>
               <p className="text-xs text-muted-foreground">
-                ワンクリックでアプリをインストールできます
+                ワンタップでアプリをインストールできます
               </p>
             </div>
           )}
