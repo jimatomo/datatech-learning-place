@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useNotificationManager } from "@/app/notifications/lib/use-notification-manager"
-import { Bell, CheckCircle, Clock, Trash2 } from "lucide-react"
+import { Bell, CheckCircle, Clock, Trash2, CheckCheck } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -165,6 +165,20 @@ export function NotificationHistoryClient() {
     }
   }
 
+  const markAllAsRead = async () => {
+    try {
+      const unreadNotifications = notifications.filter(n => !n.read)
+      for (const notification of unreadNotifications) {
+        await updateNotificationInIndexedDB(notification.id, { read: true })
+      }
+      setNotifications(prev => 
+        prev.map(notification => ({ ...notification, read: true }))
+      )
+    } catch (error) {
+      console.error('全既読マークの更新に失敗:', error)
+    }
+  }
+
   const deleteNotification = async (id: string) => {
     try {
       await deleteNotificationFromIndexedDB(id)
@@ -244,11 +258,22 @@ export function NotificationHistoryClient() {
       {/* アクションボタン */}
       {notifications.length > 0 && (
         <div className="flex flex-wrap gap-2">
+          {notifications.filter(n => !n.read).length > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={markAllAsRead}
+              className="flex items-center gap-2"
+            >
+              <CheckCheck className="w-4 h-4" />
+              すべて既読
+            </Button>
+          )}
           <Button
             variant="outline"
             size="sm"
             onClick={clearAllNotifications}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 text-destructive hover:text-destructive"
           >
             <Trash2 className="w-4 h-4" />
             すべて削除
@@ -287,6 +312,11 @@ export function NotificationHistoryClient() {
                     <CardDescription className="flex items-center gap-2 text-xs pt-2">
                       <Clock className="w-3 h-3 flex-shrink-0" />
                       {formatTimestamp(notification.timestamp)}
+                      {notification.read && (
+                        <Badge variant="outline" className="text-xs ml-2">
+                          既読
+                        </Badge>
+                      )}
                     </CardDescription>
                   </div>
                   
@@ -306,9 +336,13 @@ export function NotificationHistoryClient() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => deleteNotification(notification.id)}
-                        className="h-6 w-6 sm:h-8 sm:w-8 p-0 text-destructive hover:text-destructive"
-                        title="削除"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          deleteNotification(notification.id)
+                        }}
+                        className="h-6 w-6 sm:h-8 sm:w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                        title="通知を削除"
                       >
                         <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                       </Button>
@@ -325,18 +359,30 @@ export function NotificationHistoryClient() {
               {(notification.url || notification.quizId) ? (
                 <Link
                   href={notification.url || `/quiz/${notification.quizId}`}
-                  onClick={() => markAsRead(notification.id)}
+                  onClick={() => {
+                    if (!notification.read) {
+                      markAsRead(notification.id)
+                    }
+                  }}
                   className="block"
                 >
                   <CardContent className="pt-0 p-3 sm:p-6 sm:pt-0 hover:bg-muted/50 transition-colors cursor-pointer">
-                    <p className="text-sm text-muted-foreground pt-6 leading-relaxed">
+                    <p className="text-sm text-muted-foreground leading-relaxed">
                       {notification.body}
                     </p>
+                    <div className="flex items-center justify-between mt-2 pt-2 border-t border-muted">
+                      <span className="text-xs text-muted-foreground">クリックして詳細を表示</span>
+                      {!notification.read && (
+                        <Badge variant="default" className="text-xs">
+                          未読
+                        </Badge>
+                      )}
+                    </div>
                   </CardContent>
                 </Link>
               ) : (
                 <CardContent className="pt-0 p-3 sm:p-6 sm:pt-0">
-                  <p className="text-sm text-muted-foreground mb-3 leading-relaxed">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
                     {notification.body}
                   </p>
                 </CardContent>

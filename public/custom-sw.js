@@ -21,6 +21,27 @@ async function saveNotificationToHistory(notification) {
   }
 }
 
+// 通知を既読にマークする関数
+async function markNotificationAsRead(notificationId) {
+  try {
+    const db = await openHistoryDB();
+    const transaction = db.transaction([HISTORY_STORE_NAME], 'readwrite');
+    const store = transaction.objectStore(HISTORY_STORE_NAME);
+    
+    const getRequest = store.get(notificationId);
+    getRequest.onsuccess = () => {
+      const notification = getRequest.result;
+      if (notification) {
+        const updatedNotification = { ...notification, read: true };
+        store.put(updatedNotification);
+        console.log('通知を既読にマークしました:', notificationId);
+      }
+    };
+  } catch (error) {
+    console.error('通知の既読マーク処理に失敗:', error);
+  }
+}
+
 // IndexedDBを開く
 function openHistoryDB() {
   return new Promise((resolve, reject) => {
@@ -104,11 +125,17 @@ self.addEventListener('push', function(event) {
       const data = event.data.json();
       console.log('通知データ:', data);
       
+      // 通知履歴ID を生成
+      const notificationHistoryId = `notification_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
       const options = {
         body: data.body,
         icon: data.icon || '/icon-192x192.png',
         badge: data.badge || '/icon-192x192.png',
-        data: data.data || {},
+        data: {
+          ...(data.data || {}),
+          _notificationHistoryId: notificationHistoryId
+        },
         vibrate: [100, 50, 100],
         requireInteraction: true,
         actions: [
@@ -137,7 +164,7 @@ self.addEventListener('push', function(event) {
           })(),
           // 通知履歴をIndexedDBに保存
           saveNotificationToHistory({
-            id: `notification_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            id: notificationHistoryId,
             title: data.title,
             body: data.body,
             timestamp: Date.now(),
@@ -152,12 +179,17 @@ self.addEventListener('push', function(event) {
       console.error('プッシュ通知データの解析エラー:', error);
       
       // エラーが発生した場合のフォールバック通知
+      const fallbackNotificationId = `fallback_notification_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
       event.waitUntil(
         Promise.all([
           self.registration.showNotification('新しいクイズが投稿されました', {
             body: 'DTLP - Datatech Learning Place',
             icon: '/icon-192x192.png',
-            badge: '/icon-192x192.png'
+            badge: '/icon-192x192.png',
+            data: {
+              _notificationHistoryId: fallbackNotificationId
+            }
           }),
           // フォールバック時もバッジを更新
           (async () => {
@@ -168,7 +200,7 @@ self.addEventListener('push', function(event) {
           })(),
           // フォールバック通知も履歴に保存
           saveNotificationToHistory({
-            id: `fallback_notification_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            id: fallbackNotificationId,
             title: '新しいクイズが投稿されました',
             body: 'DTLP - Datatech Learning Place',
             timestamp: Date.now(),
@@ -191,14 +223,22 @@ self.addEventListener('notificationclick', function(event) {
   const data = event.notification.data || {};
   
   if (action === 'close') {
-    // 閉じるボタンがクリックされた場合もバッジを減少
+    // 閉じるボタンがクリックされた場合もバッジを減少し、既読にマーク
     event.waitUntil(
-      (async () => {
-        const currentCount = await getUnreadCount();
-        const newCount = Math.max(0, currentCount - 1);
-        await setUnreadCount(newCount);
-        await updateBadge(newCount);
-      })()
+      Promise.all([
+        (async () => {
+          const currentCount = await getUnreadCount();
+          const newCount = Math.max(0, currentCount - 1);
+          await setUnreadCount(newCount);
+          await updateBadge(newCount);
+        })(),
+        // 通知履歴を既読にマーク
+        (async () => {
+          if (data._notificationHistoryId) {
+            await markNotificationAsRead(data._notificationHistoryId);
+          }
+        })()
+      ])
     );
     return;
   }
@@ -215,12 +255,18 @@ self.addEventListener('notificationclick', function(event) {
   event.waitUntil(
     Promise.all([
       handleNotificationClick(targetUrl),
-      // 通知をクリックした場合もバッジを減少
+      // 通知をクリックした場合もバッジを減少し、既読にマーク
       (async () => {
         const currentCount = await getUnreadCount();
         const newCount = Math.max(0, currentCount - 1);
         await setUnreadCount(newCount);
         await updateBadge(newCount);
+      })(),
+      // 通知履歴を既読にマーク
+      (async () => {
+        if (data._notificationHistoryId) {
+          await markNotificationAsRead(data._notificationHistoryId);
+        }
       })()
     ])
   );
@@ -257,15 +303,26 @@ async function handleNotificationClick(targetUrl) {
 self.addEventListener('notificationclose', function(event) {
   console.log('通知が閉じられました（削除）:', event);
   
-  // 通知が無視/削除された場合もバッジを減少
+  const data = event.notification.data || {};
+  
+  // 通知が無視/削除された場合もバッジを減少し、既読にマーク
   event.waitUntil(
-    (async () => {
-      const currentCount = await getUnreadCount();
-      const newCount = Math.max(0, currentCount - 1);
-      await setUnreadCount(newCount);
-      await updateBadge(newCount);
-      console.log('通知削除によりバッジを減少:', newCount);
-    })()
+    Promise.all([
+      (async () => {
+        const currentCount = await getUnreadCount();
+        const newCount = Math.max(0, currentCount - 1);
+        await setUnreadCount(newCount);
+        await updateBadge(newCount);
+        console.log('通知削除によりバッジを減少:', newCount);
+      })(),
+      // 通知履歴を既読にマーク
+      (async () => {
+        if (data._notificationHistoryId) {
+          await markNotificationAsRead(data._notificationHistoryId);
+          console.log('通知削除により既読にマーク:', data._notificationHistoryId);
+        }
+      })()
+    ])
   );
   
   // 必要に応じて分析データを送信

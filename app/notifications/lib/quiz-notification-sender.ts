@@ -5,7 +5,7 @@ import {
   getSubscribersForNotificationTime,
   filterSubscribersByTags,
   reconstructPushSubscription,
-  deleteNotificationSubscription,
+  updateNotificationSettings,
 } from '@/app/notifications/lib/notification-db'
 import { getQuizFiles } from '@/app/quiz/lib/get-files'
 import { getPathInfos } from '@/app/quiz/lib/get-path-info'
@@ -125,13 +125,19 @@ export async function sendQuizNotification(params: QuizNotificationRequest): Pro
       errorCount++
       console.error(`個別通知送信エラー (${subscriber.user_id}):`, error)
       
-      // 410 Gone エラーの場合は無効なサブスクリプションなので削除を検討
+      // 410 Gone エラーの場合は無効なサブスクリプションなので無効化を検討
       if (error instanceof webpush.WebPushError && error.statusCode === 410) {
-        // 無効なサブスクリプションをDynamoDBから削除
+        // 無効なサブスクリプションを無効化（削除ではなく既読扱い）
         try {
-          await deleteNotificationSubscription(subscriber.user_id)
-        } catch (deleteError) {
-          console.error(`無効なサブスクリプション削除エラー: ${subscriber.user_id}`, deleteError)
+          // サブスクリプションを無効化（enabled: false）
+          await updateNotificationSettings(subscriber.user_id, {
+            enabled: false,
+            selected_tags: subscriber.selected_tags,
+            notification_time: subscriber.notification_time
+          })
+          console.log(`無効なサブスクリプションを無効化しました: ${subscriber.user_id}`)
+        } catch (updateError) {
+          console.error(`無効なサブスクリプション無効化エラー: ${subscriber.user_id}`, updateError)
         }
       }
     }
