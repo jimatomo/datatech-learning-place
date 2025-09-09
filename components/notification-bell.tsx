@@ -106,8 +106,8 @@ export function NotificationBell() {
           <Badge 
             variant="destructive" 
             className={cn(
-              "absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs",
-              "min-w-[1.25rem] rounded-full"
+              "absolute -top-0.5 -right-0.5 h-4 w-1 p-0 flex items-center justify-center text-xs",
+              "min-w-[1rem] rounded-full"
             )}
           >
             {unreadCount > 99 ? '99+' : unreadCount}
