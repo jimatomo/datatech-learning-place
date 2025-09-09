@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator"
 import { ThemeProvider } from "@/components/theme-provider"
 import { AppSidebar } from "@/components/app-sidebar"
 import { ModeToggle } from "@/components/theme-mode-toggle"
+import { NotificationBell } from "@/components/notification-bell"
 import { BreadcrumbCollapsed } from "@/components/app-breadcrumb"
 import Footer from "@/components/footer"
 import NextTopLoader from 'nextjs-toploader';
@@ -92,7 +93,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                       <BreadcrumbCollapsed />
                     </div>
                   </div>
-                  <div className="ml-auto">
+                  <div className="ml-auto flex items-center sm:gap-2">
+                    <NotificationBell />
                     <ModeToggle />
                   </div>
                   <AuthStatus />

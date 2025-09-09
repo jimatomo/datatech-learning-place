@@ -80,6 +80,19 @@ async function updateBadge(count) {
       console.warn('バッジの更新に失敗:', error);
     }
   }
+  
+  // クライアントにバッジ更新を通知
+  try {
+    const clients = await self.clients.matchAll();
+    clients.forEach(client => {
+      client.postMessage({
+        type: 'BADGE_UPDATE',
+        count: count
+      });
+    });
+  } catch (error) {
+    console.warn('クライアントへのバッジ更新通知に失敗:', error);
+  }
 }
 
 // プッシュイベントを受信した時の処理
@@ -294,6 +307,25 @@ self.addEventListener('message', function(event) {
   }
   
   // バッジ関連の操作
+  if (event.data && event.data.action === 'getBadgeCount') {
+    event.waitUntil(
+      (async () => {
+        try {
+          const count = await getUnreadCount();
+          // MessageChannelを使ってレスポンスを送信
+          if (event.ports && event.ports[0]) {
+            event.ports[0].postMessage({ badgeCount: count });
+          }
+        } catch (error) {
+          console.warn('バッジ数取得に失敗:', error);
+          if (event.ports && event.ports[0]) {
+            event.ports[0].postMessage({ badgeCount: 0 });
+          }
+        }
+      })()
+    );
+  }
+  
   if (event.data && event.data.action === 'clearBadge') {
     event.waitUntil(
       (async () => {

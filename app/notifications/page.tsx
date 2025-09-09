@@ -2,6 +2,7 @@ import { Metadata } from "next"
 import Link from "next/link"
 import { Bell, Settings } from "lucide-react"
 import { NotificationHistoryClient } from "./ui/notification-history-client"
+import { NotificationBadgeClearer } from "@/components/notification-badge-clearer"
 
 export const metadata: Metadata = {
   title: "通知 - DTLP",
@@ -24,6 +25,7 @@ export const metadata: Metadata = {
 export default function NotificationsPage() {
   return (
     <div className="min-h-screen bg-background">
+      <NotificationBadgeClearer />
       <div className="container mx-auto p-4 max-w-4xl">
         {/* ヘッダー */}
         <div className="mb-6">
