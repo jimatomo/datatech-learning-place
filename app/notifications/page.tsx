@@ -26,7 +26,7 @@ export default function NotificationsPage() {
   return (
     <div className="min-h-screen bg-background">
       <NotificationBadgeClearer />
-      <div className="container mx-auto p-4 max-w-4xl">
+      <div className="container mx-auto sm:p-4 max-w-4xl">
         {/* ヘッダー */}
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-4">

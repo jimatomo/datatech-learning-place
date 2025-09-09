@@ -2,12 +2,11 @@
 
 import { useEffect, useState } from "react"
 import { useNotificationManager } from "@/app/notifications/lib/use-notification-manager"
-import { Bell, CheckCircle, Clock, ExternalLink, Trash2 } from "lucide-react"
+import { Bell, CheckCircle, Clock, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
 
 interface NotificationItem {
   id: string
@@ -282,66 +281,66 @@ export function NotificationHistoryClient() {
               <CardHeader className="pb-3 p-3 sm:p-6 sm:pb-3">
                 <div className="flex items-start justify-between gap-2 sm:gap-3">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
-                      <CardTitle className="text-sm sm:text-base leading-tight">
-                        {notification.title}
-                      </CardTitle>
-                      {!notification.read && (
-                        <Badge variant="secondary" className="text-xs w-fit">
-                          未読
-                        </Badge>
-                      )}
-                    </div>
-                    <CardDescription className="flex items-center gap-2 text-xs">
+                    <CardTitle className="text-sm sm:text-base leading-tight mb-1">
+                      {notification.title}
+                    </CardTitle>
+                    <CardDescription className="flex items-center gap-2 text-xs pt-2">
                       <Clock className="w-3 h-3 flex-shrink-0" />
                       {formatTimestamp(notification.timestamp)}
                     </CardDescription>
                   </div>
                   
-                  <div className="flex items-center gap-1 flex-shrink-0">
-                    {!notification.read && (
+                  <div className="flex flex-col items-center gap-1 flex-shrink-0">
+                    <div className="flex items-center gap-1">
+                      {!notification.read && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => markAsRead(notification.id)}
+                          className="h-6 w-6 sm:h-8 sm:w-8 p-0"
+                          title="既読にする"
+                        >
+                          <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+                        </Button>
+                      )}
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => markAsRead(notification.id)}
-                        className="h-7 w-7 sm:h-8 sm:w-8 p-0"
-                        title="既読にする"
+                        onClick={() => deleteNotification(notification.id)}
+                        className="h-6 w-6 sm:h-8 sm:w-8 p-0 text-destructive hover:text-destructive"
+                        title="削除"
                       >
-                        <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                       </Button>
+                    </div>
+                    {!notification.read && (
+                      <Badge variant="secondary" className="text-xs">
+                        未読
+                      </Badge>
                     )}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => deleteNotification(notification.id)}
-                      className="h-7 w-7 sm:h-8 sm:w-8 p-0 text-destructive hover:text-destructive"
-                      title="削除"
-                    >
-                      <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
-                    </Button>
                   </div>
                 </div>
               </CardHeader>
               
-              <CardContent className="pt-0 p-3 sm:p-6 sm:pt-0">
-                <p className="text-sm text-muted-foreground mb-3 leading-relaxed">
-                  {notification.body}
-                </p>
-                
-                {(notification.url || notification.quizId) && (
-                  <>
-                    <Separator className="mb-3" />
-                    <Link
-                      href={notification.url || `/quiz/${notification.quizId}`}
-                      className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
-                      onClick={() => markAsRead(notification.id)}
-                    >
-                      <ExternalLink className="w-3 h-3 flex-shrink-0" />
-                      <span className="truncate">{notification.quizId ? 'クイズを見る' : 'ページを開く'}</span>
-                    </Link>
-                  </>
-                )}
-              </CardContent>
+              {(notification.url || notification.quizId) ? (
+                <Link
+                  href={notification.url || `/quiz/${notification.quizId}`}
+                  onClick={() => markAsRead(notification.id)}
+                  className="block"
+                >
+                  <CardContent className="pt-0 p-3 sm:p-6 sm:pt-0 hover:bg-muted/50 transition-colors cursor-pointer">
+                    <p className="text-sm text-muted-foreground pt-6 leading-relaxed">
+                      {notification.body}
+                    </p>
+                  </CardContent>
+                </Link>
+              ) : (
+                <CardContent className="pt-0 p-3 sm:p-6 sm:pt-0">
+                  <p className="text-sm text-muted-foreground mb-3 leading-relaxed">
+                    {notification.body}
+                  </p>
+                </CardContent>
+              )}
             </Card>
           ))
         )}
