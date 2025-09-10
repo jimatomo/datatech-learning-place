@@ -88,7 +88,6 @@ FROM customer_order_summary`}
           title="クラスタリングキー設定"
           showLineNumbers={true}
           maxLines={30}
-          maxWidth="max-w-none"
         />
 
         <CodeBlock
@@ -117,7 +116,6 @@ ORDER BY o.order_date`}
           title="インクリメンタルモデル"
           showLineNumbers={true}
           maxLines={20}
-          maxWidth="max-w-none"
         />
       </div>
 
@@ -189,7 +187,6 @@ sources:
           title="拡張データ品質テスト"
           showLineNumbers={true}
           maxLines={40}
-          maxWidth="max-w-none"
         />
 
         <CodeBlock
@@ -228,7 +225,6 @@ WHERE o.order_count_from_orders != c.order_count_from_summary
           title="カスタムテスト実装"
           showLineNumbers={true}
           maxLines={30}
-          maxWidth="max-w-none"
         />
       </div>
 
@@ -312,7 +308,6 @@ models:
           title="モデルドキュメント定義"
           showLineNumbers={true}
           maxLines={45}
-          maxWidth="max-w-none"
         />
       </div>
 
@@ -361,7 +356,6 @@ models:
           title="カスタムマクロ実装"
           showLineNumbers={true}
           maxLines={30}
-          maxWidth="max-w-none"
         />
 
         <CodeBlock
@@ -397,7 +391,6 @@ FROM customer_order_summary`}
           title="マクロ活用例"
           showLineNumbers={true}
           maxLines={25}
-          maxWidth="max-w-none"
         />
       </div>
 
@@ -471,7 +464,6 @@ FROM {{ ref('stg_orders') }}`}
           title="監視メトリクス実装"
           showLineNumbers={true}
           maxLines={40}
-          maxWidth="max-w-none"
         />
       </div>
 
@@ -505,7 +497,6 @@ ORDER BY execution_time DESC;`}
           title="パフォーマンス監視"
           showLineNumbers={true}
           maxLines={20}
-          maxWidth="max-w-none"
         />
 
         <CodeBlock
@@ -541,7 +532,6 @@ packages:
           title="パフォーマンステスト自動化"
           showLineNumbers={true}
           maxLines={25}
-          maxWidth="max-w-none"
         />
       </div>
 
@@ -577,7 +567,6 @@ dbt run --dry-run`}
           title="総合テスト実行"
           showLineNumbers={true}
           maxLines={20}
-          maxWidth="max-w-none"
         />
       </div>
 

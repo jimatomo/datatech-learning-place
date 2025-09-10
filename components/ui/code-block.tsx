@@ -51,7 +51,7 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
   };
 
   return (
-    <div className={`relative text-left group w-full ${maxWidth}`}>
+    <div className={`relative text-left group ${maxWidth}`}>
       {title && (
         <div className="rounded-t-md bg-gray-200 dark:bg-gray-900 px-4 py-2 text-sm font-medium text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-700">
           <span className="flex items-center gap-2">
@@ -74,12 +74,12 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
         )}
       </button>
       <ScrollArea type="scroll"
-        className={`bg-gray-100 dark:bg-gray-950 p-2 w-full overflow-auto border border-gray-300 dark:border-gray-700 ${
+        className={`bg-gray-100 dark:bg-gray-950 p-2 overflow-auto border border-gray-300 dark:border-gray-700 ${
           title ? 'rounded-b-md border-t-0' : 'rounded-md'
         }`}
       >
         <div 
-          className="w-full"
+          className="min-w-0"
           style={{ maxHeight: calculateMaxHeight(maxLines) }}
         >
           <code className="text-gray-900 dark:text-gray-100">
@@ -106,7 +106,7 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
                   <span className="select-none w-4 inline-block text-gray-400 dark:text-gray-500 flex-shrink-0">
                     {highlight ? (highlight.type === 'add' ? '+' : highlight.type === 'remove' ? '-' : ' ') : ' '}
                   </span>
-                  <span className="whitespace-pre">{line || ' '}</span>
+                  <span className="whitespace-pre-wrap break-words">{line || ' '}</span>
                 </div>
               );
             })}

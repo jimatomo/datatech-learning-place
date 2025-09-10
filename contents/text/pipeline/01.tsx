@@ -120,42 +120,44 @@ export default function TextContents() {
           <p className="mb-4">
             これらのモダンなツールを組み合わせ、効率的で信頼性の高いデータ基盤を構築します。
           </p>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>技術名</TableHead>
-                <TableHead>カテゴリ</TableHead>
-                <TableHead>システムにおける役割</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell className="font-medium">Snowflake</TableCell>
-                <TableCell>データウェアハウス</TableCell>
-                <TableCell>データ分析の中核を担う、スケーラブルなクラウドDWH</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-medium">dbt</TableCell>
-                <TableCell>データ変換</TableCell>
-                <TableCell>SQLベースでデータ変換処理を体系化・品質管理するフレームワーク</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-medium">Docker</TableCell>
-                <TableCell>コンテナ仮想化</TableCell>
-                <TableCell>環境差異をなくし、再現性を担保するコンテナ実行環境</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-medium">GitHub Actions</TableCell>
-                <TableCell>CI/CD</TableCell>
-                <TableCell>テストやデプロイのプロセスを自動化するCI/CDプラットフォーム</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-medium">AWS Serverless</TableCell>
-                <TableCell>クラウドインフラ</TableCell>
-                <TableCell>サーバー管理不要で、コスト効率の良いインフラを実現するサービス群</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
+          <div className="overflow-x-auto">
+            <Table className="min-w-full">
+              <TableHeader>
+                <TableRow>
+                  <TableHead>技術名</TableHead>
+                  <TableHead>カテゴリ</TableHead>
+                  <TableHead>システムにおける役割</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableCell className="font-medium">Snowflake</TableCell>
+                  <TableCell>データウェアハウス</TableCell>
+                  <TableCell>データ分析の中核を担う、スケーラブルなクラウドDWH</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">dbt</TableCell>
+                  <TableCell>データ変換</TableCell>
+                  <TableCell>SQLベースでデータ変換処理を体系化・品質管理するフレームワーク</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">Docker</TableCell>
+                  <TableCell>コンテナ仮想化</TableCell>
+                  <TableCell>環境差異をなくし、再現性を担保するコンテナ実行環境</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">GitHub Actions</TableCell>
+                  <TableCell>CI/CD</TableCell>
+                  <TableCell>テストやデプロイのプロセスを自動化するCI/CDプラットフォーム</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">AWS Serverless</TableCell>
+                  <TableCell>クラウドインフラ</TableCell>
+                  <TableCell>サーバー管理不要で、コスト効率の良いインフラを実現するサービス群</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
         </div>
         
         {/* 各技術の詳細 */}

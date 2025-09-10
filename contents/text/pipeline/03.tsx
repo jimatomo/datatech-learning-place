@@ -649,7 +649,6 @@ cat ~/.dbt/.env`}
           title="dbt profiles.yml設定"
           showLineNumbers={true}
           maxLines={40}
-          maxWidth="max-w-none"
         />
 
         <p className="mt-4">
