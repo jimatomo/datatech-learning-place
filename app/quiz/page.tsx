@@ -7,7 +7,7 @@ import QuizFileListTagFiltered from '@/app/quiz/ui/quiz-file-list-tag-filtered'
 import { getSession } from '@auth0/nextjs-auth0';
 import { getJSTNow, filterFutureDates } from '@/lib/date-utils'
 import Link from "next/link"
-import { Settings, BookOpen, Trophy, TrendingUp, Calendar, Users, Sparkles } from "lucide-react"
+import { Settings, BookOpen, CircleCheckBig, TrendingUp, Calendar, Users, Sparkles } from "lucide-react"
 
 export const metadata: Metadata = {
   title: "DTLP Quiz",
@@ -163,8 +163,8 @@ export default async function QuizList({ searchParams }: Props) {
                     </span>
                   </div>
                   {pathInfo?.is_correct?.toString() === "true" && (
-                    <div className="p-1 bg-emerald-100 dark:bg-emerald-900/30 rounded-full">
-                      <Trophy className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-600 dark:text-emerald-400" />
+                    <div className="p-1 bg-emerald-100/50 dark:bg-emerald-900/50 rounded-full">
+                      <CircleCheckBig className="h-5 w-5 sm:h-7 sm:w-7 text-emerald-600 dark:text-emerald-400" />
                     </div>
                   )}
                 </div>
@@ -366,7 +366,7 @@ export default async function QuizList({ searchParams }: Props) {
           <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/30 border border-orange-200 dark:border-orange-700 p-4 sm:p-6 hover:shadow-lg dark:hover:shadow-orange-900/20 transition-all duration-200">
             <div className="flex items-center mb-3 sm:mb-4">
               <div className="p-1.5 sm:p-2 bg-orange-500 dark:bg-orange-600 rounded-lg mr-2 sm:mr-3 flex-shrink-0">
-                <Trophy className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
+                <CircleCheckBig className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
               </div>
               <div className="min-w-0">
                 <h3 className="text-sm sm:text-lg font-semibold text-orange-900 dark:text-orange-100 truncate">日曜日</h3>
