@@ -8,26 +8,26 @@ export default function TextContents() {
     <div className="w-full">
       <Alert className="bg-red-50 dark:bg-red-950 border-l-4 border-red-400 mb-6">
         <AlertTitle className="font-bold text-red-800 dark:text-red-200">
-          まだAIが作った適当なものなので後でガッチリ変えていく
+          この章の内容は、まだ更新中です。
         </AlertTitle>
       </Alert>
 
       <h1 className="text-2xl font-bold mb-4">Chapter 4: dbtモデルの開発</h1>
 
       <p className="mb-4">
-        この章では、実際のデータを使ってdbtモデルを作成し、データ変換の基本的な処理を学びます。
-        サンプルデータのロード、基本的な変換モデルの作成、テーブル間の関連性の構築を実践していきます。
+        この章では、個人の金融取引データを使ってdbtモデルを作成し、データ変換の基本的な処理を学びます。
+        複数のCSVデータソースをロードし、クリーニング、統合して、分析用のデータマートを構築するまでを実践していきます。
       </p>
 
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-3">主な学習内容</h2>
         <ul className="list-disc pl-5 space-y-2">
           <li>dbtプロジェクトの初期化と構造の理解</li>
-          <li>サンプルデータの準備とロード</li>
+          <li>複数のCSVデータの準備とSnowflakeへのロード</li>
           <li>ソーステーブルの定義</li>
-          <li>ステージングモデルの作成</li>
-          <li>マートモデルの作成</li>
-          <li>モデル間の依存関係の構築</li>
+          <li>ステージングモデルの作成（データクリーニングと整形）</li>
+          <li>マートモデルの作成（複数データソースの統合と集計）</li>
+          <li>モデル間の依存関係の構築（ref関数）</li>
           <li>dbtコマンドの実行とテスト</li>
         </ul>
       </div>
@@ -63,7 +63,6 @@ cat dbt_project.yml`}
           title="dbtプロジェクト初期化"
           showLineNumbers={true}
           maxLines={15}
-          maxWidth="max-w-none"
         />
 
         <p className="mt-4">
@@ -84,103 +83,60 @@ cat dbt_project.yml`}
           title="dbtプロジェクト構造"
           showLineNumbers={true}
           maxLines={12}
-          maxWidth="max-w-none"
         />
       </div>
 
       <div className="mb-6">
         <h3 className="text-lg font-semibold mb-2">手順2: サンプルデータの準備</h3>
         <p className="mb-3">
-          データ変換の練習用に、eコマースのサンプルデータをSnowflakeに用意します。
+          データ変換の練習用に、個人の金融取引に関する4種類のサンプルCSVデータを使用します。
+          銀行の入出金、クレジットカードの明細、Suicaの利用履歴、そして家計簿アプリのデータです。
+        </p>
+        <p className="mb-3">
+          まず、これらのCSVファイルをダウンロードします。（ファイルのダウンロードURLは後ほどこちらで設定します。）
+          ダウンロード後、Snowflakeにデータをロードします。
         </p>
 
         <CodeBlock
           code={`-- Snowflakeにログインして、以下のSQLを実行
 -- サンプルデータベースとスキーマの作成
-CREATE DATABASE IF NOT EXISTS raw_data;
-CREATE SCHEMA IF NOT EXISTS raw_data.ecommerce;
+CREATE DATABASE IF NOT EXISTS RAW;
+CREATE SCHEMA IF NOT EXISTS RAW.PUBLIC;
 
--- 顧客テーブル
-CREATE OR REPLACE TABLE raw_data.ecommerce.customers (
-    customer_id INT,
-    first_name VARCHAR(50),
-    last_name VARCHAR(50),
-    email VARCHAR(100),
-    phone VARCHAR(20),
-    address VARCHAR(200),
-    city VARCHAR(50),
-    state VARCHAR(50),
-    zip_code VARCHAR(10),
-    created_at TIMESTAMP
+-- 銀行取引テーブル
+CREATE OR REPLACE TABLE RAW.PUBLIC.BANK_TRANSACTIONS (
+    "日付" DATE, "摘要" STRING, "摘要内容" STRING, "支払い金額" NUMBER,
+    "預かり金額" NUMBER, "差引残高" NUMBER, "メモ" STRING,
+    "未資金化区分" STRING, "入払区分" STRING
 );
 
--- 商品テーブル
-CREATE OR REPLACE TABLE raw_data.ecommerce.products (
-    product_id INT,
-    product_name VARCHAR(100),
-    category VARCHAR(50),
-    brand VARCHAR(50),
-    price DECIMAL(10,2),
-    cost DECIMAL(10,2),
-    created_at TIMESTAMP
+-- クレジットカード決済テーブル
+CREATE OR REPLACE TABLE RAW.PUBLIC.CREDIT_CARD_TRANSACTIONS (
+    "日付" DATE, "利用先" STRING, "利用者" STRING, "支払方法" STRING, "不明1" STRING,
+    "支払月" STRING, "利用金額" NUMBER, "支払総額" NUMBER, "不明2" STRING, "不明3" STRING,
+    "不明4" STRING, "不明5" STRING, "不明6" STRING
 );
 
--- 注文テーブル
-CREATE OR REPLACE TABLE raw_data.ecommerce.orders (
-    order_id INT,
-    customer_id INT,
-    order_date DATE,
-    status VARCHAR(20),
-    total_amount DECIMAL(10,2),
-    created_at TIMESTAMP
+-- Suica利用履歴テーブル
+CREATE OR REPLACE TABLE RAW.PUBLIC.SUICA_TRANSACTIONS (
+    "日付" STRING, "種別" STRING, "入場駅" STRING, "退場駅" STRING,
+    "残高" NUMBER, "利用額" NUMBER
 );
 
--- 注文詳細テーブル
-CREATE OR REPLACE TABLE raw_data.ecommerce.order_items (
-    order_item_id INT,
-    order_id INT,
-    product_id INT,
-    quantity INT,
-    unit_price DECIMAL(10,2),
-    created_at TIMESTAMP
+-- 家計簿アプリデータテーブル
+CREATE OR REPLACE TABLE RAW.PUBLIC.KAKEIBO_TRANSACTIONS (
+    "日付" DATE, "方法" STRING, "カテゴリ" STRING, "カテゴリの内訳" STRING,
+    "支払元" STRING, "入金先" STRING, "品目" STRING, "メモ" STRING, "お店" STRING,
+    "通貨" STRING, "収入" NUMBER, "支出" NUMBER
 );`}
           title="サンプルテーブル作成"
           showLineNumbers={true}
           maxLines={30}
-          maxWidth="max-w-none"
         />
-
-        <CodeBlock
-          code={`-- サンプルデータの挿入
--- 顧客データ
-INSERT INTO raw_data.ecommerce.customers VALUES
-(1, 'John', 'Doe', 'john.doe@email.com', '555-0123', '123 Main St', 'New York', 'NY', '10001', '2023-01-15 10:00:00'),
-(2, 'Jane', 'Smith', 'jane.smith@email.com', '555-0124', '456 Oak Ave', 'Los Angeles', 'CA', '90001', '2023-01-16 11:00:00'),
-(3, 'Bob', 'Johnson', 'bob.johnson@email.com', '555-0125', '789 Pine St', 'Chicago', 'IL', '60601', '2023-01-17 12:00:00');
-
--- 商品データ
-INSERT INTO raw_data.ecommerce.products VALUES
-(1, 'Laptop Pro', 'Electronics', 'TechBrand', 1299.99, 800.00, '2023-01-01 09:00:00'),
-(2, 'Wireless Headphones', 'Electronics', 'AudioBrand', 199.99, 120.00, '2023-01-01 09:00:00'),
-(3, 'Coffee Mug', 'Home & Garden', 'DrinkWare', 15.99, 8.00, '2023-01-01 09:00:00');
-
--- 注文データ
-INSERT INTO raw_data.ecommerce.orders VALUES
-(1, 1, '2023-02-01', 'completed', 1315.98, '2023-02-01 14:00:00'),
-(2, 2, '2023-02-02', 'completed', 199.99, '2023-02-02 15:00:00'),
-(3, 3, '2023-02-03', 'processing', 31.98, '2023-02-03 16:00:00');
-
--- 注文詳細データ
-INSERT INTO raw_data.ecommerce.order_items VALUES
-(1, 1, 1, 1, 1299.99, '2023-02-01 14:00:00'),
-(2, 1, 3, 1, 15.99, '2023-02-01 14:00:00'),
-(3, 2, 2, 1, 199.99, '2023-02-02 15:00:00'),
-(4, 3, 3, 2, 15.99, '2023-02-03 16:00:00');`}
-          title="サンプルデータ挿入"
-          showLineNumbers={true}
-          maxLines={25}
-          maxWidth="max-w-none"
-        />
+        <p className="mt-4">
+          テーブルを作成したら、SnowsightのUIを使って、ダウンロードした各CSVファイルを対応するテーブルにロードしてください。
+          ファイル形式はヘッダーが1行あるCSVです。
+        </p>
       </div>
 
       <div className="mb-6">
@@ -191,60 +147,32 @@ INSERT INTO raw_data.ecommerce.order_items VALUES
 
         <CodeBlock
           code={`# modelsディレクトリの構造を作成
-mkdir -p models/staging/ecommerce
+mkdir -p models/staging/personal_finance
 mkdir -p models/marts/core
 mkdir -p models/marts/finance
 
 # ソース定義ファイルを作成
-cat > models/staging/ecommerce/_sources.yml << 'EOF'
+cat > models/staging/personal_finance/_sources.yml << 'EOF'
 version: 2
 
 sources:
-  - name: ecommerce
-    description: "Eコマースの生データ"
-    database: raw_data
-    schema: ecommerce
+  - name: personal_finance
+    description: "個人の金融取引に関する生データ"
+    database: RAW
+    schema: PUBLIC
     tables:
-      - name: customers
-        description: "顧客マスタ"
-        columns:
-          - name: customer_id
-            description: "顧客ID"
-            tests:
-              - unique
-              - not_null
-      
-      - name: products
-        description: "商品マスタ"
-        columns:
-          - name: product_id
-            description: "商品ID"
-            tests:
-              - unique
-              - not_null
-      
-      - name: orders
-        description: "注文テーブル"
-        columns:
-          - name: order_id
-            description: "注文ID"
-            tests:
-              - unique
-              - not_null
-      
-      - name: order_items
-        description: "注文詳細テーブル"
-        columns:
-          - name: order_item_id
-            description: "注文詳細ID"
-            tests:
-              - unique
-              - not_null
+      - name: bank_transactions
+        description: "銀行の入出金データ"
+      - name: credit_card_transactions
+        description: "クレジットカードの決済データ"
+      - name: suica_transactions
+        description: "Suicaの利用履歴データ"
+      - name: kakeibo_transactions
+        description: "家計簿アプリのデータ"
 EOF`}
           title="ソース定義ファイル作成"
           showLineNumbers={true}
           maxLines={35}
-          maxWidth="max-w-none"
         />
       </div>
 
@@ -252,166 +180,147 @@ EOF`}
         <h3 className="text-lg font-semibold mb-2">手順4: ステージングモデルの作成</h3>
         <p className="mb-3">
           生データを正規化・クリーニングするステージングモデルを作成します。
+          ここではカラム名を日本語から英語に変換し、簡単なデータ整形を行います。
         </p>
 
         <CodeBlock
-          code={`# 顧客ステージングモデル
-cat > models/staging/ecommerce/stg_customers.sql << 'EOF'
-{{ config(materialized='view') }}
-
-SELECT 
-    customer_id,
-    TRIM(first_name) AS first_name,
-    TRIM(last_name) AS last_name,
-    LOWER(TRIM(email)) AS email,
-    phone,
-    address,
-    city,
-    state,
-    zip_code,
-    created_at
-FROM {{ source('ecommerce', 'customers') }}
+          code={`# 銀行取引ステージングモデル
+cat > models/staging/personal_finance/stg_bank_transactions.sql << 'EOF'
+select
+    "日付" as transaction_date,
+    "摘要" as transaction_category,
+    "摘要内容" as description,
+    "支払い金額" as payment_amount,
+    "預かり金額" as deposit_amount,
+    "差引残高" as balance
+from {{ source('personal_finance', 'bank_transactions') }}
 EOF
 
-# 商品ステージングモデル
-cat > models/staging/ecommerce/stg_products.sql << 'EOF'
-{{ config(materialized='view') }}
-
-SELECT 
-    product_id,
-    TRIM(product_name) AS product_name,
-    TRIM(category) AS category,
-    TRIM(brand) AS brand,
-    price,
-    cost,
-    ROUND(price - cost, 2) AS margin,
-    ROUND((price - cost) / price * 100, 2) AS margin_percent,
-    created_at
-FROM {{ source('ecommerce', 'products') }}
+# クレジットカード決済ステージングモデル
+cat > models/staging/personal_finance/stg_credit_card_transactions.sql << 'EOF'
+select
+    "日付" as transaction_date,
+    "利用先" as store,
+    "支払方法" as payment_method,
+    "利用金額" as amount
+from {{ source('personal_finance', 'credit_card_transactions') }}
 EOF
 
-# 注文ステージングモデル
-cat > models/staging/ecommerce/stg_orders.sql << 'EOF'
-{{ config(materialized='view') }}
-
-SELECT 
-    order_id,
-    customer_id,
-    order_date,
-    LOWER(TRIM(status)) AS status,
-    total_amount,
-    created_at
-FROM {{ source('ecommerce', 'orders') }}
+# Suica利用履歴ステージングモデル
+cat > models/staging/personal_finance/stg_suica_transactions.sql << 'EOF'
+-- Suicaデータは年に情報が含まれていないため、ここでは2025年と仮定します。
+select
+    to_date('2025/' || "日付", 'YYYY/MM/DD') as transaction_date,
+    "種別" as transaction_type,
+    "入場駅" as entry_station,
+    "退場駅" as exit_station,
+    "残高" as balance,
+    "利用額" as amount
+from {{ source('personal_finance', 'suica_transactions') }}
 EOF
 
-# 注文詳細ステージングモデル
-cat > models/staging/ecommerce/stg_order_items.sql << 'EOF'
-{{ config(materialized='view') }}
-
-SELECT 
-    order_item_id,
-    order_id,
-    product_id,
-    quantity,
-    unit_price,
-    ROUND(quantity * unit_price, 2) AS line_total,
-    created_at
-FROM {{ source('ecommerce', 'order_items') }}
+# 家計簿アプリデータステージングモデル
+cat > models/staging/personal_finance/stg_kakeibo_transactions.sql << 'EOF'
+select
+    "日付" as transaction_date,
+    "方法" as method,
+    "カテゴリ" as category,
+    "カテゴリの内訳" as sub_category,
+    "品目" as item,
+    "お店" as store,
+    "収入" as income,
+    "支出" as expense
+from {{ source('personal_finance', 'kakeibo_transactions') }}
 EOF`}
           title="ステージングモデル作成"
           showLineNumbers={true}
           maxLines={40}
-          maxWidth="max-w-none"
         />
       </div>
 
       <div className="mb-6">
         <h3 className="text-lg font-semibold mb-2">手順5: マートモデルの作成</h3>
         <p className="mb-3">
-          ビジネス価値のあるデータマートを作成します。
+          ビジネス価値のあるデータマートを作成します。ここでは、すべての取引を統合したファクトテーブルと、月次の財務サマリテーブルを作成します。
         </p>
 
         <CodeBlock
-          code={`# 顧客別売上サマリ
-cat > models/marts/core/customer_orders.sql << 'EOF'
+          code={`# 全取引ファクトテーブル
+cat > models/marts/core/fct_transactions.sql << 'EOF'
 {{ config(materialized='table') }}
 
-WITH customer_order_summary AS (
-    SELECT 
-        c.customer_id,
-        c.first_name,
-        c.last_name,
-        c.email,
-        c.city,
-        c.state,
-        COUNT(DISTINCT o.order_id) AS total_orders,
-        SUM(o.total_amount) AS total_spent,
-        AVG(o.total_amount) AS avg_order_value,
-        MIN(o.order_date) AS first_order_date,
-        MAX(o.order_date) AS last_order_date,
-        DATEDIFF('day', MIN(o.order_date), MAX(o.order_date)) AS customer_lifetime_days
-    FROM {{ ref('stg_customers') }} c
-    LEFT JOIN {{ ref('stg_orders') }} o ON c.customer_id = o.customer_id
-    GROUP BY 1, 2, 3, 4, 5, 6
+with bank as (
+    select
+        transaction_date,
+        '銀行' as source,
+        coalesce(deposit_amount, 0) - coalesce(payment_amount, 0) as amount,
+        description,
+        transaction_category as category
+    from {{ ref('stg_bank_transactions') }}
+),
+
+credit_card as (
+    select
+        transaction_date,
+        'クレジットカード' as source,
+        amount * -1 as amount,
+        store as description,
+        'カード利用' as category
+    from {{ ref('stg_credit_card_transactions') }}
+),
+
+suica as (
+    select
+        transaction_date,
+        'Suica' as source,
+        amount,
+        case
+            when transaction_type = '物販' then '物販'
+            when transaction_type = 'ﾊﾞｽ等' then 'バス等利用'
+            when entry_station is not null then entry_station || ' -> ' || exit_station
+            else transaction_type
+        end as description,
+        '交通費' as category
+    from {{ ref('stg_suica_transactions') }}
+),
+
+kakeibo as (
+    select
+        transaction_date,
+        '家計簿' as source,
+        coalesce(income, 0) - coalesce(expense, 0) as amount,
+        coalesce(item, sub_category) as description,
+        category
+    from {{ ref('stg_kakeibo_transactions') }}
 )
 
-SELECT 
-    *,
-    CASE 
-        WHEN total_orders >= 3 THEN 'High Value'
-        WHEN total_orders >= 2 THEN 'Medium Value'
-        ELSE 'Low Value'
-    END AS customer_segment
-FROM customer_order_summary
+select * from bank
+union all
+select * from credit_card
+union all
+select * from suica
+union all
+select * from kakeibo
 EOF
 
-# 商品別売上分析
-cat > models/marts/core/product_performance.sql << 'EOF'
+# 月次財務サマリ
+cat > models/marts/finance/monthly_summary.sql << 'EOF'
 {{ config(materialized='table') }}
 
-SELECT 
-    p.product_id,
-    p.product_name,
-    p.category,
-    p.brand,
-    p.price,
-    p.cost,
-    p.margin,
-    p.margin_percent,
-    COUNT(DISTINCT oi.order_id) AS total_orders,
-    SUM(oi.quantity) AS total_quantity_sold,
-    SUM(oi.line_total) AS total_revenue,
-    AVG(oi.quantity) AS avg_quantity_per_order,
-    ROUND(SUM(oi.line_total) / SUM(oi.quantity), 2) AS avg_selling_price
-FROM {{ ref('stg_products') }} p
-LEFT JOIN {{ ref('stg_order_items') }} oi ON p.product_id = oi.product_id
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
-ORDER BY total_revenue DESC
-EOF
-
-# 日別売上レポート
-cat > models/marts/finance/daily_sales.sql << 'EOF'
-{{ config(materialized='table') }}
-
-SELECT 
-    o.order_date,
-    COUNT(DISTINCT o.order_id) AS total_orders,
-    COUNT(DISTINCT o.customer_id) AS unique_customers,
-    SUM(o.total_amount) AS daily_revenue,
-    AVG(o.total_amount) AS avg_order_value,
-    SUM(SUM(o.total_amount)) OVER (
-        ORDER BY o.order_date 
-        ROWS UNBOUNDED PRECEDING
-    ) AS cumulative_revenue
-FROM {{ ref('stg_orders') }} o
-WHERE o.status = 'completed'
-GROUP BY o.order_date
-ORDER BY o.order_date
+select
+    date_trunc('month', transaction_date)::date as year_month,
+    source,
+    sum(case when amount > 0 then amount else 0 end) as monthly_income,
+    sum(case when amount < 0 then amount * -1 else 0 end) as monthly_expense,
+    sum(amount) as monthly_net_change,
+    count(*) as transaction_count
+from {{ ref('fct_transactions') }}
+group by 1, 2
+order by 1, 2
 EOF`}
           title="マートモデル作成"
           showLineNumbers={true}
           maxLines={45}
-          maxWidth="max-w-none"
         />
       </div>
 
@@ -425,19 +334,19 @@ EOF`}
           code={`# dbt接続確認
 dbt debug
 
-# 依存関係の確認
-dbt deps
+# 依存関係の確認 (パッケージを使用している場合)
+# dbt deps
 
 # 全モデルの実行
 dbt run
 
-# モデルの実行結果確認
-dbt run --select stg_customers
+# 特定のモデルの実行結果確認
+dbt run --select stg_bank_transactions
 
 # 特定のモデルとその依存関係の実行
-dbt run --select +customer_orders
+dbt run --select +monthly_summary
 
-# テストの実行
+# テストの実行 (今後テストを追加した場合)
 dbt test
 
 # ドキュメント生成
@@ -448,7 +357,6 @@ dbt docs serve`}
           title="dbtコマンド実行"
           showLineNumbers={true}
           maxLines={20}
-          maxWidth="max-w-none"
         />
 
         <Alert className="bg-green-50 dark:bg-green-950 border-l-4 border-green-400 mt-4">
@@ -456,8 +364,8 @@ dbt docs serve`}
           <AlertTitle className="font-bold text-green-800 dark:text-green-200">実行成功の確認</AlertTitle>
           <AlertDescription className="text-green-700 dark:text-green-300 leading-loose">
             dbt runが成功すると、Snowflakeに以下のテーブル・ビューが作成されます：<br/>
-            ✓ ステージングビュー：stg_customers, stg_products, stg_orders, stg_order_items<br/>
-            ✓ マートテーブル：customer_orders, product_performance, daily_sales<br/>
+            ✓ ステージングビュー：stg_bank_transactions, stg_credit_card_transactions, stg_suica_transactions, stg_kakeibo_transactions<br/>
+            ✓ マートテーブル：fct_transactions, monthly_summary<br/>
             SnowflakeのWebUIで作成されたオブジェクトを確認してみてください。
           </AlertDescription>
         </Alert>
@@ -472,24 +380,14 @@ dbt docs serve`}
         <CodeBlock
           code={`-- Snowflakeで以下のクエリを実行して結果を確認
 
--- 顧客別売上サマリの確認
-SELECT * FROM dbt_tutorial.customer_orders LIMIT 10;
+-- 全取引ファクトテーブルの確認
+SELECT * FROM dbt_tutorial.fct_transactions ORDER BY transaction_date DESC LIMIT 10;
 
--- 商品別パフォーマンスの確認
-SELECT * FROM dbt_tutorial.product_performance ORDER BY total_revenue DESC;
-
--- 日別売上の確認
-SELECT * FROM dbt_tutorial.daily_sales ORDER BY order_date;
-
--- ステージングビューの確認
-SELECT COUNT(*) FROM dbt_tutorial.stg_customers;
-SELECT COUNT(*) FROM dbt_tutorial.stg_products;
-SELECT COUNT(*) FROM dbt_tutorial.stg_orders;
-SELECT COUNT(*) FROM dbt_tutorial.stg_order_items;`}
+-- 月次財務サマリの確認
+SELECT * FROM dbt_tutorial.monthly_summary ORDER BY year_month, source;`}
           title="結果確認クエリ"
           showLineNumbers={true}
           maxLines={15}
-          maxWidth="max-w-none"
         />
       </div>
 
