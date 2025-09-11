@@ -312,9 +312,13 @@ export function NotificationHistoryClient() {
                     <CardDescription className="flex items-center gap-2 text-xs pt-2">
                       <Clock className="w-3 h-3 flex-shrink-0" />
                       {formatTimestamp(notification.timestamp)}
-                      {notification.read && (
+                      {notification.read ? (
                         <Badge variant="outline" className="text-xs ml-2">
                           既読
+                        </Badge>
+                      ) : (
+                        <Badge variant="default" className="text-xs ml-2">
+                          未読
                         </Badge>
                       )}
                     </CardDescription>
@@ -330,28 +334,26 @@ export function NotificationHistoryClient() {
                           className="h-6 w-6 sm:h-8 sm:w-8 p-0"
                           title="既読にする"
                         >
-                          <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+                          <CheckCircle className="w-5 h-5 sm:w-7 sm:h-7" />
                         </Button>
                       )}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          e.stopPropagation()
-                          deleteNotification(notification.id)
-                        }}
-                        className="h-6 w-6 sm:h-8 sm:w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                        title="通知を削除"
-                      >
-                        <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
-                      </Button>
+                      {notification.read && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            deleteNotification(notification.id)
+                          }}
+                          className="h-6 w-6 sm:h-8 sm:w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                          title="通知を削除"
+                        >
+                          <Trash2 className="w-5 h-5 sm:w-7 sm:h-7" />
+                        </Button>
+                      )}
                     </div>
-                    {!notification.read && (
-                      <Badge variant="secondary" className="text-xs">
-                        未読
-                      </Badge>
-                    )}
+                    
                   </div>
                 </div>
               </CardHeader>
@@ -372,11 +374,6 @@ export function NotificationHistoryClient() {
                     </p>
                     <div className="flex items-center justify-between mt-2 pt-2 border-t border-muted">
                       <span className="text-xs text-muted-foreground">クリックして詳細を表示</span>
-                      {!notification.read && (
-                        <Badge variant="default" className="text-xs">
-                          未読
-                        </Badge>
-                      )}
                     </div>
                   </CardContent>
                 </Link>
