@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useNotificationManager } from "@/app/notifications/lib/use-notification-manager"
-import { Bell, CheckCircle, Clock, Trash2, CheckCheck } from "lucide-react"
+import { Bell, Clock, Trash2, CheckCheck, Check } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -331,10 +331,10 @@ export function NotificationHistoryClient() {
                           variant="ghost"
                           size="sm"
                           onClick={() => markAsRead(notification.id)}
-                          className="h-6 w-6 sm:h-8 sm:w-8 p-0"
+                          className="h-6 w-6 sm:h-10 sm:w-10 p-0"
                           title="既読にする"
                         >
-                          <CheckCircle className="w-5 h-5 sm:w-7 sm:h-7" />
+                          <Check className="w-5 h-5 sm:w-7 sm:h-7 dark:text-blue-300 text-blue-700" />
                         </Button>
                       )}
                       {notification.read && (
@@ -346,7 +346,7 @@ export function NotificationHistoryClient() {
                             e.stopPropagation()
                             deleteNotification(notification.id)
                           }}
-                          className="h-6 w-6 sm:h-8 sm:w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                          className="h-6 w-6 sm:h-10 sm:w-10 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
                           title="通知を削除"
                         >
                           <Trash2 className="w-5 h-5 sm:w-7 sm:h-7" />
