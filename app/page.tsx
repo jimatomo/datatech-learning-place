@@ -1,4 +1,4 @@
-import { ContentCard } from "@/components/ui/content-card"
+import { EnhancedCard } from "@/components/ui/enhanced-card"
 
 import { Metadata } from "next"
 
@@ -75,14 +75,14 @@ export default function Home() {
           </a>
           でコンテンツ含めてソースを公開しております。
         </p>
-        <div className="flex flex-col lg:flex-row gap-2">
-          <ContentCard 
+        <div className="flex flex-col lg:flex-row gap-6">
+          <EnhancedCard 
             title="Quiz"
             description="データエンジニアリングのクイズ"
             imageSrc="https://datatech-learning-place.net/logo/quiz_card.jpg"
             href="/quiz"
           />
-          <ContentCard 
+          <EnhancedCard 
             title="Text"
             description="データエンジニアリングのテキスト"
             imageSrc="https://datatech-learning-place.net/logo/book.png"
