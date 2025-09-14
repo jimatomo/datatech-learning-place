@@ -12,25 +12,40 @@ function validateInternalRequest(request: Request): { isValid: boolean; error?: 
   // 1. APIキー認証 - EventBridge Connectionの両方のヘッダー形式に対応
   const headersList = headers()
   
+  // デバッグ用: リクエストヘッダーをログ出力
+  console.log('🔍 リクエスト受信 - デバッグ情報:')
+  console.log('  - HTTP Method:', request.method)
+  console.log('  - User-Agent:', headersList.get('user-agent'))
+  console.log('  - Content-Type:', headersList.get('content-type'))
+  console.log('  - X-Internal-Key:', headersList.get('x-internal-key') ? '***設定済み***' : '未設定')
+  console.log('  - Authorization:', headersList.get('authorization') ? '***設定済み***' : '未設定')
+  
   // EventBridge ConnectionでAPI_KEY認証を使用した場合の両方のヘッダー形式に対応
   const internalKey = 
     headersList.get('x-internal-key') || 
     headersList.get('authorization')?.replace('X-Internal-Key ', '') ||
     headersList.get('authorization')
-  
+
+  console.log('  - 抽出されたAPI Key:', internalKey ? '***設定済み***' : '未設定')
+
   if (!internalKey || internalKey !== INTERNAL_API_KEY) {
+    console.log('❌ API Key認証失敗')
     return { isValid: false, error: '無効な内部APIキー' }
   }
 
   // 2. リクエストメソッド制限
   if (request.method !== 'POST') {
+    console.log('❌ HTTP Method認証失敗:', request.method)
     return { isValid: false, error: '許可されていないHTTPメソッド' }
   }
 
+  console.log('✅ 認証成功')
   return { isValid: true }
 }
 
 export async function POST(request: Request) {
+  console.log('🚀 /api/notifications/quiz エンドポイントにPOSTリクエスト受信')
+  
   try {
     // セキュリティチェック
     const securityCheck = validateInternalRequest(request)
