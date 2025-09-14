@@ -40,41 +40,18 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <div>
-      <h1 className="scroll-m-20 pb-2 text-xl font-bold tracking-tight">
-        Datatech Learning Place (alpha)
+      <h1 className="scroll-m-20 pb-2 text-lg sm:text-xl font-bold tracking-tight">
+        Datatech Learning Place β版
       </h1>
       <div className="flex flex-col gap-2 md:text-base text-sm">
         <p>
-          ここはデータエンジニアのための学習サイトです。<br />
-          今後以下のコンテンツを追加予定です。
-        </p>
-        <ul className="list-disc pl-6">
-          <li>一日一問出題されるクイズ</li>
-          <li>データアプリケーションを構築しながら学んでいくテキスト</li>
-          <li>学習の進捗を分析するダッシュボード機能</li>
-          <li>企業・チームで利用しやすくする組織管理機能（有償予定）</li>
-          <li>スポンサー紹介コンテンツ（スポンサーになってもいいよという場合はフッターのお問い合わせページよりお願いします）</li>
-        </ul>
-      </div>
-      <div className="flex flex-col gap-2 pt-8 md:text-base text-sm">
-        <h2 className="scroll-m-20 pb-2 text-xl font-bold tracking-tight">
-          学習状況の保存
-        </h2>
-        <p>
-          サインインすることで、学習状況の保存やお気に入り登録などの機能が利用できるようになります。<br />
-          個人情報に関する取り扱いに関しては<a href="/global/privacy" className="underline hover:text-blue-500">プライバシーポリシー</a>をご参照ください。
+          データエンジニアのための学習サイトです。<br />
         </p>
       </div>
       <div className="flex flex-col gap-2 pt-8">
-        <h2 className="scroll-m-20 pb-2 text-xl font-bold tracking-tight">
+        <h2 className="scroll-m-20 pb-2 text-lg sm:text-xl font-bold tracking-tight">
           コンテンツ
         </h2>
-        <p className="text-sm md:text-base">
-          <a href="https://github.com/jimatomo/dtsb-learning-place" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-500">
-            GitHub
-          </a>
-          でコンテンツ含めてソースを公開しております。
-        </p>
         <div className="flex flex-col lg:flex-row gap-6">
           <EnhancedCard 
             title="Quiz"
@@ -89,6 +66,21 @@ export default function Home() {
             href="/text"
           />
         </div>
+        <p className="text-sm md:text-base pt-2">
+          <a href="https://github.com/jimatomo/dtsb-learning-place" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-500">
+            GitHub
+          </a>
+          でコンテンツ含めてソースを公開しております。
+        </p>
+      </div>
+      <div className="flex flex-col gap-2 pt-8 md:text-base text-sm">
+        <h2 className="scroll-m-20 pb-2 text-lg sm:text-xl font-bold tracking-tight">
+          学習状況の保存
+        </h2>
+        <p>
+          サインインすることで、学習状況の保存やお気に入り登録などの機能が利用できるようになります。<br />
+          個人情報に関する取り扱いに関しては<a href="/global/privacy" className="underline hover:text-blue-500">プライバシーポリシー</a>をご参照ください。
+        </p>
       </div>
     </div>
   );
