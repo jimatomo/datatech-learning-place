@@ -15,7 +15,7 @@ export const tags = [
   'Snowflake Advanced',     // Tuesday
   'Snowpark',
   'Cortex',
-  'Snowflake Performance',
+  'Performance',
   
   // Data Science & Libraries
   'Python',
