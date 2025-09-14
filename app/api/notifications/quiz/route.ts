@@ -7,19 +7,16 @@ import { randomBytes } from 'crypto'
 // 環境変数で上書き可能（本番環境での固定化用）
 const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || randomBytes(32).toString('hex')
 
-// APIキーのログ出力
-// if (!process.env.INTERNAL_API_KEY) {
-//   console.log(`🔑 自動生成されたAPIキー: ${INTERNAL_API_KEY}`)
-//   console.log('⚠️  本番環境では環境変数 INTERNAL_API_KEY を設定することを推奨します')
-// } else {
-//   console.log('🔑 環境変数からAPIキーを読み込みました')
-// }
-
 // セキュリティチェック関数
 function validateInternalRequest(request: Request): { isValid: boolean; error?: string } {
-  // 1. APIキー認証
+  // 1. APIキー認証 - EventBridge Connectionの両方のヘッダー形式に対応
   const headersList = headers()
-  const internalKey = headersList.get('x-internal-key')
+  
+  // EventBridge ConnectionでAPI_KEY認証を使用した場合の両方のヘッダー形式に対応
+  const internalKey = 
+    headersList.get('x-internal-key') || 
+    headersList.get('authorization')?.replace('X-Internal-Key ', '') ||
+    headersList.get('authorization')
   
   if (!internalKey || internalKey !== INTERNAL_API_KEY) {
     return { isValid: false, error: '無効な内部APIキー' }
