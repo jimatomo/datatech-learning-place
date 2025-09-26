@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect, useRef } from "react"
 import { useNotificationManager, NotificationSettings } from "@/app/notifications/lib/use-notification-manager"
 import { NotificationActionRequest, NotificationActionResponse } from "@/app/notifications/lib/notification-actions"
 import { Switch } from "@/components/ui/switch"
@@ -37,6 +37,9 @@ export function NotificationSettingsClient({
   } = useNotificationManager({ initialSettings })
 
   const [isLoading, setIsLoading] = useState(false)
+  const [isGuideVisible, setIsGuideVisible] = useState(false)
+  const [isGuideHoverActive, setIsGuideHoverActive] = useState(false)
+  const guideEffectInitialized = useRef(false)
 
   // 時間と分の選択肢を生成（useMemoで最適化）
   const hourOptions = useMemo(() => 
@@ -155,12 +158,16 @@ export function NotificationSettingsClient({
         }
 
         // VAPID公開キーを安全にデコード
-        let applicationServerKey: Uint8Array
+        let applicationServerKey: ArrayBuffer
         try {
           // Base64URLからBase64に変換（必要に応じて）
           const base64Key = vapidPublicKey.replace(/-/g, '+').replace(/_/g, '/')
           const binaryString = atob(base64Key)
-          applicationServerKey = new Uint8Array(binaryString.split('').map(char => char.charCodeAt(0)))
+          const keyBytes = new Uint8Array(binaryString.length)
+          for (let i = 0; i < binaryString.length; i++) {
+            keyBytes[i] = binaryString.charCodeAt(i)
+          }
+          applicationServerKey = keyBytes.buffer
         } catch (decodeError) {
           console.error('VAPID公開キーのデコードエラー:', decodeError)
           throw new Error('VAPID公開キーの形式が正しくありません')
@@ -301,6 +308,46 @@ export function NotificationSettingsClient({
     setIsLoading(false)
   }
 
+  // 通知が未設定かどうかを判定
+  const isNotificationNotConfigured = !settings?.enabled
+
+  useEffect(() => {
+    if (!isNotificationNotConfigured) {
+      setIsGuideVisible(false)
+      setIsGuideHoverActive(false)
+      guideEffectInitialized.current = false
+      return
+    }
+
+    if (typeof window === "undefined") {
+      return
+    }
+
+    if (guideEffectInitialized.current) {
+      return
+    }
+
+    guideEffectInitialized.current = true
+
+    const hasShownGuide = window.localStorage.getItem("notificationGuideShown")
+    if (hasShownGuide) {
+      setIsGuideVisible(false)
+      return
+    }
+
+    setIsGuideVisible(true)
+
+    const timer = window.setTimeout(() => {
+      setIsGuideVisible(false)
+      window.localStorage.setItem("notificationGuideShown", "true")
+    }, 5000)
+
+    return () => {
+      clearTimeout(timer)
+      guideEffectInitialized.current = false
+    }
+  }, [isNotificationNotConfigured])
+
   if (!userId) {
     return (
       <Card className={className}>
@@ -353,12 +400,10 @@ export function NotificationSettingsClient({
 
   const currentTimeParts = getCurrentTimeParts()
 
-  // 通知が未設定かどうかを判定
-  const isNotificationNotConfigured = !settings?.enabled
-
   // 通知設定ガイドコンポーネント（ツールチップ風）
   const NotificationGuide = () => {
-    if (!isNotificationNotConfigured) return null
+    const shouldShowGuide = isNotificationNotConfigured && (isGuideVisible || isGuideHoverActive)
+    if (!shouldShowGuide) return null
 
     return (
               <>
@@ -398,7 +443,15 @@ export function NotificationSettingsClient({
               クイズ投稿時の通知は{settings?.enabled ? '有効' : '無効'}です
             </div>
           </div>
-          <div className="relative">
+          <div
+            className="relative"
+            onMouseEnter={() => {
+              if (isNotificationNotConfigured) {
+                setIsGuideHoverActive(true)
+              }
+            }}
+            onMouseLeave={() => setIsGuideHoverActive(false)}
+          >
             {/* 通知設定ガイド */}
             <NotificationGuide />
             <Switch
