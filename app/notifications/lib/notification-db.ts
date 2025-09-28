@@ -155,15 +155,18 @@ export async function getSubscribersForNotificationTime(targetTime: string): Pro
       TableName: TABLE_NAME,
       IndexName: 'setting_type-notification_time-index', // GSIを使用
       KeyConditionExpression: 'setting_type = :setting_type AND notification_time = :notification_time',
-      FilterExpression: 'enabled = :enabled',
       ExpressionAttributeValues: {
         ':setting_type': SETTING_TYPE,
-        ':notification_time': targetTime,
-        ':enabled': true
+        ':notification_time': targetTime
       }
     }));
     
-    return (result.Items as NotificationSubscription[]) || [];
+    const items = (result.Items as NotificationSubscription[]) || [];
+    return items.filter(item =>
+      typeof item.enabled === 'boolean'
+        ? item.enabled
+        : String((item as unknown as { enabled: unknown }).enabled).toLowerCase() === 'true'
+    );
   } catch (error) {
     console.error('時刻別購読者の取得エラー:', error);
     return [];
