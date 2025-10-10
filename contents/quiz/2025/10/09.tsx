@@ -8,7 +8,7 @@ export default function QuizContent() {
     author: "jimatomo",
     author_url: "https://github.com/jimatomo",
     tags: ["AWS", "CDK", "IaC", "Infrastructure"],
-    created_at: new Date("2025-10-02"),
+    created_at: new Date("2025-10-09"),
     updated_at: new Date("2025-10-09"),
 
     // ----- quiz -----
