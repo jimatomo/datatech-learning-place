@@ -8,7 +8,7 @@ export default function QuizContent() {
     author: "jimatomo",
     author_url: "https://github.com/jimatomo",
     tags: ["Snowflake", "Cortex", "Infrastructure", "Datatech News"],
-    created_at: new Date("2025-10-05"),
+    created_at: new Date("2025-10-14"),
     updated_at: new Date("2025-10-14"),
 
     // ----- quiz -----
