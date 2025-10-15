@@ -169,7 +169,7 @@ function QuizQuestion() {
 - Detail why each correct statement is right and touch on why the distractors are wrong.
 - Avoid phrasing like "Option 1 is correct" because the UI does not show option numbers.
 - For explanations use:
-  - `<p className="font-semibold text-green-600">Correct statement:</p>`
+  - `<p className="font-semibold text-emerald-500">Correct statement:</p>`
   - `<p className="font-semibold text-red-500">Incorrect statement (answer):</p>`
 - Suggested layout:
 ```tsx
@@ -212,6 +212,7 @@ function QuizExplanation() {
 - [ ] `created_at` and `updated_at` are set correctly.
 - [ ] Required imports are present; optional imports only when used.
 - [ ] Tailwind classes match the guidelines.
+- [ ] Check Linter Error (Do not use ', use &apos)
 
 ## Update Policy
 - When editing existing quizzes, bump only `updated_at`.

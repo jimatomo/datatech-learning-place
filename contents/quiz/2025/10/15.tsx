@@ -8,8 +8,8 @@ export default function QuizContent() {
     author: "jimatomo",
     author_url: "https://github.com/jimatomo",
     tags: ["Snowflake", "SQL", "Data Integration", "Data Modeling"],
-    created_at: new Date("2025-10-08"),
-    updated_at: new Date("2025-10-14"),
+    created_at: new Date("2025-10-15"),
+    updated_at: new Date("2025-10-15"),
 
     // ----- quiz -----
     title: "Snowflakeの半構造化データのクエリ基礎（VARIANT/FLATTEN）",
