@@ -18,7 +18,6 @@
       ],
       "settings": {
         "editor.formatOnSave": false,
-
         "workbench.colorCustomizations": {
           "titleBar.activeBackground": "#8b007f6b", // タイトルバーの背景色
           "titleBar.activeForeground": "#ffffff", // タイトルバーの文字色
