@@ -8,8 +8,8 @@ export default function QuizContent() {
     author: "jimatomo",
     author_url: "https://github.com/jimatomo",
     tags: ["Snowflake", "SQL", "Data Management", "Snowflake Basic"],
-    created_at: new Date("2025-10-13"),
-    updated_at: new Date("2025-10-22"),
+    created_at: new Date("2025-10-20"),
+    updated_at: new Date("2025-10-20"),
 
     // ----- quiz -----
     title: "Snowflake の DDL / DML を正しく分類できる？",

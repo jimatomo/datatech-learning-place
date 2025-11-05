@@ -1,5 +1,4 @@
 import { Quiz, generateQuizId, generateFilePath } from "@/contents/quiz";
-// (No code block sample; quiz focuses on when to use SQL API.)
 
 export default function QuizContent() {
   const quiz = new Quiz({
@@ -8,28 +7,23 @@ export default function QuizContent() {
     file_path: generateFilePath(import.meta.url),
     author: "jimatomo",
     author_url: "https://github.com/jimatomo",
-    tags: ["Snowflake", "SQL", "Data Application", "Snowflake Advanced"],
-    created_at: new Date("2025-10-14"),
-    updated_at: new Date("2025-10-14"),
+    tags: ["Snowflake", "Performance", "S3", "Snowflake Advanced"],
+    created_at: new Date("2025-10-21"),
+    updated_at: new Date("2025-10-21"),
 
     // ----- quiz -----
-    title: "Snowflake SQL API はどんな場面で使う？",
+    title: "External Table のスキャン量を最も減らす方法は？",
     question_jsx: <QuizQuestion />,
     options: {
-      0: "ドライバを配置できないサーバーレス/外部SaaS連携から HTTPS 経由で SQL を実行し、必要に応じて非同期でポーリング取得したいときに適している。",
-      1: "ステージへの PUT/GET を SQL API 単体で実行してファイル転送まで完結できるため、大規模なファイル取り込みに最適である。",
-      2: "ミリ秒オーダーの超低遅延ストリーミング書き込み（行単位連続投入）の主要手段として最適である。",
-      3: "ネットワークが不安定な環境では同一リクエストの重複実行を避ける仕組みがないため、SQL API の利用は避けるべきである。",
+      0: "外部テーブルをパーティション分割し、ディレクトリ階層に対応するパーティション列を定義。WHERE 句の条件で一致するパーティションのみを読み取り、不要なファイルのスキャンを回避する。",
+      1: "ウェアハウスのサイズを上げて並列度を増やす。スキャン対象は変えずに処理時間だけ短縮を狙う。",
+      2: "CLUSTER BY を設定してパーティションの代替とする（外部テーブルでも同様に効く）。",
+      3: "ファイルフォーマットの圧縮方式を変更して I/O を削減すれば、読み取るファイル数自体も減らせる。",
     },
     answers: [0],
     explanation_jsx: <QuizExplanation />,
     references: [
-      { title: "Introduction to the SQL API | Snowflake Documentation", url: "https://docs.snowflake.com/en/developer-guide/sql-api/intro" },
-      { title: "Snowflake SQL API reference. | Snowflake Documentation", url: "https://docs.snowflake.com/en/developer-guide/sql-api/reference" },
-      { title: "Submitting a request to execute SQL statements | Snowflake Documentation", url: "https://docs.snowflake.com/en/developer-guide/sql-api/submitting-requests" },
-      { title: "Handling responses | Snowflake Documentation", url: "https://docs.snowflake.com/en/developer-guide/sql-api/handling-responses" },
-      { title: "Using programmatic access tokens for authentication | Snowflake Documentation", url: "https://docs.snowflake.com/en/user-guide/programmatic-access-tokens" },
-      { title: "Snowpipe Streaming | Snowflake Documentation", url: "https://docs.snowflake.com/en/user-guide/data-load-snowpipe-streaming-overview" },
+      { title: "Partitioned external tables | Snowflake ドキュメント", url: "https://docs.snowflake.com/ja/user-guide/tables-external-intro#partitioned-external-tables" },
     ],
   });
   return quiz;
@@ -39,12 +33,11 @@ function QuizQuestion() {
   return (
     <div>
       <p>
-        Snowflake の SQL API は、REST（HTTPS）経由で SQL を実行・結果取得できるエンドポイントです。必要に応じて
-        <code>async=true</code> で非同期実行し、ステートメントハンドルをポーリングして結果を取得できます。
+        データレイク上（例: S3）の多数ファイルを参照する <strong>External Table</strong> に対し、
+        日付や地域などの条件でクエリすることが多い状況を想定します。
       </p>
       <p>
-        SQL API の<strong className="text-green-600">利用に適した場面</strong>として、
-        <strong className="text-green-600">正しいもの</strong>を 1 つ選んでください。
+        <strong className="text-green-600">スキャン対象とリスト処理を最も減らす有効な対策</strong>を 1 つ選んでください。
       </p>
     </div>
   );
@@ -53,30 +46,30 @@ function QuizQuestion() {
 function QuizExplanation() {
   return (
     <div className="text-xs md:text-sm">
-      <p className="font-semibold text-green-600">Correct statement:</p>
+      <p className="font-semibold text-emerald-500">Correct statement:</p>
       <ul className="list-disc pl-4 py-2">
         <li>
-          ドライバ不要で HTTPS 越しに SQL を実行でき、<code>async=true</code> や 45 秒超の実行時はステートメントハンドル（HTTP 202）を受け取り
-          ステータス API でポーリングして結果取得できます。軽量な外部連携やサーバーレス実装に向いています。
+          外部テーブルを<strong>パーティション分割</strong>し、ディレクトリ階層（例: <code>/dt=YYYY-MM-DD/region=APAC/</code>）に対応する
+          <strong>パーティション列</strong>を定義すると、WHERE 句の条件に一致するパーティションだけを読み取るため、
+          不要なファイルの列挙・スキャンを大幅に削減できます（パーティションプルーニング）。
         </li>
       </ul>
-      <p className="font-semibold text-red-500">Incorrect statements (why they are wrong):</p>
+      <p className="font-semibold text-red-500">Why other choices are wrong:</p>
       <ul className="list-disc pl-4 py-2">
         <li>
-          SQL API は <code>PUT</code>/<code>GET</code> を<strong>サポートしません</strong>。ファイル転送の完結用途には不適です（別手段が必要）。
+          ウェアハウスを大型化しても<strong>対象データ量は減りません</strong>。並列度や処理時間に影響はあっても、不要ファイルの読み取りは避けられません。
         </li>
         <li>
-          超低遅延の行ベース連続取り込みには <strong>Snowpipe Streaming</strong>（または対応 SDK/コネクタ）が適しています。SQL API はクエリ実行・結果取得が主眼です。
+          <code>CLUSTER BY</code> は<strong>内部テーブル向け</strong>のデータ配置ヒントであり、外部テーブルのファイル列挙やリモート読み取りの削減には使えません。
         </li>
         <li>
-          SQL API には <code>requestId</code> と <code>retry=true</code> による<strong>冪等な再送</strong>の仕組みがあり、ネットワーク障害時の重複実行防止に使えます。
+          圧縮方式の変更は<strong>読み取るバイト量</strong>を左右する可能性はありますが、<strong>読むファイル数や範囲</strong>は変えられません。根本対策にはなりません。
         </li>
       </ul>
       <p>補足:</p>
       <ul className="list-disc pl-4 py-2">
         <li>
-          認証は OAuth、キーペア JWT、または <strong>PAT（Programmatic Access Token）</strong> が利用できます。<code>Authorization: Bearer</code> と必要に応じて
-          <code>X-Snowflake-Authorization-Token-Type</code> ヘッダーを設定します。
+          パーティション列はディレクトリパスから抽出して定義します。クエリではその列を WHERE 句で指定することでプルーニングが働きます。
         </li>
       </ul>
     </div>
