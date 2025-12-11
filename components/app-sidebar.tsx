@@ -195,20 +195,20 @@ export function AppSidebar() {
                       </DropdownMenuItem>
                     ))}
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem key="signout">
-                      <a href="/api/auth/logout" className="flex items-center gap-2 w-full" onClick={handleLinkClick}>
+                    <DropdownMenuItem key="signout" asChild>
+                      <Link href="/api/auth/logout" className="flex items-center gap-2 w-full" onClick={handleLinkClick}>
                         <LogOut />
                         Sign out
-                      </a>
+                      </Link>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
                 <SidebarMenuButton asChild>
-                  <a href={`/api/auth/login?returnTo=${pathname}`} className="flex items-center gap-2" onClick={handleLinkClick}>
+                  <Link href={`/api/auth/login?returnTo=${pathname}`} className="flex items-center gap-2" onClick={handleLinkClick}>
                     <User2 />
                     <span className="text-sm">Sign in</span>
-                  </a>
+                  </Link>
                 </SidebarMenuButton>
               )}
             </SidebarMenuItem>
