@@ -196,6 +196,7 @@ export function AppSidebar() {
                     ))}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem key="signout">
+                      {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- Auth API routes require full browser navigation for redirects */}
                       <a href="/api/auth/logout" className="flex items-center gap-2 w-full" onClick={handleLinkClick}>
                         <LogOut />
                         Sign out
@@ -205,6 +206,7 @@ export function AppSidebar() {
                 </DropdownMenu>
               ) : (
                 <SidebarMenuButton asChild>
+                  {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- Auth API routes require full browser navigation for redirects */}
                   <a href={`/api/auth/login?returnTo=${pathname}`} className="flex items-center gap-2" onClick={handleLinkClick}>
                     <User2 />
                     <span className="text-sm">Sign in</span>
