@@ -4,7 +4,7 @@ import { QuizFileList } from '@/app/quiz/ui/quiz-file-list';
 import { getQuizFiles } from '@/app/quiz/lib/get-files';
 import { getPathInfos } from '@/app/quiz/lib/get-path-info';
 import BadgeList from '@/app/harvor/ui/badge_list';
-import { getSession } from '@auth0/nextjs-auth0';
+import { auth0 } from '@/lib/auth0'
 import { filterFutureDates } from '@/lib/date-utils';
 
 export default async function QuizDashboard() {
@@ -22,7 +22,7 @@ export default async function QuizDashboard() {
 
   // 最新のクイズを取得
   const latest_quizzes = await getQuizFiles({ dir: 'contents/quiz', limit_count: 7 });
-  const session = await getSession();
+  const session = await auth0.getSession();
   const userId = session?.user?.sub;
   const latest_quizzes_path_info = await getPathInfos(latest_quizzes, [], true, userId);
   // 将来日付のクイズを除外（JST基準で判定）

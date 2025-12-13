@@ -121,7 +121,9 @@ export function AppSidebar() {
   }
 
   if (isLoading) return <div></div>;
-  if (error) return <div>{error.message}</div>;
+  // 未ログイン時の /api/auth/profile は 204 を想定だが、環境差や一時的な401が出ても
+  // UIが壊れないよう「Unauthorized」はサインアウト扱いで握りつぶす。
+  if (error && error.message !== "Unauthorized") return <div>{error.message}</div>;
 
   return (
     <Sidebar collapsible="icon" aria-label="メインナビゲーション">

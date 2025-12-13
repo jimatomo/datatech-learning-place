@@ -28,7 +28,7 @@ export default function QuizContent() {
   return quiz;
 }
 
-function QuizQuestion(): JSX.Element {
+function QuizQuestion() {
   const questionCode = `
 import streamlit as st
 import streamlit.components.v1 as components
@@ -54,7 +54,7 @@ st.write("結果:", result)
   );
 }
 
-function QuizExplanation(): JSX.Element {
+function QuizExplanation() {
   const correctCode = `
 import streamlit as st
 import streamlit.components.v1 as components

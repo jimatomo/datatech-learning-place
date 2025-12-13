@@ -52,7 +52,7 @@ print(cities)
   );
 }
 
-function QuizExplanation(): JSX.Element {
+function QuizExplanation() {
   const correctCode = `[d.get('city') for d in data]`;
   const option0Code = `[d['city'] for d in data]`;
   const option2Code = `list(map(lambda x: x['city'], data))`;

@@ -5,6 +5,11 @@ import withPWA from 'next-pwa';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
+  env: {
+    // Auth0 SDK v4 (client) が参照するルートを、このアプリの /api/auth/* に合わせる
+    NEXT_PUBLIC_PROFILE_ROUTE: '/api/auth/profile',
+    NEXT_PUBLIC_ACCESS_TOKEN_ROUTE: '/api/auth/access-token',
+  },
   images: {
     remotePatterns: [
       {

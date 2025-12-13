@@ -4,11 +4,11 @@ import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
 const client = new DynamoDBClient({ region: 'ap-northeast-1' });
 const ddbDocClient = DynamoDBDocumentClient.from(client);
 
-import { getSession } from '@auth0/nextjs-auth0';
+import { auth0 } from '@/lib/auth0'
 
 export async function queryLearningTrackers() {
   // ユーザー情報を取得
-  const session = await getSession()
+  const session = await auth0.getSession()
   const userId = session?.user?.sub
 
   // ユーザーの学習トラッカーを取得

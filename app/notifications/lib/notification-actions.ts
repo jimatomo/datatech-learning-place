@@ -1,6 +1,6 @@
 'use server'
 
-import { getSession } from '@auth0/nextjs-auth0'
+import { auth0 } from '@/lib/auth0'
 import { 
   saveNotificationSubscription,
   updateNotificationSettings,
@@ -29,7 +29,7 @@ export interface NotificationActionResponse {
 export async function updateNotificationSettingsAction(request: NotificationActionRequest): Promise<NotificationActionResponse> {
   try {
     // セッションからユーザーIDを取得
-    const session = await getSession()
+    const session = await auth0.getSession()
     const userId = session?.user?.sub
     
     if (!userId) {

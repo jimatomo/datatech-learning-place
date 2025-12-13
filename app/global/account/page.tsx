@@ -7,7 +7,7 @@ import {
   TableHead,
   TableCell,
 } from "@/components/ui/table"
-import { getSession } from '@auth0/nextjs-auth0';
+import { auth0 } from '@/lib/auth0'
 
 export const metadata: Metadata = {
   title: "DTLP Account",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 }
 
 export default async function AccountPage() {
-  const user = await getSession();
+  const user = await auth0.getSession();
 
   return (
     <div className="flex flex-col max-w-3xl mx-auto">

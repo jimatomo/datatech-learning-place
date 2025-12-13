@@ -3,7 +3,7 @@ import { getQuizById } from '@/app/quiz/lib/get-quiz-by-id'
 import { Quiz } from '@/contents/quiz'
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
-import { getSession } from '@auth0/nextjs-auth0';
+import { auth0 } from '@/lib/auth0'
 const client = new DynamoDBClient({ region: 'ap-northeast-1' });
 const ddbDocClient = DynamoDBDocumentClient.from(client);
 
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   const { quizId, selectedOptions } = data;
 
   // ユーザーIDを取得
-  const session = await getSession();
+  const session = await auth0.getSession();
   const userId = session?.user?.sub;
   
   // DBやキャッシュから正解と解説を取得
@@ -60,7 +60,7 @@ async function saveQuizResult(
   selectedOptions: string[],
 ) {
   // sessionのユーザと一致しているかチェック
-  const session = await getSession();
+  const session = await auth0.getSession();
   const sessionUserId = session?.user?.sub;
   if (userId !== sessionUserId) {
     return;

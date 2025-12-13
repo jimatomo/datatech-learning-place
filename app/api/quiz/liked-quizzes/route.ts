@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, QueryCommand } from '@aws-sdk/lib-dynamodb';
-import { getSession } from '@auth0/nextjs-auth0';
+import { auth0 } from '@/lib/auth0'
 
 export const dynamic = 'force-dynamic';
 
@@ -11,7 +11,7 @@ const ddbDocClient = DynamoDBDocumentClient.from(client);
 export async function GET() {
   try {
     // セッションからユーザーIDを取得
-    const session = await getSession();
+    const session = await auth0.getSession();
     const userId = session?.user?.sub;
 
     if (!userId) {

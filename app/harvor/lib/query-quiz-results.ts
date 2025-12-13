@@ -1,7 +1,7 @@
 import path from 'path';
 import { getQuizFiles } from '@/app/quiz/lib/get-files';
 import { getPathInfos } from '@/app/quiz/lib/get-path-info';
-import { getSession } from '@auth0/nextjs-auth0';
+import { auth0 } from '@/lib/auth0'
 import { filterFutureDates } from '@/lib/date-utils';
 
 export async function queryQuizResults(
@@ -14,7 +14,7 @@ export async function queryQuizResults(
   const quizFiles = await getQuizFiles({ dir: quiz_dir, limit_count: limit_count });
 
   // ユーザー情報を取得
-  const session = await getSession()
+  const session = await auth0.getSession()
   const userId = session?.user?.sub
 
   // path infoを取得

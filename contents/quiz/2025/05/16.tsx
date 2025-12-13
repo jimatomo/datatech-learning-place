@@ -52,7 +52,7 @@ print(df.head())
   );
 }
 
-function QuizExplanation(): JSX.Element {
+function QuizExplanation() {
   const correctCode = `import modin.pandas as pd
 import snowflake.snowpark.modin.plugin`;
   const option0Code = `import pandas as pd`;
