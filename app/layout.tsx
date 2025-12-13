@@ -14,7 +14,7 @@ import { BreadcrumbCollapsed } from "@/components/app-breadcrumb"
 import Footer from "@/components/footer"
 import NextTopLoader from 'nextjs-toploader';
 
-import { UserProvider } from '@auth0/nextjs-auth0/client';
+import { Auth0Provider } from '@auth0/nextjs-auth0';
 import { AuthStatus } from "@/components/auth-status"
 import { AuthDialog } from "@/components/auth-dialog"
 import ConsentManager from "@/components/ConsentManager"
@@ -70,7 +70,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <meta name="msapplication-config" content="/browserconfig.xml" />
         <meta name="msapplication-TileColor" content="#1d4ed8" />
       </head>
-      <UserProvider>
+      <Auth0Provider>
       <body>
         <ConsentManager />
         <ThemeProvider
@@ -117,7 +117,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <NotificationHandler />
         </ThemeProvider>
       </body>
-      </UserProvider>
+      </Auth0Provider>
     </html>
   );
 }

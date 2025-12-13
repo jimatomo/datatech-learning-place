@@ -28,7 +28,7 @@ export default function QuizContent() {
   return quiz;
 }
 
-function QuizQuestion(): JSX.Element {
+function QuizQuestion() {
   const questionCode = `
 import pandas as pd
 import numpy as np
@@ -54,7 +54,7 @@ print(output)
   );
 }
 
-function QuizExplanation(): JSX.Element {
+function QuizExplanation() {
   const dfSetupCode = `
 import pandas as pd
 import numpy as np

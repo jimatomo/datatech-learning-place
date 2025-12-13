@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, QueryCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
 import type { NativeAttributeValue } from '@aws-sdk/util-dynamodb';
-import { getSession } from '@auth0/nextjs-auth0';
+import { auth0 } from '@/lib/auth0'
 
 export const dynamic = 'force-dynamic';
 
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'message は 1000 文字以内にしてください' }, { status: 400 });
     }
 
-    const session = await getSession();
+    const session = await auth0.getSession();
     const userId: string | null = session?.user?.sub ?? null;
 
     const nowIso = new Date().toISOString();
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'quizId is required' }, { status: 400 });
     }
 
-    const session = await getSession();
+    const session = await auth0.getSession();
     const sessionUserId: string | null = session?.user?.sub ?? null;
 
     const prefix = 'feedback|v1|';
@@ -125,7 +125,7 @@ export async function GET(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const session = await getSession();
+    const session = await auth0.getSession();
     const userId: string | null = session?.user?.sub ?? null;
 
     const body = await request.json();

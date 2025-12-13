@@ -8,7 +8,7 @@ import { getPathInfos } from '@/app/quiz/lib/get-path-info'
 import { QuizContent } from '@/app/quiz/ui/quiz-content'
 import { QuizFileList } from '@/app/quiz/ui/quiz-file-list'
 import { ErrorDisplay } from '@/app/quiz/ui/error-display'
-import { getSession } from '@auth0/nextjs-auth0';
+import { auth0 } from '@/lib/auth0'
 import { UpperNavigation } from '@/app/quiz/ui/upper-navigation'
 import { isBeforeJSTNow } from '@/lib/date-utils'
 
@@ -91,7 +91,7 @@ export default async function QuizPage({
     }
     
     // Quizページでない場合はQuizFileListを表示するためのデータを取得
-    const session = await getSession();
+    const session = await auth0.getSession();
     const userId = session?.user?.sub;
     const files = await getQuizFiles({ dir: folder_path });
     const path_infos = await getPathInfos(files, id, false, userId);

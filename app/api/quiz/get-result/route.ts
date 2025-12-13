@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, GetCommand } from '@aws-sdk/lib-dynamodb';
 
-import { getSession } from '@auth0/nextjs-auth0';
+import { auth0 } from '@/lib/auth0'
 
 export const dynamic = 'force-dynamic';
 
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const session = await getSession();
+    const session = await auth0.getSession();
     const userId = session?.user?.sub;
 
     // ユーザーがログインしていない場合は、空の結果を返して終了

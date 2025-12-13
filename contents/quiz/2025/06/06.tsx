@@ -28,7 +28,7 @@ export default function QuizContent() {
   return quiz;
 }
 
-function QuizQuestion(): JSX.Element {
+function QuizQuestion() {
   const questionCode = `
 import streamlit as st
 from datetime import date
@@ -48,7 +48,7 @@ st.write("選択した日付:", selected_date)
   );
 }
 
-function QuizExplanation(): JSX.Element {
+function QuizExplanation() {
   const correctCode = `
 import streamlit as st
 from datetime import date

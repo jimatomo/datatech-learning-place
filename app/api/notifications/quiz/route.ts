@@ -8,9 +8,9 @@ import { randomBytes } from 'crypto'
 const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || randomBytes(32).toString('hex')
 
 // セキュリティチェック関数
-function validateInternalRequest(request: Request): { isValid: boolean; error?: string } {
+async function validateInternalRequest(request: Request): Promise<{ isValid: boolean; error?: string }> {
   // 1. APIキー認証 - EventBridge Connectionの両方のヘッダー形式に対応
-  const headersList = headers()
+  const headersList = await headers()
   
   // EventBridge ConnectionでAPI_KEY認証を使用した場合の両方のヘッダー形式に対応
   const internalKey = 
@@ -33,7 +33,7 @@ function validateInternalRequest(request: Request): { isValid: boolean; error?: 
 export async function POST(request: Request) {
   try {
     // セキュリティチェック
-    const securityCheck = validateInternalRequest(request)
+    const securityCheck = await validateInternalRequest(request)
     if (!securityCheck.isValid) {
       console.warn(`セキュリティ違反の試行: ${securityCheck.error}`)
       return NextResponse.json(

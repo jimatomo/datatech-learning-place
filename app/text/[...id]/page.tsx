@@ -1,7 +1,7 @@
 // TODO: メタタグも生成しておく
 // import { Metadata } from 'next';
 
-export default async function TextPage({ params }: { params: { id: string[] } }) {
+export default async function TextPage({ params }: { params: Promise<{ id: string[] }> }) {
   const { id } = await params;
   const TextModule = await import(`@/contents/text/${id.join("/")}.tsx`).catch((error) => {
     console.error("Error loading module:", error);

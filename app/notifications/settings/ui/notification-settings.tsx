@@ -1,4 +1,4 @@
-import { getSession } from '@auth0/nextjs-auth0'
+import { auth0 } from '@/lib/auth0'
 import { getNotificationSettings } from '@/app/notifications/lib/notification-db'
 import { updateNotificationSettingsAction } from '@/app/notifications/lib/notification-actions'
 import { NotificationSettingsClient } from './notification-settings-client'
@@ -9,7 +9,7 @@ interface NotificationSettingsProps {
 
 export async function NotificationSettingsComponent({ className }: NotificationSettingsProps) {
   // サーバーサイドでユーザー情報と通知設定を取得
-  const session = await getSession()
+  const session = await auth0.getSession()
   const userId = session?.user?.sub
 
   let settings = {

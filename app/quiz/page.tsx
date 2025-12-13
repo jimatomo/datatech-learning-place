@@ -4,7 +4,7 @@ import path from 'path'
 import { getQuizFiles } from '@/app/quiz/lib/get-files'
 import { getPathInfos, PathInfo } from '@/app/quiz/lib/get-path-info'
 import QuizFileListTagFiltered from '@/app/quiz/ui/quiz-file-list-tag-filtered'
-import { getSession } from '@auth0/nextjs-auth0';
+import { auth0 } from '@/lib/auth0'
 import { getJSTNow, filterFutureDates } from '@/lib/date-utils'
 import Link from "next/link"
 import { Settings, BookOpen, CircleCheckBig, TrendingUp, Calendar, Users, Sparkles } from "lucide-react"
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
 
 // SearchParamsの型定義を追加
 type Props = {
-  searchParams: { limit?: string }
+  searchParams?: Promise<{ limit?: string }>
 }
 
 // searchParamsを受け取るように修正
@@ -57,11 +57,11 @@ export default async function QuizList({ searchParams }: Props) {
   const quiz_dir = path.join(process.cwd(), 'contents', 'quiz')
 
   // ユーザー情報を取得
-  const session = await getSession()
+  const session = await auth0.getSession()
   const userId = session?.user?.sub
 
   // searchParamsからlimitを取得し、デフォルト値を14に設定
-  const { limit } = await searchParams
+  const { limit } = (await searchParams) ?? {}
   const limit_count = limit ? parseInt(limit) : 14
 
   // クイズディレクトリ内のクイズファイルを取得する際にlimitを使用

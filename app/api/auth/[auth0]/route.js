@@ -1,31 +1,34 @@
-import { handleAuth, handleLogin, handleCallback } from '@auth0/nextjs-auth0';
+import { auth0 } from "@/lib/auth0";
 
-// Auth0のハンドラーを設定
-const handler = handleAuth({
-  login: async (req) => {
-    // URLSearchParamsを使用してクエリパラメータを取得
-    const url = new URL(req.url);
-    const returnTo = url.searchParams.get('returnTo') || '/';
-    
-    // handleLoginを使用してログイン処理を行い、リダイレクト先を指定
-    return handleLogin(req, {
-      returnTo
-    });
-  },
-  callback: async (req) => {
-    // コールバック処理を行い、リダイレクト先を指定
-    const res = await handleCallback(req, {
-      redirectUri: `${process.env.AUTH0_BASE_URL}/api/auth/callback/auth0`,
-      afterCallback: (req, session) => {
-        return session;
-      }
-    });
-    
-    return res;
+const ALLOWED_PATHS = new Set([
+  "/api/auth/login",
+  "/api/auth/logout",
+  "/api/auth/callback",
+  "/api/auth/profile",
+  "/api/auth/access-token",
+]);
+
+async function handler(req) {
+  const { pathname } = new URL(req.url);
+  if (!ALLOWED_PATHS.has(pathname)) {
+    return new Response("Not Found", { status: 404 });
   }
-});
 
-// GETリクエストのハンドラーを設定
+  // Auth0 SDK は GET 以外(例: HEAD)で NextResponse.next() を返すことがあり、
+  // Next.js App Route では NextResponse.next() がサポートされず 500 になる。
+  // そのため HEAD は GET と同等に処理して安全にリダイレクト/204 を返す。
+  if (req.method === "HEAD") {
+    const getReq = new Request(req.url, { method: "GET", headers: req.headers });
+    return auth0.middleware(getReq);
+  }
+
+  if (req.method !== "GET" && req.method !== "POST") {
+    return new Response("Method Not Allowed", { status: 405 });
+  }
+
+  return auth0.middleware(req);
+}
+
 export const GET = handler;
-// POSTリクエストのハンドラーも設定（必要に応じて）
-export const POST = handler; 
+export const POST = handler;
+export const HEAD = handler;
