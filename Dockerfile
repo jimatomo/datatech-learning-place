@@ -32,7 +32,15 @@ COPY --from=builder /app/node_modules/kuromoji/dict ./node_modules/kuromoji/dict
 # transformersモデルキャッシュ（存在する場合）
 COPY --from=builder /app/.cache ./.cache
 
-RUN ln -s /tmp/cache ./.next/cache
+RUN ln -s /tmp/cache ./.next/cache && \
+    # transformersキャッシュ用の書き込み可能なディレクトリを作成
+    mkdir -p /tmp/cache/transformers && \
+    # .cacheディレクトリの権限を設定（読み取り専用として使用、書き込みは/tmp/cache/transformersを使用）
+    chown -R node:node /tmp/cache && \
+    chown -R node:node ./.cache || true
+
+# transformersキャッシュを書き込み可能なディレクトリに設定
+ENV TRANSFORMERS_CACHE=/tmp/cache/transformers
 
 USER node
 

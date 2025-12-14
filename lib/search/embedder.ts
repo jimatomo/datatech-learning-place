@@ -21,9 +21,12 @@ export async function getEmbeddingPipeline(): Promise<FeatureExtractionPipeline>
 
   console.log(`Loading embedding model: ${MODEL_NAME}...`);
   
+  // キャッシュディレクトリを決定（環境変数優先、Docker実行時は書き込み可能なディレクトリを使用）
+  const cacheDir = process.env.TRANSFORMERS_CACHE || './.cache/transformers';
+  
   embeddingPromise = pipeline('feature-extraction', MODEL_NAME, {
     // キャッシュディレクトリを指定
-    cache_dir: './.cache/transformers',
+    cache_dir: cacheDir,
   }).then((p) => {
     embeddingPipeline = p;
     console.log('Embedding model loaded successfully');
@@ -110,4 +113,5 @@ export function getEmbeddingDimension(): number {
   // multilingual-e5-smallの次元数
   return 384;
 }
+
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { search, vectorSearch, hybridSearch, type SearchOptions } from '@/lib/search/orama-client';
+import { search, vectorSearch, hybridSearch, type SearchOptions, type SearchResponse } from '@/lib/search/orama-client';
 import { auth0 } from '@/lib/auth0';
 
 export const dynamic = 'force-dynamic';
@@ -71,22 +71,22 @@ export async function GET(request: NextRequest) {
     };
 
     // 検索実行
-    let results;
+    let searchResponse: SearchResponse;
     switch (searchType) {
       case 'fulltext':
-        results = await search(query, options);
+        searchResponse = await search(query, options);
         break;
       case 'vector':
-        results = await vectorSearch(query, options);
+        searchResponse = await vectorSearch(query, options);
         break;
       case 'hybrid':
       default:
-        results = await hybridSearch(query, options);
+        searchResponse = await hybridSearch(query, options);
         break;
     }
 
     // レスポンスの整形（contentは長いので短縮）
-    const formattedResults = results.map(result => ({
+    const formattedResults = searchResponse.results.map(result => ({
       id: result.id,
       type: result.type,
       title: result.title,
@@ -103,7 +103,7 @@ export async function GET(request: NextRequest) {
       query,
       searchType,
       contentType: validatedContentType,
-      total: formattedResults.length,
+      total: searchResponse.total,
       results: formattedResults,
     });
 

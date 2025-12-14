@@ -122,6 +122,7 @@ export function SearchDialog() {
     if (!query.trim()) {
       setResults([])
       setHasSearched(false)
+      setIsLoading(false) // クエリが空の場合はローディング状態を解除
       return
     }
 
@@ -151,10 +152,13 @@ export function SearchDialog() {
         setResults([])
         console.error("Search error:", error)
       } finally {
-        // キャンセルされた場合はローディング状態を更新しない
+        // キャンセルされた場合もローディング状態を解除（新しい検索が開始される場合はsetIsLoading(true)が呼ばれる）
         if (!abortController.signal.aborted) {
           setIsLoading(false)
           setHasSearched(true)
+        } else {
+          // 中断された場合もローディング状態を解除
+          setIsLoading(false)
         }
       }
     }, 300) // 300ms デバウンス
@@ -162,6 +166,8 @@ export function SearchDialog() {
     return () => {
       clearTimeout(timer)
       abortController.abort()
+      // クリーンアップ時にローディング状態を解除（タイマーがクリアされた場合）
+      setIsLoading(false)
     }
   }, [query])
 

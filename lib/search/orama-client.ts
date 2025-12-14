@@ -17,6 +17,12 @@ export interface SearchResult {
   score: number;
 }
 
+// 検索結果と総件数の型
+export interface SearchResponse {
+  results: SearchResult[];
+  total: number;
+}
+
 // 検索オプション
 export interface SearchOptions {
   type?: 'hybrid' | 'fulltext' | 'vector';
@@ -129,7 +135,7 @@ function mapHitToResult(hit: any): SearchResult {
 export async function search(
   query: string,
   options: SearchOptions = {}
-): Promise<SearchResult[]> {
+): Promise<SearchResponse> {
   const { limit = 20, contentType = 'all', tags } = options;
   const db = await getSearchClient();
 
@@ -150,7 +156,10 @@ export async function search(
     where: Object.keys(where).length > 0 ? where : undefined,
   });
 
-  return results.hits.map(mapHitToResult);
+  return {
+    results: results.hits.map(mapHitToResult),
+    total: results.count,
+  };
 }
 
 /**
@@ -159,7 +168,7 @@ export async function search(
 export async function vectorSearch(
   query: string,
   options: SearchOptions = {}
-): Promise<SearchResult[]> {
+): Promise<SearchResponse> {
   const { limit = 20, contentType = 'all', tags } = options;
   const db = await getSearchClient();
 
@@ -188,7 +197,10 @@ export async function vectorSearch(
     includeVectors: false,
   });
 
-  return results.hits.map(mapHitToResult);
+  return {
+    results: results.hits.map(mapHitToResult),
+    total: results.count,
+  };
 }
 
 /**
@@ -197,14 +209,17 @@ export async function vectorSearch(
 export async function hybridSearch(
   query: string,
   options: SearchOptions = {}
-): Promise<SearchResult[]> {
+): Promise<SearchResponse> {
   const { limit = 20 } = options;
 
   // 全文検索とベクター検索を並列実行
-  const [fulltextResults, vectorResults] = await Promise.all([
+  const [fulltextResponse, vectorResponse] = await Promise.all([
     search(query, { ...options, limit: limit * 2 }),
     vectorSearch(query, { ...options, limit: limit * 2 }),
   ]);
+
+  const fulltextResults = fulltextResponse.results;
+  const vectorResults = vectorResponse.results;
 
   // スコアを正規化してマージ
   const resultMap = new Map<string, SearchResult & { combinedScore: number }>();
@@ -241,9 +256,20 @@ export async function hybridSearch(
     .slice(0, limit);
 
   // combinedScoreをscoreとして返す
-  return sortedResults.map(({ combinedScore, ...rest }) => ({
+  const finalResults = sortedResults.map(({ combinedScore, ...rest }) => ({
     ...rest,
     score: combinedScore,
   }));
+
+  // ハイブリッド検索の総件数は、マージ後のユニークな結果の数
+  // ただし、limitで制限される前の総件数を取得するため、
+  // 全文検索とベクター検索のcountの最大値を使用する
+  // （実際の総件数はこれより多い可能性があるが、実用的な近似値として使用）
+  const total = Math.max(fulltextResponse.total, vectorResponse.total);
+
+  return {
+    results: finalResults,
+    total,
+  };
 }
 

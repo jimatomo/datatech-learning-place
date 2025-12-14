@@ -10,8 +10,11 @@ export {
 export { 
   getSearchClient, 
   search, 
+  vectorSearch,
   hybridSearch,
   type SearchResult,
-  type SearchOptions 
+  type SearchOptions,
+  type SearchResponse
 } from './orama-client';
+
 
