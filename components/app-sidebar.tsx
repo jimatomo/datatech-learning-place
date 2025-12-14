@@ -16,7 +16,7 @@ import {
   Search,
 } from "lucide-react"
 
-import { SearchCommand } from "@/components/search/search-command"
+import { SearchCommand, useSearchDialog } from "@/components/search/search-command"
 
 import {
   Sidebar,
@@ -99,6 +99,7 @@ export function AppSidebar() {
   const pathname = usePathname()
   const { toggleSidebar } = useSidebar()
   const { user, error, isLoading } = useUser();
+  const { handleOpenSearch } = useSearchDialog();
 
   // 画面サイズが小さい時のみサイドバーを閉じる関数
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -146,7 +147,7 @@ export function AppSidebar() {
           </SidebarMenuItem>
           <SidebarMenuItem className="hidden group-data-[collapsible=icon]:flex justify-center">
             <SidebarMenuButton asChild className="w-8 h-8 p-0 mt-4">
-              <button onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}>
+              <button onClick={handleOpenSearch}>
                 <Search className="h-4 w-4" />
               </button>
             </SidebarMenuButton>

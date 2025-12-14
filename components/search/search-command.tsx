@@ -46,16 +46,30 @@ interface SearchResponse {
   results: SearchResult[]
 }
 
-export function SearchCommand() {
-  const router = useRouter()
-  const pathname = usePathname()
-  const { user, isLoading: isUserLoading } = useUser()
+// 検索ダイアログの状態を管理するコンテキスト
+interface SearchDialogContextType {
+  open: boolean
+  setOpen: (open: boolean) => void
+  showLoginDialog: boolean
+  setShowLoginDialog: (show: boolean) => void
+  handleOpenSearch: () => void
+}
+
+const SearchDialogContext = React.createContext<SearchDialogContextType | null>(null)
+
+export function useSearchDialog() {
+  const context = React.useContext(SearchDialogContext)
+  if (!context) {
+    throw new Error("useSearchDialog must be used within a SearchDialogProvider")
+  }
+  return context
+}
+
+// 検索ダイアログプロバイダー（キーボードショートカットと状態管理）
+export function SearchDialogProvider({ children }: { children: React.ReactNode }) {
+  const { user } = useUser()
   const [open, setOpen] = React.useState(false)
   const [showLoginDialog, setShowLoginDialog] = React.useState(false)
-  const [query, setQuery] = React.useState("")
-  const [results, setResults] = React.useState<SearchResult[]>([])
-  const [isLoading, setIsLoading] = React.useState(false)
-  const [hasSearched, setHasSearched] = React.useState(false)
 
   // 検索ダイアログを開く処理
   const handleOpenSearch = React.useCallback(() => {
@@ -77,6 +91,31 @@ export function SearchCommand() {
     document.addEventListener("keydown", down)
     return () => document.removeEventListener("keydown", down)
   }, [handleOpenSearch])
+
+  const contextValue = React.useMemo(() => ({
+    open,
+    setOpen,
+    showLoginDialog,
+    setShowLoginDialog,
+    handleOpenSearch,
+  }), [open, showLoginDialog, handleOpenSearch])
+
+  return (
+    <SearchDialogContext.Provider value={contextValue}>
+      {children}
+    </SearchDialogContext.Provider>
+  )
+}
+
+// 検索ダイアログコンポーネント（常にレンダリングされる場所に配置）
+export function SearchDialog() {
+  const router = useRouter()
+  const pathname = usePathname()
+  const { open, setOpen, showLoginDialog, setShowLoginDialog } = useSearchDialog()
+  const [query, setQuery] = React.useState("")
+  const [results, setResults] = React.useState<SearchResult[]>([])
+  const [isLoading, setIsLoading] = React.useState(false)
+  const [hasSearched, setHasSearched] = React.useState(false)
 
   // 検索のデバウンス
   React.useEffect(() => {
@@ -138,20 +177,6 @@ export function SearchCommand() {
 
   return (
     <>
-      <Button
-        variant="outline"
-        className="relative h-9 w-full justify-start rounded-md bg-muted/50 text-sm font-normal text-muted-foreground shadow-none sm:pr-12 lg:w-60 mt-4 mb-0"
-        onClick={handleOpenSearch}
-        disabled={isUserLoading}
-      >
-        <Search className="mr-2 h-4 w-4" />
-        <span className="hidden lg:inline-flex">検索...</span>
-        <span className="inline-flex lg:hidden">検索</span>
-        <kbd className="pointer-events-none absolute right-1.5 top-1.5 hidden h-6 select-none items-center gap-1 rounded border bg-background px-1.5 font-mono text-xs font-medium opacity-100 sm:flex">
-          <span className="text-xs">⌘</span>K
-        </kbd>
-      </Button>
-
       {/* ログインを促すダイアログ */}
       <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
         <DialogContent>
@@ -261,6 +286,28 @@ export function SearchCommand() {
         </CommandList>
       </CommandDialog>
     </>
+  )
+}
+
+// 検索トリガーボタン（サイドバー内に配置）
+export function SearchCommand() {
+  const { handleOpenSearch } = useSearchDialog()
+  const { isLoading: isUserLoading } = useUser()
+
+  return (
+    <Button
+      variant="outline"
+      className="relative h-9 w-full justify-start rounded-md bg-muted/50 text-sm font-normal text-muted-foreground shadow-none sm:pr-12 lg:w-60 mt-4 mb-0"
+      onClick={handleOpenSearch}
+      disabled={isUserLoading}
+    >
+      <Search className="mr-2 h-4 w-4" />
+      <span className="hidden lg:inline-flex">検索...</span>
+      <span className="inline-flex lg:hidden">検索</span>
+      <kbd className="pointer-events-none absolute right-1.5 top-1.5 hidden h-6 select-none items-center gap-1 rounded border bg-background px-1.5 font-mono text-xs font-medium opacity-100 sm:flex">
+        <span className="text-xs">⌘</span>K
+      </kbd>
+    </Button>
   )
 }
 
