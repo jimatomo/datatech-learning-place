@@ -9,7 +9,7 @@
 import fs from 'fs';
 import path from 'path';
 import { create, insertMultiple, save } from '@orama/orama';
-import { getTokenizer } from '../lib/search/tokenizer';
+import { getTokenizer, createOramaTokenizer } from '../lib/search/tokenizer';
 import { generateEmbeddings, getEmbeddingDimension } from '../lib/search/embedder';
 
 // インデックスに格納するドキュメントの型
@@ -268,6 +268,9 @@ async function main() {
       url: 'string',
       createdAt: 'string',
       embedding: `vector[${getEmbeddingDimension()}]`,
+    },
+    components: {
+      tokenizer: createOramaTokenizer(),
     },
   });
 

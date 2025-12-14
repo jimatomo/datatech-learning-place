@@ -2,6 +2,7 @@ import { create, load, search as oramaSearch } from '@orama/orama';
 import fs from 'fs';
 import path from 'path';
 import { generateQueryEmbedding, getEmbeddingDimension } from './embedder';
+import { getTokenizer, createOramaTokenizer } from './tokenizer';
 
 // 検索結果の型
 export interface SearchResult {
@@ -70,6 +71,9 @@ export async function getSearchClient() {
  * データベースをロードする
  */
 async function loadDatabase() {
+  // トークナイザーを初期化（日本語トークナイザーを使用するため）
+  await getTokenizer();
+
   const indexPath = path.join(process.cwd(), 'data', 'search-index.json');
 
   // インデックスファイルが存在しない場合は空のDBを作成
@@ -77,6 +81,9 @@ async function loadDatabase() {
     console.warn('Search index not found. Creating empty database.');
     return create({
       schema: SEARCH_SCHEMA,
+      components: {
+        tokenizer: createOramaTokenizer(),
+      },
     });
   }
 
@@ -86,6 +93,9 @@ async function loadDatabase() {
   // スキーマを定義してDBを作成
   const db = await create({
     schema: SEARCH_SCHEMA,
+    components: {
+      tokenizer: createOramaTokenizer(),
+    },
   });
 
   // 保存したデータをロード
