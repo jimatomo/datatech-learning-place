@@ -49,12 +49,13 @@ export async function getPathInfos(
         updated_at = quiz.getUpdatedAt();
         author = quiz.getAuthor();
         quiz_id = quiz.getId();
-        // ログイン済みユーザーの場合のみクイズ結果を取得
+        // ログイン済みユーザーの場合のみクイズ結果といいねステータスを並列取得
         if (userId) {
-          const quizResult = await getQuizResult(userId, quiz.getId());
+          const [quizResult, quizLike] = await Promise.all([
+            getQuizResult(userId, quiz.getId()),
+            getQuizLike(userId, quiz.getId())
+          ]);
           is_correct = quizResult?.Item?.is_correct === "true";
-          // いいねステータスの取得
-          const quizLike = await getQuizLike(userId, quiz.getId());
           is_liked = quizLike?.Item?.like ?? false;
         }
       } catch (error) {

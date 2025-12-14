@@ -10,11 +10,12 @@ export async function queryQuizResults(
   // クイズディレクトリのパスを取得
   const quiz_dir = path.join(process.cwd(), 'contents', 'quiz')
 
-  // クイズの全体の数を取得
-  const quizFiles = await getQuizFiles({ dir: quiz_dir, limit_count: limit_count });
+  // クイズファイルの取得とユーザー情報の取得を並列実行
+  const [quizFiles, session] = await Promise.all([
+    getQuizFiles({ dir: quiz_dir, limit_count: limit_count }),
+    auth0.getSession()
+  ]);
 
-  // ユーザー情報を取得
-  const session = await auth0.getSession()
   const userId = session?.user?.sub
 
   // path infoを取得
