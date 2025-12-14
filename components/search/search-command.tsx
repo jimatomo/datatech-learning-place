@@ -117,7 +117,7 @@ export function SearchDialog() {
   const [isLoading, setIsLoading] = React.useState(false)
   const [hasSearched, setHasSearched] = React.useState(false)
 
-  // 検索のデバウンス
+  // 検索のデバウンス（AbortControllerでin-flightリクエストをキャンセル）
   React.useEffect(() => {
     if (!query.trim()) {
       setResults([])
@@ -125,11 +125,14 @@ export function SearchDialog() {
       return
     }
 
+    const abortController = new AbortController()
+
     const timer = setTimeout(async () => {
       setIsLoading(true)
       try {
         const response = await fetch(
-          `/api/search?q=${encodeURIComponent(query)}&type=hybrid&limit=20`
+          `/api/search?q=${encodeURIComponent(query)}&type=hybrid&limit=20`,
+          { signal: abortController.signal }
         )
         if (response.ok) {
           const data: SearchResponse = await response.json()
@@ -140,16 +143,26 @@ export function SearchDialog() {
           console.error("Search API error:", response.status, response.statusText)
         }
       } catch (error) {
+        // AbortErrorは無視（クエリ変更による正常なキャンセル）
+        if (error instanceof Error && error.name === 'AbortError') {
+          return
+        }
         // ネットワークエラー時も結果をクリア
         setResults([])
         console.error("Search error:", error)
       } finally {
-        setIsLoading(false)
-        setHasSearched(true)
+        // キャンセルされた場合はローディング状態を更新しない
+        if (!abortController.signal.aborted) {
+          setIsLoading(false)
+          setHasSearched(true)
+        }
       }
     }, 300) // 300ms デバウンス
 
-    return () => clearTimeout(timer)
+    return () => {
+      clearTimeout(timer)
+      abortController.abort()
+    }
   }, [query])
 
   // 結果選択時の処理

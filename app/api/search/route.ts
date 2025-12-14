@@ -57,7 +57,8 @@ export async function GET(request: NextRequest) {
       : 'all';
 
     // 件数のバリデーション
-    const limit = limitParam ? Math.min(Math.max(1, parseInt(limitParam, 10)), 50) : 20;
+    const parsedLimit = limitParam ? parseInt(limitParam, 10) : NaN;
+    const limit = Number.isNaN(parsedLimit) ? 20 : Math.min(Math.max(1, parsedLimit), 50);
 
     // タグのパース
     const tags = tagsParam ? tagsParam.split(',').map(t => t.trim()).filter(t => t.length > 0) : undefined;
