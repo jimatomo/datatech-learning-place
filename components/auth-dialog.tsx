@@ -68,14 +68,14 @@ export function AuthDialog() {
     return (
       <Dialog open={open} onOpenChange={handleDialogClose}>
         <DialogContent>
-          <DialogHeader>
+          <DialogHeader className="mx-2">
             <DialogTitle>学習状況を記録しよう</DialogTitle>
             <DialogDescription>
               クイズの解答状況などの学習状況を記録するにはサインインが必要です。<br />
               <Link href="/global/privacy" onClick={() => handleDialogClose(false)} className="underline text-blue-500">プライバシーポリシーはこちら</Link>
             </DialogDescription>
           </DialogHeader>
-          <Button asChild>
+          <Button asChild className="mx-2">
             <a href={`/api/auth/login?returnTo=${pathname}`} onClick={handleLoginClick}>サインイン（無料）</a>
           </Button>
         </DialogContent>

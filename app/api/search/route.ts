@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { search, vectorSearch, hybridSearch, type SearchOptions } from '@/lib/search/orama-client';
+import { auth0 } from '@/lib/auth0';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,6 +14,15 @@ type ContentType = typeof VALID_CONTENT_TYPES[number];
 
 export async function GET(request: NextRequest) {
   try {
+    // 認証チェック
+    const session = await auth0.getSession();
+    if (!session) {
+      return NextResponse.json(
+        { error: '検索機能を利用するにはログインが必要です' },
+        { status: 401 }
+      );
+    }
+
     const searchParams = request.nextUrl.searchParams;
     const query = searchParams.get('q');
     const type = searchParams.get('type') as SearchType | null;

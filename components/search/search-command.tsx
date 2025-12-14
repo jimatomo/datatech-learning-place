@@ -1,8 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { Search, FileQuestion, BookOpen, Loader2, Tag } from "lucide-react"
+import { useUser } from "@auth0/nextjs-auth0/client"
 
 import {
   CommandDialog,
@@ -13,8 +14,16 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 // 検索結果の型
 interface SearchResult {
@@ -39,23 +48,35 @@ interface SearchResponse {
 
 export function SearchCommand() {
   const router = useRouter()
+  const pathname = usePathname()
+  const { user, isLoading: isUserLoading } = useUser()
   const [open, setOpen] = React.useState(false)
+  const [showLoginDialog, setShowLoginDialog] = React.useState(false)
   const [query, setQuery] = React.useState("")
   const [results, setResults] = React.useState<SearchResult[]>([])
   const [isLoading, setIsLoading] = React.useState(false)
   const [hasSearched, setHasSearched] = React.useState(false)
+
+  // 検索ダイアログを開く処理
+  const handleOpenSearch = React.useCallback(() => {
+    if (!user) {
+      setShowLoginDialog(true)
+    } else {
+      setOpen(true)
+    }
+  }, [user])
 
   // キーボードショートカット (Cmd+K / Ctrl+K)
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault()
-        setOpen((open) => !open)
+        handleOpenSearch()
       }
     }
     document.addEventListener("keydown", down)
     return () => document.removeEventListener("keydown", down)
-  }, [])
+  }, [handleOpenSearch])
 
   // 検索のデバウンス
   React.useEffect(() => {
@@ -120,7 +141,8 @@ export function SearchCommand() {
       <Button
         variant="outline"
         className="relative h-9 w-full justify-start rounded-md bg-muted/50 text-sm font-normal text-muted-foreground shadow-none sm:pr-12 lg:w-60 mt-4 mb-0"
-        onClick={() => setOpen(true)}
+        onClick={handleOpenSearch}
+        disabled={isUserLoading}
       >
         <Search className="mr-2 h-4 w-4" />
         <span className="hidden lg:inline-flex">検索...</span>
@@ -129,6 +151,22 @@ export function SearchCommand() {
           <span className="text-xs">⌘</span>K
         </kbd>
       </Button>
+
+      {/* ログインを促すダイアログ */}
+      <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>検索機能を利用するにはサインインが必要です</DialogTitle>
+            <DialogDescription>
+              検索機能はサインインしたユーザーのみ利用可能です。<br />
+              <Link href="/global/privacy" onClick={() => setShowLoginDialog(false)} className="underline text-blue-500">プライバシーポリシーはこちら</Link>
+            </DialogDescription>
+          </DialogHeader>
+          <Button asChild>
+            <a href={`/api/auth/login?returnTo=${pathname}`}>サインイン（無料）</a>
+          </Button>
+        </DialogContent>
+      </Dialog>
 
       <CommandDialog open={open} onOpenChange={handleOpenChange}>
         <CommandInput
@@ -225,5 +263,7 @@ export function SearchCommand() {
     </>
   )
 }
+
+
 
 
