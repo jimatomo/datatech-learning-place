@@ -147,7 +147,7 @@ export function AppSidebar() {
           </SidebarMenuItem>
           <SidebarMenuItem className="hidden group-data-[collapsible=icon]:flex justify-center">
             <SidebarMenuButton asChild className="w-8 h-8 p-0 mt-4">
-              <button onClick={handleOpenSearch}>
+              <button onClick={handleOpenSearch} aria-label="検索を開く">
                 <Search className="h-4 w-4" />
               </button>
             </SidebarMenuButton>

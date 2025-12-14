@@ -28,8 +28,10 @@ interface SearchDocument {
 // クイズファイルからメタデータとコンテンツを抽出
 function extractQuizData(filePath: string, fileContent: string): Omit<SearchDocument, 'embedding'> | null {
   try {
+    // パスを正規化（Windowsのバックスラッシュをスラッシュに変換）
+    const normalizedPath = filePath.replace(/\\/g, '/');
     // クイズIDを抽出（ファイルパスから）
-    const pathMatch = filePath.match(/quiz\/(\d{4})\/(\d{2})\/(\d{2})\.tsx$/);
+    const pathMatch = normalizedPath.match(/quiz\/(\d{4})\/(\d{2})\/(\d{2})\.tsx$/);
     if (!pathMatch) return null;
 
     const [, year, month, day] = pathMatch;
@@ -99,8 +101,10 @@ function extractQuizData(filePath: string, fileContent: string): Omit<SearchDocu
 // テキストファイルからメタデータとコンテンツを抽出
 function extractTextData(filePath: string, fileContent: string): Omit<SearchDocument, 'embedding'> | null {
   try {
+    // パスを正規化（Windowsのバックスラッシュをスラッシュに変換）
+    const normalizedPath = filePath.replace(/\\/g, '/');
     // パスからIDを生成
-    const pathMatch = filePath.match(/text\/([^/]+)\/(\d+)\.tsx$/);
+    const pathMatch = normalizedPath.match(/text\/([^/]+)\/(\d+)\.tsx$/);
     if (!pathMatch) return null;
 
     const [, category, pageNum] = pathMatch;
