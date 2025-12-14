@@ -150,7 +150,7 @@ export async function vectorSearch(
   query: string,
   options: SearchOptions = {}
 ): Promise<SearchResult[]> {
-  const { limit = 20, contentType = 'all' } = options;
+  const { limit = 20, contentType = 'all', tags } = options;
   const db = await getSearchClient();
 
   // クエリのembeddingを生成
@@ -161,6 +161,9 @@ export async function vectorSearch(
   const where: Record<string, any> = {};
   if (contentType !== 'all') {
     where.type = contentType;
+  }
+  if (tags && tags.length > 0) {
+    where.tags = { containsAll: tags };
   }
 
   // Orama v3ではsearchにmodeを指定してベクター検索
