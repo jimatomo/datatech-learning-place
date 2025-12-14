@@ -29,6 +29,7 @@ export async function GET(request: NextRequest) {
     const contentType = searchParams.get('contentType') as ContentType | null;
     const limitParam = searchParams.get('limit');
     const tagsParam = searchParams.get('tags');
+    const minScoreParam = searchParams.get('minScore');
 
     // クエリパラメータのバリデーション
     if (!query || query.trim().length === 0) {
@@ -63,11 +64,18 @@ export async function GET(request: NextRequest) {
     // タグのパース
     const tags = tagsParam ? tagsParam.split(',').map(t => t.trim()).filter(t => t.length > 0) : undefined;
 
+    // 最小スコア閾値のバリデーション（デフォルト: 0.5）
+    const parsedMinScore = minScoreParam ? parseFloat(minScoreParam) : NaN;
+    const minScore = Number.isNaN(parsedMinScore) 
+      ? 0.5  // デフォルト閾値
+      : Math.min(Math.max(0, parsedMinScore), 1); // 0〜1の範囲に制限
+
     // 検索オプション
     const options: SearchOptions = {
       limit,
       contentType: validatedContentType === 'all' ? 'all' : validatedContentType,
       tags,
+      minScore,
     };
 
     // 検索実行
@@ -95,8 +103,8 @@ export async function GET(request: NextRequest) {
       url: result.url,
       createdAt: result.createdAt,
       score: result.score,
-      // contentは最初の200文字のみ返す
-      snippet: result.content.slice(0, 200) + (result.content.length > 200 ? '...' : ''),
+      // contentは最初の100文字のみ返す
+      snippet: result.content.slice(0, 100) + (result.content.length > 100 ? '...' : ''),
     }));
 
     return NextResponse.json({

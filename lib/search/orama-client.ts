@@ -29,6 +29,7 @@ export interface SearchOptions {
   limit?: number;
   contentType?: 'quiz' | 'text' | 'all';
   tags?: string[];
+  minScore?: number; // 最小スコア閾値（0〜1、この値以上の結果のみ返す）
 }
 
 // スキーマ定義
@@ -250,26 +251,28 @@ export async function hybridSearch(
     }
   }
 
-  // スコアでソートして上位を返す
+  // スコアでソート
   const sortedResults = Array.from(resultMap.values())
-    .sort((a, b) => b.combinedScore - a.combinedScore)
-    .slice(0, limit);
+    .sort((a, b) => b.combinedScore - a.combinedScore);
 
   // combinedScoreをscoreとして返す
-  const finalResults = sortedResults.map(({ combinedScore, ...rest }) => ({
+  const scoredResults = sortedResults.map(({ combinedScore, ...rest }) => ({
     ...rest,
     score: combinedScore,
   }));
 
-  // ハイブリッド検索の総件数は、マージ後のユニークな結果の数
-  // ただし、limitで制限される前の総件数を取得するため、
-  // 全文検索とベクター検索のcountの最大値を使用する
-  // （実際の総件数はこれより多い可能性があるが、実用的な近似値として使用）
-  const total = Math.max(fulltextResponse.total, vectorResponse.total);
+  // 最小スコア閾値でフィルタリング（limitの前に適用）
+  const { minScore } = options;
+  const filteredResults = minScore !== undefined
+    ? scoredResults.filter(r => r.score >= minScore)
+    : scoredResults;
+
+  // 最後にlimitを適用
+  const finalResults = filteredResults.slice(0, limit);
 
   return {
     results: finalResults,
-    total,
+    total: filteredResults.length, // フィルタ後の総件数
   };
 }
 
