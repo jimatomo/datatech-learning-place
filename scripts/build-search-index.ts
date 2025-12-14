@@ -228,7 +228,7 @@ async function main() {
   console.log('📖 テキストファイルを処理中...');
   const textDir = path.join(contentsDir, 'text');
   if (fs.existsSync(textDir)) {
-    const textFiles = getFilesRecursively(textDir, /^\d{2}\.tsx$/);
+    const textFiles = getFilesRecursively(textDir, /^\d+\.tsx$/);
     const textStartCount = documents.length;
     
     for (const filePath of textFiles) {
