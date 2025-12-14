@@ -207,13 +207,15 @@ async function main() {
   // クイズファイルを処理
   console.log('📝 クイズファイルを処理中...');
   const quizDir = path.join(contentsDir, 'quiz');
-  const quizFiles = getFilesRecursively(quizDir, /^\d{2}\.tsx$/);
-  
-  for (const filePath of quizFiles) {
-    const content = fs.readFileSync(filePath, 'utf-8');
-    const data = extractQuizData(filePath, content);
-    if (data) {
-      documents.push(data);
+  if (fs.existsSync(quizDir)) {
+    const quizFiles = getFilesRecursively(quizDir, /^\d{2}\.tsx$/);
+    
+    for (const filePath of quizFiles) {
+      const content = fs.readFileSync(filePath, 'utf-8');
+      const data = extractQuizData(filePath, content);
+      if (data) {
+        documents.push(data);
+      }
     }
   }
   console.log(`✅ ${documents.length}件のクイズを処理しました\n`);
