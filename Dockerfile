@@ -22,6 +22,16 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/run.sh ./run.sh
 # for Auth0
 COPY --from=builder /app/.env.production.local ./.env.production.local
+
+# 検索インデックス
+COPY --from=builder /app/data ./data
+
+# kuromoji辞書（形態素解析用）
+COPY --from=builder /app/node_modules/kuromoji/dict ./node_modules/kuromoji/dict
+
+# transformersモデルキャッシュ（存在する場合）
+COPY --from=builder /app/.cache ./.cache
+
 RUN ln -s /tmp/cache ./.next/cache
 
 USER node

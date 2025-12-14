@@ -13,7 +13,10 @@ import {
   LogOut,
   ChevronLeft,
   Bell,
+  Search,
 } from "lucide-react"
+
+import { SearchCommand } from "@/components/search/search-command"
 
 import {
   Sidebar,
@@ -137,6 +140,16 @@ export function AppSidebar() {
               </span>
             </Link>
             <ChevronLeft className="w-10 group-data-[collapsible=icon]:hidden cursor-pointer" onClick={() => toggleSidebar()} />
+          </SidebarMenuItem>
+          <SidebarMenuItem className="group-data-[collapsible=icon]:hidden">
+            <SearchCommand />
+          </SidebarMenuItem>
+          <SidebarMenuItem className="hidden group-data-[collapsible=icon]:flex justify-center">
+            <SidebarMenuButton asChild className="w-8 h-8 p-0 mt-4">
+              <button onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}>
+                <Search className="h-4 w-4" />
+              </button>
+            </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
