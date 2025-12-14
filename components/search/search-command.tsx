@@ -74,12 +74,18 @@ export function SearchCommand() {
         if (response.ok) {
           const data: SearchResponse = await response.json()
           setResults(data.results)
-          setHasSearched(true)
+        } else {
+          // エラー時は結果をクリア
+          setResults([])
+          console.error("Search API error:", response.status, response.statusText)
         }
       } catch (error) {
+        // ネットワークエラー時も結果をクリア
+        setResults([])
         console.error("Search error:", error)
       } finally {
         setIsLoading(false)
+        setHasSearched(true)
       }
     }, 300) // 300ms デバウンス
 
@@ -219,4 +225,5 @@ export function SearchCommand() {
     </>
   )
 }
+
 
