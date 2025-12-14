@@ -1,14 +1,10 @@
 import { queryQuizResults } from '@/app/harvor/lib/query-quiz-results';
 import { ChartAnswerdCount } from '@/app/harvor/ui/chart-answerd-count';
 import { QuizFileList } from '@/app/quiz/ui/quiz-file-list';
-import { getQuizFiles } from '@/app/quiz/lib/get-files';
-import { getPathInfos } from '@/app/quiz/lib/get-path-info';
 import BadgeList from '@/app/harvor/ui/badge_list';
-import { auth0 } from '@/lib/auth0'
-import { filterFutureDates } from '@/lib/date-utils';
 
 export default async function QuizDashboard() {
-  // クイズの最新の結果を取得
+  // クイズの最新の結果を取得（全クイズ情報を含む）
   const quizResults = await queryQuizResults();
 
   // 全問題の数を取得
@@ -17,22 +13,17 @@ export default async function QuizDashboard() {
   // 正解数を取得
   const correctCount = quizResults.filter(result => result.is_correct).length;
 
-  // 未正解のクイズを取得（3件）
+  // 未正解のクイズを取得（1件）
   const not_correct_quizzes = quizResults.filter(result => !result.is_correct).slice(0, 1);
 
-  // 最新のクイズを取得
-  const latest_quizzes = await getQuizFiles({ dir: 'contents/quiz', limit_count: 7 });
-  const session = await auth0.getSession();
-  const userId = session?.user?.sub;
-  const latest_quizzes_path_info = await getPathInfos(latest_quizzes, [], true, userId);
-  // 将来日付のクイズを除外（JST基準で判定）
-  const latest_quizzes_filtered = filterFutureDates(latest_quizzes_path_info);
-  // 最新の日付だけに絞る
-  const latest_quizzes_path_info_sorted = latest_quizzes_filtered.sort((a, b) => {
-    if (!a.created_at || !b.created_at) return 0;
-    return b.created_at.getTime() - a.created_at.getTime();
-  });
-  const latest_quizzes_path_info_sorted_limited = latest_quizzes_path_info_sorted.slice(0, 1);
+  // 最新のクイズを取得（queryQuizResultsで取得済みのデータを再利用）
+  // 日付でソートして最新の1件を取得
+  const latest_quizzes_path_info_sorted_limited = [...quizResults]
+    .sort((a, b) => {
+      if (!a.created_at || !b.created_at) return 0;
+      return b.created_at.getTime() - a.created_at.getTime();
+    })
+    .slice(0, 1);
 
   return (
     <div>

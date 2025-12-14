@@ -1,9 +1,34 @@
+import { Suspense } from 'react';
 import QuizDashboard from '@/app/harvor/ui/quiz-dashboard';
 import LearningTracker from '@/app/harvor/ui/learning_tracker';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 
-export default async function Harvor() {
+// QuizDashboardのローディングスケルトン
+function QuizDashboardSkeleton() {
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-col md:flex-row gap-4 pt-2 pb-4">
+        <Skeleton className="h-48 w-48 rounded-full" />
+        <Skeleton className="h-24 w-64" />
+      </div>
+      <Skeleton className="h-6 w-32" />
+      <Skeleton className="h-20 w-full" />
+    </div>
+  );
+}
+
+// LearningTrackerのローディングスケルトン
+function LearningTrackerSkeleton() {
+  return (
+    <div className="p-2 border-2 max-w-[30rem]">
+      <Skeleton className="h-24 w-full" />
+    </div>
+  );
+}
+
+export default function Harvor() {
   return (
     <div className="w-full">
       <h2 className="scroll-m-20 pb-2 text-lg font-bold tracking-tight">
@@ -11,7 +36,9 @@ export default async function Harvor() {
       </h2>
 
       <h3 className="scroll-m-20 pb-2 font-semibold tracking-tight">クイズの進捗状況</h3>
-      <QuizDashboard />
+      <Suspense fallback={<QuizDashboardSkeleton />}>
+        <QuizDashboard />
+      </Suspense>
       
       <div className="mb-6">
         <h3 className="scroll-m-20 pb-2 font-semibold tracking-tight">セルフ問題集</h3>
@@ -25,7 +52,9 @@ export default async function Harvor() {
         </Link>
       </div>
       <h3 className="scroll-m-20 pb-2 font-semibold tracking-tight">学習トラッカー</h3>
-      <LearningTracker />
+      <Suspense fallback={<LearningTrackerSkeleton />}>
+        <LearningTracker />
+      </Suspense>
     </div>
   );
 }
