@@ -29,10 +29,17 @@ COPY --from=builder /app/data ./data
 # kuromoji辞書（形態素解析用）
 COPY --from=builder /app/node_modules/kuromoji/dict ./node_modules/kuromoji/dict
 
-# transformersモデルキャッシュ（存在する場合）
-COPY --from=builder /app/.cache ./.cache
+# transformersモデルキャッシュ（存在する場合のみコピー）
+RUN --mount=from=builder,source=/app/.cache,target=/tmp/.cache-source,rw \
+    if [ -d /tmp/.cache-source ] && [ "$(ls -A /tmp/.cache-source 2>/dev/null)" ]; then \
+        cp -r /tmp/.cache-source ./.cache; \
+    else \
+        mkdir -p ./.cache; \
+    fi
 
-RUN ln -s /tmp/cache ./.next/cache && \
+# .next/cacheが既に存在する場合は削除してからシンボリックリンクを作成
+RUN (rm -rf ./.next/cache 2>/dev/null || true) && \
+    ln -s /tmp/cache ./.next/cache && \
     # transformersキャッシュ用の書き込み可能なディレクトリを作成
     mkdir -p /tmp/cache/transformers && \
     # .cacheディレクトリの権限を設定（読み取り専用として使用、書き込みは/tmp/cache/transformersを使用）

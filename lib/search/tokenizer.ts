@@ -111,18 +111,9 @@ export function createOramaTokenizer() {
       }
 
       // 元のテキストも含める（完全一致検索用）
-      // N-gramも追加してより柔軟な検索を可能に
       const normalized = text.toLowerCase().replace(/\s+/g, ' ').trim();
       if (normalized.length > 0) {
         result.push(normalized);
-        
-        // 2-gramを追加
-        for (let i = 0; i < normalized.length - 1; i++) {
-          const bigram = normalized.slice(i, i + 2);
-          if (bigram.trim().length === 2) {
-            result.push(bigram);
-          }
-        }
       }
 
       return [...new Set(result)];
@@ -130,5 +121,3 @@ export function createOramaTokenizer() {
     language: 'japanese',
   };
 }
-
-

@@ -113,5 +113,3 @@ export function getEmbeddingDimension(): number {
   // multilingual-e5-smallの次元数
   return 384;
 }
-
-

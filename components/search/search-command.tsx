@@ -116,6 +116,8 @@ export function SearchDialog() {
   const [results, setResults] = React.useState<SearchResult[]>([])
   const [isLoading, setIsLoading] = React.useState(false)
   const [hasSearched, setHasSearched] = React.useState(false)
+  // 最新の検索リクエストIDを追跡（abortされたリクエストが状態を更新しないようにするため）
+  const searchRequestIdRef = React.useRef(0)
 
   // 検索のデバウンス（AbortControllerでin-flightリクエストをキャンセル）
   React.useEffect(() => {
@@ -127,14 +129,24 @@ export function SearchDialog() {
     }
 
     const abortController = new AbortController()
+    // このリクエストの一意IDを生成
+    const currentRequestId = ++searchRequestIdRef.current
 
     const timer = setTimeout(async () => {
+      // このリクエストが最新でない場合は何もしない
+      if (currentRequestId !== searchRequestIdRef.current) {
+        return
+      }
       setIsLoading(true)
       try {
         const response = await fetch(
           `/api/search?q=${encodeURIComponent(query)}&type=hybrid&limit=20`,
           { signal: abortController.signal }
         )
+        // リクエストがabortされた場合は結果を更新しない
+        if (currentRequestId !== searchRequestIdRef.current) {
+          return
+        }
         if (response.ok) {
           const data: SearchResponse = await response.json()
           setResults(data.results)
@@ -148,17 +160,18 @@ export function SearchDialog() {
         if (error instanceof Error && error.name === 'AbortError') {
           return
         }
+        // リクエストがabortされた場合は結果を更新しない
+        if (currentRequestId !== searchRequestIdRef.current) {
+          return
+        }
         // ネットワークエラー時も結果をクリア
         setResults([])
         console.error("Search error:", error)
       } finally {
-        // キャンセルされた場合もローディング状態を解除（新しい検索が開始される場合はsetIsLoading(true)が呼ばれる）
-        if (!abortController.signal.aborted) {
+        // このリクエストが最新の場合のみローディング状態を更新
+        if (currentRequestId === searchRequestIdRef.current) {
           setIsLoading(false)
           setHasSearched(true)
-        } else {
-          // 中断された場合もローディング状態を解除
-          setIsLoading(false)
         }
       }
     }, 300) // 300ms デバウンス
@@ -166,8 +179,8 @@ export function SearchDialog() {
     return () => {
       clearTimeout(timer)
       abortController.abort()
-      // クリーンアップ時にローディング状態を解除（タイマーがクリアされた場合）
-      setIsLoading(false)
+      // クリーンアップ時はローディング状態を更新しない
+      // （新しいリクエストが開始されている可能性があるため）
     }
   }, [query])
 

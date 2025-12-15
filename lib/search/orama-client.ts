@@ -131,13 +131,32 @@ function mapHitToResult(hit: any): SearchResult {
 }
 
 /**
+ * 検索結果をタグでフィルタリングする
+ * すべての指定されたタグを含むドキュメントのみを返す
+ */
+function filterByTags(
+  results: SearchResult[],
+  tags: string[]
+): SearchResult[] {
+  if (!tags || tags.length === 0) {
+    return results;
+  }
+
+  return results.filter(result => {
+    const resultTags = Array.isArray(result.tags) ? result.tags : [];
+    // すべての指定されたタグが結果のタグに含まれているかチェック
+    return tags.every(tag => resultTags.includes(tag));
+  });
+}
+
+/**
  * 全文検索を実行
  */
 export async function search(
   query: string,
   options: SearchOptions = {}
 ): Promise<SearchResponse> {
-  const { limit = 20, contentType = 'all', tags } = options;
+  const { limit = 20, contentType = 'all', tags, minScore } = options;
   const db = await getSearchClient();
 
   // フィルター条件を構築
@@ -146,20 +165,41 @@ export async function search(
   if (contentType !== 'all') {
     where.type = contentType;
   }
-  if (tags && tags.length > 0) {
-    where.tags = { containsAll: tags };
-  }
+  // 注意: Oramaのstring[]フィールドではcontainsAllはサポートされていないため、
+  // 検索結果を後処理でフィルタリングする
+
+  // タグフィルタリングを考慮して、より多くの結果を取得
+  const searchLimit = tags && tags.length > 0 ? limit * 3 : limit;
 
   const results = await oramaSearch(db, {
     term: query,
     properties: ['title', 'content', 'tags'],
-    limit,
+    limit: searchLimit,
     where: Object.keys(where).length > 0 ? where : undefined,
   });
 
+  // 検索結果を変換
+  let mappedResults = results.hits.map(mapHitToResult);
+
+  // タグでフィルタリング（後処理）
+  if (tags && tags.length > 0) {
+    mappedResults = filterByTags(mappedResults, tags);
+  }
+
+  // スコアを正規化してminScoreでフィルタリング
+  if (minScore !== undefined && mappedResults.length > 0) {
+    const maxScore = Math.max(...mappedResults.map(r => r.score), 1);
+    mappedResults = mappedResults
+      .map(r => ({ ...r, score: r.score / maxScore }))
+      .filter(r => r.score >= minScore);
+  }
+
+  // limitを適用
+  const finalResults = mappedResults.slice(0, limit);
+
   return {
-    results: results.hits.map(mapHitToResult),
-    total: results.count,
+    results: finalResults,
+    total: mappedResults.length,
   };
 }
 
@@ -170,7 +210,7 @@ export async function vectorSearch(
   query: string,
   options: SearchOptions = {}
 ): Promise<SearchResponse> {
-  const { limit = 20, contentType = 'all', tags } = options;
+  const { limit = 20, contentType = 'all', tags, minScore } = options;
   const db = await getSearchClient();
 
   // クエリのembeddingを生成
@@ -182,9 +222,11 @@ export async function vectorSearch(
   if (contentType !== 'all') {
     where.type = contentType;
   }
-  if (tags && tags.length > 0) {
-    where.tags = { containsAll: tags };
-  }
+  // 注意: Oramaのstring[]フィールドではcontainsAllはサポートされていないため、
+  // 検索結果を後処理でフィルタリングする
+
+  // タグフィルタリングを考慮して、より多くの結果を取得
+  const searchLimit = tags && tags.length > 0 ? limit * 3 : limit;
 
   // Orama v3ではsearchにmodeを指定してベクター検索
   const results = await oramaSearch(db, {
@@ -193,14 +235,33 @@ export async function vectorSearch(
       value: queryEmbedding,
       property: 'embedding',
     },
-    limit,
+    limit: searchLimit,
     where: Object.keys(where).length > 0 ? where : undefined,
     includeVectors: false,
   });
 
+  // 検索結果を変換
+  let mappedResults = results.hits.map(mapHitToResult);
+
+  // タグでフィルタリング（後処理）
+  if (tags && tags.length > 0) {
+    mappedResults = filterByTags(mappedResults, tags);
+  }
+
+  // スコアを正規化してminScoreでフィルタリング
+  if (minScore !== undefined && mappedResults.length > 0) {
+    const maxScore = Math.max(...mappedResults.map(r => r.score), 1);
+    mappedResults = mappedResults
+      .map(r => ({ ...r, score: r.score / maxScore }))
+      .filter(r => r.score >= minScore);
+  }
+
+  // limitを適用
+  const finalResults = mappedResults.slice(0, limit);
+
   return {
-    results: results.hits.map(mapHitToResult),
-    total: results.count,
+    results: finalResults,
+    total: mappedResults.length,
   };
 }
 
@@ -213,10 +274,13 @@ export async function hybridSearch(
 ): Promise<SearchResponse> {
   const { limit = 20 } = options;
 
+  // サブクエリではminScoreを適用しない（マージ後に適用するため）
+  const { minScore: _, ...subOptions } = options;
+
   // 全文検索とベクター検索を並列実行
   const [fulltextResponse, vectorResponse] = await Promise.all([
-    search(query, { ...options, limit: limit * 2 }),
-    vectorSearch(query, { ...options, limit: limit * 2 }),
+    search(query, { ...subOptions, limit: limit * 2 }),
+    vectorSearch(query, { ...subOptions, limit: limit * 2 }),
   ]);
 
   const fulltextResults = fulltextResponse.results;
