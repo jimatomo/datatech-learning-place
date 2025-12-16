@@ -122,6 +122,8 @@ export function SearchDialog() {
   // 検索のデバウンス（AbortControllerでin-flightリクエストをキャンセル）
   React.useEffect(() => {
     if (!query.trim()) {
+      // リクエストIDをインクリメントして、in-flightリクエストのコールバックを無効化
+      searchRequestIdRef.current++
       setResults([])
       setHasSearched(false)
       setIsLoading(false) // クエリが空の場合はローディング状態を解除
