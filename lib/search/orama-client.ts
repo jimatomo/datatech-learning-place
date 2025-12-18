@@ -319,10 +319,13 @@ export async function hybridSearch(
   const sortedResults = Array.from(resultMap.values())
     .sort((a, b) => b.combinedScore - a.combinedScore);
 
-  // combinedScoreをscoreとして返す
+  // combinedScoreを正規化してscoreとして返す
+  // これにより、片方の検索のみで見つかった結果も適切にスコアリングされる
+  // （例：全文検索のみの結果でも最大スコアが1.0になりうる）
+  const maxCombinedScore = Math.max(...sortedResults.map(r => r.combinedScore), 0.001);
   const scoredResults = sortedResults.map(({ combinedScore, ...rest }) => ({
     ...rest,
-    score: combinedScore,
+    score: combinedScore / maxCombinedScore,
   }));
 
   // 最小スコア閾値でフィルタリング（limitの前に適用）
