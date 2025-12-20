@@ -188,7 +188,9 @@ export async function search(
 
   // スコアを正規化してminScoreでフィルタリング
   if (minScore !== undefined && mappedResults.length > 0) {
-    const maxScore = Math.max(...mappedResults.map(r => r.score), 1);
+    // 結果内の最大スコアで正規化（最高スコアが1.0になる）
+    // フォールバックの1は全スコアが0の場合のみ使用（0除算防止）
+    const maxScore = Math.max(...mappedResults.map(r => r.score)) || 1;
     mappedResults = mappedResults
       .map(r => ({ ...r, score: r.score / maxScore }))
       .filter(r => r.score >= minScore);
@@ -250,7 +252,9 @@ export async function vectorSearch(
 
   // スコアを正規化してminScoreでフィルタリング
   if (minScore !== undefined && mappedResults.length > 0) {
-    const maxScore = Math.max(...mappedResults.map(r => r.score), 1);
+    // 結果内の最大スコアで正規化（最高スコアが1.0になる）
+    // フォールバックの1は全スコアが0の場合のみ使用（0除算防止）
+    const maxScore = Math.max(...mappedResults.map(r => r.score)) || 1;
     mappedResults = mappedResults
       .map(r => ({ ...r, score: r.score / maxScore }))
       .filter(r => r.score >= minScore);
@@ -290,7 +294,8 @@ export async function hybridSearch(
   const resultMap = new Map<string, SearchResult & { combinedScore: number }>();
 
   // 全文検索結果を追加（重み: 0.4）
-  const maxFulltextScore = Math.max(...fulltextResults.map(r => r.score), 1);
+  // 結果内の最大スコアで正規化（フォールバックの1は結果が空または全スコア0の場合のみ）
+  const maxFulltextScore = Math.max(...fulltextResults.map(r => r.score)) || 1;
   for (const result of fulltextResults) {
     const normalizedScore = result.score / maxFulltextScore;
     resultMap.set(result.id, {
@@ -300,7 +305,8 @@ export async function hybridSearch(
   }
 
   // ベクター検索結果を追加/マージ（重み: 0.6）
-  const maxVectorScore = Math.max(...vectorResults.map(r => r.score), 1);
+  // 結果内の最大スコアで正規化（フォールバックの1は結果が空または全スコア0の場合のみ）
+  const maxVectorScore = Math.max(...vectorResults.map(r => r.score)) || 1;
   for (const result of vectorResults) {
     const normalizedScore = result.score / maxVectorScore;
     const existing = resultMap.get(result.id);
