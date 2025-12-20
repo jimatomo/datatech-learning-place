@@ -13,7 +13,10 @@ import {
   LogOut,
   ChevronLeft,
   Bell,
+  Search,
 } from "lucide-react"
+
+import { SearchCommand, useSearchDialog } from "@/components/search/search-command"
 
 import {
   Sidebar,
@@ -96,6 +99,7 @@ export function AppSidebar() {
   const pathname = usePathname()
   const { toggleSidebar } = useSidebar()
   const { user, error, isLoading } = useUser();
+  const { handleOpenSearch } = useSearchDialog();
 
   // 画面サイズが小さい時のみサイドバーを閉じる関数
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -137,6 +141,16 @@ export function AppSidebar() {
               </span>
             </Link>
             <ChevronLeft className="w-10 group-data-[collapsible=icon]:hidden cursor-pointer" onClick={() => toggleSidebar()} />
+          </SidebarMenuItem>
+          <SidebarMenuItem className="group-data-[collapsible=icon]:hidden">
+            <SearchCommand />
+          </SidebarMenuItem>
+          <SidebarMenuItem className="hidden group-data-[collapsible=icon]:flex justify-center">
+            <SidebarMenuButton asChild className="w-8 h-8 p-0 mt-4">
+              <button onClick={handleOpenSearch} aria-label="検索を開く">
+                <Search className="h-4 w-4" />
+              </button>
+            </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>

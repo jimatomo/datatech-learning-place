@@ -20,6 +20,7 @@ import { AuthDialog } from "@/components/auth-dialog"
 import ConsentManager from "@/components/ConsentManager"
 import { PWAInstallPrompt } from "@/components/pwa-install-prompt"
 import { NotificationHandler } from "@/components/actions/notification-handler"
+import { SearchDialogProvider, SearchDialog } from "@/components/search/search-command"
 
 export const metadata: Metadata = {
   title: "Datatech Learning Place",
@@ -80,8 +81,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           disableTransitionOnChange
         >
           <NextTopLoader color="#1d4ed8" />
+          <SearchDialogProvider>
           <SidebarProvider defaultOpen={defaultOpen}>
             <AppSidebar />
+            <SearchDialog />
             <div className="flex flex-col min-h-screen w-screen">
               <main className="flex-1">
                 {/* スマホ対応の固定ヘッダー */}
@@ -113,6 +116,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <Footer />
             </div>
           </SidebarProvider>
+          </SearchDialogProvider>
           <PWAInstallPrompt />
           <NotificationHandler />
         </ThemeProvider>
