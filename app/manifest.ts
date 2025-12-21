@@ -11,7 +11,7 @@ export default function manifest(): MetadataRoute.Manifest {
     orientation: 'portrait-primary',
     icons: [
       {
-        src: '/logo_square.png',
+        src: '/icon-square.png',
         sizes: '1120x1120',
         type: 'image/png',
       },
@@ -45,14 +45,14 @@ export default function manifest(): MetadataRoute.Manifest {
         short_name: 'Quiz',
         description: 'データ技術に関するクイズにチャレンジ',
         url: '/quiz',
-        icons: [{ src: '/logo_square.png', sizes: '1120x1120', type: 'image/png' }],
+        icons: [{ src: '/icon-square.png', sizes: '1120x1120', type: 'image/png' }],
       },
       {
         name: 'マイページ',
         short_name: 'My Page',
         description: '学習の進捗を確認',
         url: '/harvor',
-        icons: [{ src: '/logo_square.png', sizes: '1120x1120', type: 'image/png' }],
+        icons: [{ src: '/icon-square.png', sizes: '1120x1120', type: 'image/png' }],
       },
     ],
   }

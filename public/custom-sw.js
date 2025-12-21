@@ -130,8 +130,8 @@ self.addEventListener('push', function(event) {
       
       const options = {
         body: data.body,
-        icon: data.icon || '/logo_square.png',
-        badge: data.badge || '/logo_square.png',
+        icon: data.icon || '/icon-square.png',
+        badge: data.badge || '/icon-square.png',
         data: {
           ...(data.data || {}),
           _notificationHistoryId: notificationHistoryId
@@ -142,7 +142,7 @@ self.addEventListener('push', function(event) {
           {
             action: 'open',
             title: 'クイズを見る',
-            icon: '/logo_square.png'
+            icon: '/icon-square.png'
           },
           {
             action: 'close',
@@ -171,7 +171,7 @@ self.addEventListener('push', function(event) {
             read: false,
             url: data.data?.url,
             quizId: data.data?.quizId,
-            icon: data.icon || '/logo_square.png'
+            icon: data.icon || '/icon-square.png'
           })
         ])
       );
@@ -185,8 +185,8 @@ self.addEventListener('push', function(event) {
         Promise.all([
           self.registration.showNotification('新しいクイズが投稿されました', {
             body: 'DTLP - Datatech Learning Place',
-            icon: '/logo_square.png',
-            badge: '/logo_square.png',
+            icon: '/icon-square.png',
+            badge: '/icon-square.png',
             data: {
               _notificationHistoryId: fallbackNotificationId
             }
@@ -205,7 +205,7 @@ self.addEventListener('push', function(event) {
             body: 'DTLP - Datatech Learning Place',
             timestamp: Date.now(),
             read: false,
-            icon: '/logo_square.png'
+            icon: '/icon-square.png'
           })
         ])
       );

@@ -108,8 +108,8 @@ export async function sendQuizNotification(params: QuizNotificationRequest): Pro
         JSON.stringify({
           title: "クイズにチャレンジしましょう！",
           body: quizTitle,
-          icon: "/logo_square.png",
-          badge: "/logo_square.png",
+          icon: "/icon-square.png",
+          badge: "/icon-square.png",
           data: {
             url: `/quiz/${quizPath}`,
             tags: quizTags,
