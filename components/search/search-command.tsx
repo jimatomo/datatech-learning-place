@@ -120,6 +120,40 @@ export function SearchDialog() {
   const [hasSearched, setHasSearched] = React.useState(false)
   // 最新の検索リクエストIDを追跡（abortされたリクエストが状態を更新しないようにするため）
   const searchRequestIdRef = React.useRef(0)
+  // 検索APIのウォームアップ（セッション中1回だけ）
+  const warmupStatusRef = React.useRef<'idle' | 'in_flight' | 'done'>('idle')
+
+  // ダイアログを開いたタイミングで検索APIをウォームアップ
+  React.useEffect(() => {
+    if (!open) return
+    if (warmupStatusRef.current !== 'idle') return
+
+    warmupStatusRef.current = 'in_flight'
+    const abortController = new AbortController()
+
+    fetch(`/api/search?warmup=1`, { signal: abortController.signal })
+      .then((res) => {
+        if (res.ok) {
+          warmupStatusRef.current = 'done'
+          return
+        }
+        // 失敗時は次回開いたときに再トライできるようにする
+        warmupStatusRef.current = 'idle'
+      })
+      .catch((error) => {
+        // AbortErrorは無視（ダイアログの開閉による正常なキャンセル）
+        if (error instanceof Error && error.name === 'AbortError') {
+          warmupStatusRef.current = 'idle'
+          return
+        }
+        warmupStatusRef.current = 'idle'
+        console.warn('Search warmup failed:', error)
+      })
+
+    return () => {
+      abortController.abort()
+    }
+  }, [open])
 
   // 検索のデバウンス（AbortControllerでin-flightリクエストをキャンセル）
   React.useEffect(() => {

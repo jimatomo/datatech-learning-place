@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { search, vectorSearch, hybridSearch, type SearchOptions, type SearchResponse } from '@/lib/search/orama-client';
+import { getSearchClient, search, vectorSearch, hybridSearch, type SearchOptions, type SearchResponse } from '@/lib/search/orama-client';
 import { auth0 } from '@/lib/auth0';
+import { getEmbeddingPipeline } from '@/lib/search/embedder';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,6 +12,14 @@ type SearchType = typeof VALID_SEARCH_TYPES[number];
 // コンテンツタイプのバリデーション
 const VALID_CONTENT_TYPES = ['quiz', 'text', 'all'] as const;
 type ContentType = typeof VALID_CONTENT_TYPES[number];
+
+// サーバプロセス内のウォーム状態（コールドスタート対策）
+// - 同一サーバインスタンス内で一度ロードできていれば、その後のwarmupは初期化処理をスキップする
+// - サーバレス等でプロセスが変わればリセットされる（その場合は再度warmupが走る）
+let serverWarmState = {
+  searchClient: false,
+  embedding: false,
+};
 
 export async function GET(request: NextRequest) {
   try {
@@ -24,12 +33,55 @@ export async function GET(request: NextRequest) {
     }
 
     const searchParams = request.nextUrl.searchParams;
+    const warmup = searchParams.get('warmup') === '1';
     const query = searchParams.get('q');
     const type = searchParams.get('type') as SearchType | null;
     const contentType = searchParams.get('contentType') as ContentType | null;
     const limitParam = searchParams.get('limit');
     const tagsParam = searchParams.get('tags');
     const minScoreParam = searchParams.get('minScore');
+
+    // ウォームアップ（検索は実行せず、初回コストが高い初期化だけ行う）
+    if (warmup) {
+      // 既にロード済みなら、warmup自体をスキップ（より快適に）
+      if (serverWarmState.searchClient && serverWarmState.embedding) {
+        return NextResponse.json({ ok: true, skipped: true });
+      }
+
+      const tasks: Promise<unknown>[] = [];
+
+      if (!serverWarmState.searchClient) {
+        tasks.push(
+          getSearchClient().then(() => {
+            serverWarmState.searchClient = true;
+          })
+        );
+      }
+
+      if (!serverWarmState.embedding) {
+        tasks.push(
+          getEmbeddingPipeline()
+            .then(() => {
+              serverWarmState.embedding = true;
+            })
+            .catch((error) => {
+              // 失敗しても検索自体は後でリトライできるため握りつぶす
+              console.warn('Embedding warmup failed:', error);
+              return null;
+            })
+        );
+      }
+
+      if (tasks.length > 0) {
+        await Promise.all(tasks);
+      }
+
+      return NextResponse.json({
+        ok: true,
+        skipped: false,
+        warmed: { ...serverWarmState },
+      });
+    }
 
     // クエリパラメータのバリデーション
     if (!query || query.trim().length === 0) {
@@ -62,7 +114,12 @@ export async function GET(request: NextRequest) {
     const limit = Number.isNaN(parsedLimit) ? 20 : Math.min(Math.max(1, parsedLimit), 50);
 
     // タグのパース
-    const tags = tagsParam ? tagsParam.split(',').map(t => t.trim()).filter(t => t.length > 0) : undefined;
+    const tags = tagsParam
+      ? tagsParam
+          .split(',')
+          .map((t: string) => t.trim())
+          .filter((t: string) => t.length > 0)
+      : undefined;
 
     // 最小スコア閾値のバリデーション（デフォルト: 0.5）
     const parsedMinScore = minScoreParam ? parseFloat(minScoreParam) : NaN;
@@ -91,6 +148,13 @@ export async function GET(request: NextRequest) {
       default:
         searchResponse = await hybridSearch(query, options);
         break;
+    }
+
+    // 検索が成功した＝少なくとも検索クライアントはロード済み
+    serverWarmState.searchClient = true;
+    // vector/hybridはembeddingモデルを必ず使うため、成功時点でロード済み扱い
+    if (searchType !== 'fulltext') {
+      serverWarmState.embedding = true;
     }
 
     // レスポンスの整形（contentは長いので短縮）
