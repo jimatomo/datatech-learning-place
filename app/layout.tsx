@@ -63,7 +63,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="ja" suppressHydrationWarning>
       <head>
-        <link rel="apple-touch-icon" href="/icon-192x192.png" />
+        <link rel="apple-touch-icon" href="/logo_square.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Datatech Learning Place" />
