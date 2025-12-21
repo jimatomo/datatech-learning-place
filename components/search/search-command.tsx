@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation"
 import { Search, FileQuestion, BookOpen, Loader2, Tag } from "lucide-react"
 import { useUser } from "@auth0/nextjs-auth0/client"
 
+import { useSidebar } from "@/components/ui/sidebar"
 import {
   CommandDialog,
   CommandEmpty,
@@ -112,6 +113,7 @@ export function SearchDialog() {
   const router = useRouter()
   const pathname = usePathname()
   const { open, setOpen, showLoginDialog, setShowLoginDialog } = useSearchDialog()
+  const { isMobile, setOpenMobile } = useSidebar()
   const [query, setQuery] = React.useState("")
   const [results, setResults] = React.useState<SearchResult[]>([])
   const [isLoading, setIsLoading] = React.useState(false)
@@ -188,6 +190,10 @@ export function SearchDialog() {
 
   // 結果選択時の処理
   const handleSelect = (url: string) => {
+    // モバイルの時は、検索から遷移したタイミングで左ナビ（Sheet）も閉じる
+    if (isMobile) {
+      setOpenMobile(false)
+    }
     setOpen(false)
     setQuery("")
     setResults([])
