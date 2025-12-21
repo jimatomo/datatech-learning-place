@@ -279,7 +279,7 @@ export async function hybridSearch(
   const { limit = 20 } = options;
 
   // サブクエリではminScoreを適用しない（マージ後に適用するため）
-  const { minScore: _, ...subOptions } = options;
+  const { minScore, ...subOptions } = options;
 
   // 全文検索とベクター検索を並列実行
   const [fulltextResponse, vectorResponse] = await Promise.all([
@@ -335,7 +335,6 @@ export async function hybridSearch(
   }));
 
   // 最小スコア閾値でフィルタリング（limitの前に適用）
-  const { minScore } = options;
   const filteredResults = minScore !== undefined
     ? scoredResults.filter(r => r.score >= minScore)
     : scoredResults;

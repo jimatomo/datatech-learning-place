@@ -1,4 +1,3 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { getSearchClient, search, vectorSearch, hybridSearch, type SearchOptions, type SearchResponse } from '@/lib/search/orama-client';
 import { auth0 } from '@/lib/auth0';
 import { getEmbeddingPipeline } from '@/lib/search/embedder';
@@ -16,23 +15,23 @@ type ContentType = typeof VALID_CONTENT_TYPES[number];
 // サーバプロセス内のウォーム状態（コールドスタート対策）
 // - 同一サーバインスタンス内で一度ロードできていれば、その後のwarmupは初期化処理をスキップする
 // - サーバレス等でプロセスが変わればリセットされる（その場合は再度warmupが走る）
-let serverWarmState = {
+const serverWarmState = {
   searchClient: false,
   embedding: false,
 };
 
-export async function GET(request: NextRequest) {
+export async function GET(request: Request) {
   try {
     // 認証チェック
     const session = await auth0.getSession();
     if (!session) {
-      return NextResponse.json(
+      return Response.json(
         { error: '検索機能を利用するにはログインが必要です' },
         { status: 401 }
       );
     }
 
-    const searchParams = request.nextUrl.searchParams;
+    const searchParams = new URL(request.url).searchParams;
     const warmup = searchParams.get('warmup') === '1';
     const query = searchParams.get('q');
     const type = searchParams.get('type') as SearchType | null;
@@ -45,7 +44,7 @@ export async function GET(request: NextRequest) {
     if (warmup) {
       // 既にロード済みなら、warmup自体をスキップ（より快適に）
       if (serverWarmState.searchClient && serverWarmState.embedding) {
-        return NextResponse.json({ ok: true, skipped: true });
+        return Response.json({ ok: true, skipped: true });
       }
 
       const tasks: Promise<unknown>[] = [];
@@ -76,7 +75,7 @@ export async function GET(request: NextRequest) {
         await Promise.all(tasks);
       }
 
-      return NextResponse.json({
+      return Response.json({
         ok: true,
         skipped: false,
         warmed: { ...serverWarmState },
@@ -85,7 +84,7 @@ export async function GET(request: NextRequest) {
 
     // クエリパラメータのバリデーション
     if (!query || query.trim().length === 0) {
-      return NextResponse.json(
+      return Response.json(
         { error: '検索クエリは必須です' },
         { status: 400 }
       );
@@ -93,7 +92,7 @@ export async function GET(request: NextRequest) {
 
     // クエリの長さ制限
     if (query.length > 200) {
-      return NextResponse.json(
+      return Response.json(
         { error: '検索クエリは200文字以内にしてください' },
         { status: 400 }
       );
@@ -171,7 +170,7 @@ export async function GET(request: NextRequest) {
       snippet: result.content.slice(0, 100) + (result.content.length > 100 ? '...' : ''),
     }));
 
-    return NextResponse.json({
+    return Response.json({
       query,
       searchType,
       contentType: validatedContentType,
@@ -181,7 +180,7 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('Search error:', error);
-    return NextResponse.json(
+    return Response.json(
       { error: '検索中にエラーが発生しました' },
       { status: 500 }
     );
