@@ -23,18 +23,20 @@ export default function QuizLikeButton({ quizId }: QuizLikeButtonProps) {
 
   useEffect(() => {
     const fetchInitialData = async () => {
-      if (!userId) return
-      
       try {
-        // いいねステータスの取得
-        const statusResponse = await fetch(`/api/quiz/like?quizId=${quizId}&userId=${userId}`)
-        const statusResult = await statusResponse.json()
-        setLiked(statusResult.Item?.like ?? false)
-
         // いいね数の取得
         const countResponse = await fetch(`/api/quiz/count-like?quizId=${quizId}`)
         const countResult = await countResponse.json()
         setLikeCount(countResult.count)
+
+        // いいねステータスの取得（ログイン時のみ）
+        if (userId) {
+          const statusResponse = await fetch(`/api/quiz/like?quizId=${quizId}`)
+          const statusResult = await statusResponse.json()
+          setLiked(statusResult.Item?.like ?? false)
+        } else {
+          setLiked(false)
+        }
       } catch (error) {
         console.error('データの取得に失敗しました:', error)
       }
@@ -61,7 +63,6 @@ export default function QuizLikeButton({ quizId }: QuizLikeButtonProps) {
         },
         body: JSON.stringify({ 
           quizId, 
-          userId: userId, 
           like: !liked 
         })
       })
