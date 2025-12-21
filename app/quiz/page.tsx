@@ -120,7 +120,7 @@ export default async function QuizList({ searchParams }: Props) {
               <span className="block">DTLP Quiz</span>
             </h1>
             <p className="mx-auto mt-3 sm:mt-4 max-w-xl text-sm sm:text-base opacity-90 px-4 relative z-10">
-              毎日更新されるクイズでデータエンジニアとしての基礎を鍛えましょう
+              クイズを通じてデータエンジニアとしての基礎を鍛えましょう
             </p>
           </div>
         </div>
