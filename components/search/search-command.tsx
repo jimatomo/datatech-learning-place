@@ -233,7 +233,7 @@ export function SearchDialog() {
           value={query}
           onValueChange={setQuery}
         />
-        <CommandList className="max-h-[400px]">
+        <CommandList className="max-h-[calc(100dvh-12rem)] md:max-h-[400px]">
           {isLoading ? (
             <div className="flex items-center justify-center py-6">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />

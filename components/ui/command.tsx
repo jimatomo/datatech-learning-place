@@ -31,7 +31,18 @@ interface CommandDialogProps extends DialogProps {
 const CommandDialog = ({ children, title = "検索", ...props }: CommandDialogProps) => {
   return (
     <Dialog {...props}>
-      <DialogContent className="overflow-hidden p-0 shadow-lg">
+      <DialogContent
+        className={cn(
+          "overflow-hidden p-0 shadow-lg",
+          // モバイルでキーボードに被りにくいように上寄せ表示
+          // - iOSのsafe-areaにも対応
+          // - md以上は従来通り中央寄せ
+          "w-[calc(100%-1rem)] md:w-full",
+          "top-[calc(env(safe-area-inset-top)+0.75rem)] translate-y-0",
+          "md:top-[50%] md:translate-y-[-50%]",
+          "max-h-[calc(100dvh-1.5rem)]"
+        )}
+      >
         <VisuallyHidden.Root>
           <DialogTitle>{title}</DialogTitle>
         </VisuallyHidden.Root>
