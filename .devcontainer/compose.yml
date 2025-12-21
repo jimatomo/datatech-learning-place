@@ -10,6 +10,7 @@ services:
       - ../:/workspace/app:cached
       - ~/.aws/:/home/vscode/.aws:cached
     tty: true
+    stdin_open: true
 
 volumes:
   dtsb-learning-place-dev:

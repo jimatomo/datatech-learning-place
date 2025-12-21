@@ -1,25 +1,15 @@
-# dtsb-learning-place
-web application of learning place for datatech
+# Datatech Learning Place
+
+Web application of learning place for datatech
 
 https://datatech-learning-place.net/
 
-ここはデータエンジニアのための学び舎です。
-今後以下のコンテンツを追加予定です。
-
-- 一日一問出題されるクイズ（完全無料）
-- データアプリケーションを構築しながら学んでいくテキスト（完全無料）
-- 運用費の足しにするのための広告・アフェリエイト（無料ユーザに表示）
-- 学習の進捗を分析するダッシュボード機能（有償予定）
-- 企業・チームで利用しやすくする組織管理機能（有償予定）
-- スポンサー紹介コンテンツ（スポンサーになってもいいよという場合はフッターのお問い合わせページよりお願いします）
-
+ここはデータエンジニアのための学習サイトです。
 
 # コンテンツはOSSで育てていく
 
 - Next.jsのコードをこのリポジトリで公開しています。
-- 何かコンテンツに不備がありましたら、気軽にIssueを作成してください。
-- 実際のコンテンツはcontents/配下に配置していますので、Pull Requestを送る場合はそちらをご覧いただければと思います。
-- ページのレイアウトなどはapp/配下やcomponents/配下に配置しています。
+- 何かコンテンツに不備がありましたら、気軽にIssueもしくはフィードバックフォームでお知らせください。
 
 ※インフラ周りはTerraformで構築されており、プライベートリポジトリで管理しています。
 
@@ -29,8 +19,7 @@ https://datatech-learning-place.net/
 - AWSを利用してデプロイしています。
 - フロントエンドはCloudFront + API Gateway (HTTP) ( + CloudMap ) + ECS on Fargate + S3 で構成されています。
 - バックエンドのデータベースは DynamoDB を利用しています。
-- 将来的にDynamoDBStreamを利用して学習データをS3に送り込んで学習状況の分析ダッシュボードも提供しようと構想しています（まだないです。）
-
+- DynamoDB StreamsとData Firehoseを利用してS3 Tablesへ連携して学習履歴として蓄積しています。
 
 ## 開発者向け情報
 
@@ -54,5 +43,13 @@ aws configure sso
 aws sso login
 
 # local role
-aws sts assume-role --role-arn arn:aws:iam::179217610303:role/prod-dtlp-local-test-role --role-session-name local
+eval "$(aws sts assume-role --role-session-name local \
+  --role-arn arn:aws:iam::account_id:role/prod-dtlp-local-test-role \
+  --query '[Credentials.AccessKeyId, Credentials.SecretAccessKey, Credentials.SessionToken]' \
+  --output text | (
+  read AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SECURITY_TOKEN
+  export AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SECURITY_TOKEN
+  declare -p AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SECURITY_TOKEN))"
+
+aws configure list
 ```
