@@ -32,6 +32,57 @@ async function validateInternalRequest(request: Request): Promise<{ isValid: boo
   return { isValid: true }
 }
 
+/**
+ * warm up処理をバックグラウンドで実行する
+ * エラーはログに記録するが、呼び出し元には影響しない
+ */
+function executeWarmupInBackground(): void {
+  // 既にwarm up済みの場合は何もしない
+  if (isFullyWarmed()) {
+    return
+  }
+
+  // バックグラウンドでwarm up処理を実行（awaitしない）
+  const tasks: Promise<unknown>[] = []
+
+  if (!serverWarmState.searchClient) {
+    tasks.push(
+      getSearchClient()
+        .then(() => {
+          serverWarmState.searchClient = true
+          console.log('Search client warmed up successfully')
+        })
+        .catch((error) => {
+          console.error('Search client warmup failed:', error)
+        })
+    )
+  }
+
+  if (!serverWarmState.embedding) {
+    tasks.push(
+      getEmbeddingPipeline()
+        .then(() => {
+          serverWarmState.embedding = true
+          console.log('Embedding pipeline warmed up successfully')
+        })
+        .catch((error) => {
+          // 失敗しても検索自体は後でリトライできるため握りつぶす
+          console.warn('Embedding warmup failed:', error)
+        })
+    )
+  }
+
+  if (tasks.length > 0) {
+    Promise.all(tasks)
+      .then(() => {
+        console.log('Search warmup completed:', { ...serverWarmState })
+      })
+      .catch((error) => {
+        console.error('Search warmup error:', error)
+      })
+  }
+}
+
 export async function POST(request: Request) {
   try {
     // セキュリティチェック
@@ -48,57 +99,37 @@ export async function POST(request: Request) {
       )
     }
 
-    // 既にwarm up済みの場合はスキップ
+    // 既にwarm up済みの場合は即座にレスポンス
     if (isFullyWarmed()) {
       return NextResponse.json({
         success: true,
         skipped: true,
         warmed: { ...serverWarmState },
+        message: '既にwarm up済みです',
       })
     }
 
-    // warm up処理を実行
-    const tasks: Promise<unknown>[] = []
+    // warm up処理をバックグラウンドで開始（非同期）
+    executeWarmupInBackground()
 
-    if (!serverWarmState.searchClient) {
-      tasks.push(
-        getSearchClient().then(() => {
-          serverWarmState.searchClient = true
-        })
-      )
-    }
-
-    if (!serverWarmState.embedding) {
-      tasks.push(
-        getEmbeddingPipeline()
-          .then(() => {
-            serverWarmState.embedding = true
-          })
-          .catch((error) => {
-            // 失敗しても検索自体は後でリトライできるため握りつぶす
-            console.warn('Embedding warmup failed:', error)
-            return null
-          })
-      )
-    }
-
-    if (tasks.length > 0) {
-      await Promise.all(tasks)
-    }
-
-    return NextResponse.json({
-      success: true,
-      skipped: false,
-      warmed: { ...serverWarmState },
-    })
+    // 即座に202 Acceptedを返す（処理はバックグラウンドで継続）
+    return NextResponse.json(
+      {
+        success: true,
+        skipped: false,
+        message: 'warm up処理を開始しました',
+        warmed: { ...serverWarmState },
+      },
+      { status: 202 } // 202 Accepted: リクエストは受理されたが、処理はまだ完了していない
+    )
     
   } catch (error) {
-    console.error("Search warmup エラー:", error)
+    console.error("Search warmup API エラー:", error)
     
     return NextResponse.json(
       {
         success: false,
-        error: "Search warmup に失敗しました",
+        error: "Search warmup API でエラーが発生しました",
       },
       { status: 500 }
     )
