@@ -1,6 +1,7 @@
 import { getSearchClient, search, vectorSearch, hybridSearch, type SearchOptions, type SearchResponse } from '@/lib/search/orama-client';
 import { auth0 } from '@/lib/auth0';
 import { getEmbeddingPipeline } from '@/lib/search/embedder';
+import { serverWarmState } from '@/lib/search/warm-state';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,14 +12,6 @@ type SearchType = typeof VALID_SEARCH_TYPES[number];
 // コンテンツタイプのバリデーション
 const VALID_CONTENT_TYPES = ['quiz', 'text', 'all'] as const;
 type ContentType = typeof VALID_CONTENT_TYPES[number];
-
-// サーバプロセス内のウォーム状態（コールドスタート対策）
-// - 同一サーバインスタンス内で一度ロードできていれば、その後のwarmupは初期化処理をスキップする
-// - サーバレス等でプロセスが変わればリセットされる（その場合は再度warmupが走る）
-const serverWarmState = {
-  searchClient: false,
-  embedding: false,
-};
 
 export async function GET(request: Request) {
   try {
