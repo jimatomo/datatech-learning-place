@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect, useRef } from "react"
 import { useNotificationManager, NotificationSettings, urlBase64ToUint8Array } from "@/app/notifications/lib/use-notification-manager"
 import { NotificationActionRequest, NotificationActionResponse } from "@/app/notifications/lib/notification-actions"
+import { getUsableServiceWorkerRegistration } from "@/app/notifications/lib/service-worker"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -11,49 +12,6 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Bell, Clock, Tag, AlertCircle, Smartphone, Trash2, ArrowDown } from "lucide-react"
-
-// Service Worker を確実に active まで待つ（ready が返らないケース対策）
-const getServiceWorkerRegistrationWithTimeout = async (timeoutMs = 30000) => {
-  const ensureActive = (registration: ServiceWorkerRegistration) => {
-    if (registration.active) return Promise.resolve(registration)
-    const sw = registration.installing || registration.waiting
-    if (!sw) return Promise.resolve(registration)
-
-    return new Promise<ServiceWorkerRegistration>((resolve) => {
-      const handler = () => {
-        if (sw.state === 'activated') {
-          sw.removeEventListener('statechange', handler)
-          resolve(registration)
-        }
-      }
-      sw.addEventListener('statechange', handler)
-      // 念のため現在の状態も即時チェック
-      if (sw.state === 'activated') {
-        sw.removeEventListener('statechange', handler)
-        resolve(registration)
-      }
-    })
-  }
-
-  return await Promise.race([
-    (async () => {
-      // 既存登録を優先
-      let registration = await navigator.serviceWorker.getRegistration()
-      if (!registration) {
-        // 無ければ明示的に登録を試行（Serwist生成sw.js）
-        registration = await navigator.serviceWorker.register("/sw.js", {
-          scope: "/",
-          updateViaCache: "none",
-        })
-      }
-      // active になるまで待つ
-      return await ensureActive(registration)
-    })(),
-    new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error(`Service Worker の準備がタイムアウトしました (${timeoutMs}ms)`)), timeoutMs)
-    ),
-  ])
-}
 
 // 汎用タイムアウトラッパー
 const withTimeout = async <T,>(promise: Promise<T>, ms: number, label: string) => {
@@ -216,7 +174,7 @@ export function NotificationSettingsClient({
         }
         
         // Service Workerの準備
-        const registration = await getServiceWorkerRegistrationWithTimeout()
+        const registration = await getUsableServiceWorkerRegistration({ timeoutMs: 30000, swUrl: "/sw.js", scope: "/" })
 
         // iOS PWA などで PushManager が隠れている／無効な場合に即座に通知
         if (!registration.pushManager) {

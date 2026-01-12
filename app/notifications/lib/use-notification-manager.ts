@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { getUsableServiceWorkerRegistration } from "@/app/notifications/lib/service-worker"
 
 // グローバルウィンドウオブジェクトの型拡張
 declare global {
@@ -183,7 +184,7 @@ export function useNotificationManager({ initialSettings, updateSettingsOnServer
       }
 
       // Service Worker の準備
-      const registration = await navigator.serviceWorker.ready
+      const registration = await getUsableServiceWorkerRegistration({ timeoutMs: 30000, swUrl: "/sw.js", scope: "/" })
 
       const sub = await registration.pushManager.subscribe({
         userVisibleOnly: true,
@@ -295,7 +296,7 @@ export function useNotificationManager({ initialSettings, updateSettingsOnServer
   const clearBadge = async () => {
     try {
       if ('serviceWorker' in navigator) {
-        const registration = await navigator.serviceWorker.ready
+        const registration = await getUsableServiceWorkerRegistration({ timeoutMs: 30000, swUrl: "/sw.js", scope: "/" })
         if (registration.active) {
           registration.active.postMessage({ action: 'clearBadge' })
           setBadgeCount(0)
@@ -318,7 +319,7 @@ export function useNotificationManager({ initialSettings, updateSettingsOnServer
   const getBadgeCount = async (): Promise<number> => {
     try {
       if ('serviceWorker' in navigator) {
-        const registration = await navigator.serviceWorker.ready
+        const registration = await getUsableServiceWorkerRegistration({ timeoutMs: 30000, swUrl: "/sw.js", scope: "/" })
         if (registration.active) {
           return new Promise((resolve) => {
             const channel = new MessageChannel()

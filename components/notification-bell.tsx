@@ -6,6 +6,7 @@ import { Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+import { getUsableServiceWorkerRegistration } from "@/app/notifications/lib/service-worker"
 
 export function NotificationBell() {
   const [unreadCount, setUnreadCount] = useState(0)
@@ -19,7 +20,7 @@ export function NotificationBell() {
     const getBadgeCount = async (): Promise<number> => {
       try {
         if ('serviceWorker' in navigator) {
-          const registration = await navigator.serviceWorker.ready
+          const registration = await getUsableServiceWorkerRegistration({ timeoutMs: 30000, swUrl: "/sw.js", scope: "/" })
           if (registration.active) {
             return new Promise((resolve) => {
               const channel = new MessageChannel()
@@ -62,7 +63,7 @@ export function NotificationBell() {
     const updateBadgeCount = async () => {
       if ('serviceWorker' in navigator) {
         try {
-          const registration = await navigator.serviceWorker.ready
+          const registration = await getUsableServiceWorkerRegistration({ timeoutMs: 30000, swUrl: "/sw.js", scope: "/" })
           if (registration.active) {
             const channel = new MessageChannel()
             channel.port1.onmessage = (event) => {
