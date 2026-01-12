@@ -83,8 +83,8 @@ export function useNotificationManager({ initialSettings, updateSettingsOnServer
       let registration = existingRegistration
       
       if (!existingRegistration) {
-        // カスタムService Workerを登録
-        registration = await navigator.serviceWorker.register("/custom-sw.js", {
+        // Serwist が生成するメインSW（custom-sw.js を importScripts で取り込んでいる）を登録
+        registration = await navigator.serviceWorker.register("/sw.js", {
           scope: "/",
           updateViaCache: "none",
         })
