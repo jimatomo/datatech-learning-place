@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo, useEffect, useRef } from "react"
-import { useNotificationManager, NotificationSettings } from "@/app/notifications/lib/use-notification-manager"
+import { useNotificationManager, NotificationSettings, urlBase64ToUint8Array } from "@/app/notifications/lib/use-notification-manager"
 import { NotificationActionRequest, NotificationActionResponse } from "@/app/notifications/lib/notification-actions"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
@@ -157,26 +157,11 @@ export function NotificationSettingsClient({
           throw new Error('VAPID公開キーが設定されていません')
         }
 
-        // VAPID公開キーを安全にデコード
-        let applicationServerKey: ArrayBuffer
-        try {
-          // Base64URLからBase64に変換（必要に応じて）
-          const base64Key = vapidPublicKey.replace(/-/g, '+').replace(/_/g, '/')
-          const binaryString = atob(base64Key)
-          const keyBytes = new Uint8Array(binaryString.length)
-          for (let i = 0; i < binaryString.length; i++) {
-            keyBytes[i] = binaryString.charCodeAt(i)
-          }
-          applicationServerKey = keyBytes.buffer
-        } catch (decodeError) {
-          console.error('VAPID公開キーのデコードエラー:', decodeError)
-          throw new Error('VAPID公開キーの形式が正しくありません')
-        }
-
         // 新しい購読を作成
         currentSubscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
-          applicationServerKey,
+          // Safari(iOS)でも失敗しないようパディング付きでデコード
+          applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
         })
         
         // useNotificationManagerの状態も更新

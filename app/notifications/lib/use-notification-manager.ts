@@ -20,6 +20,27 @@ export interface NotificationSettings {
   notificationTime: string // HH:MM format
 }
 
+// Base64URL文字列をUint8Arrayに変換（VAPIDキー用）
+export function urlBase64ToUint8Array(base64String: string) {
+  try {
+    const padding = "=".repeat((4 - (base64String.length % 4)) % 4)
+    const base64 = (base64String + padding)
+      .replace(/-/g, "+")
+      .replace(/_/g, "/")
+
+    const rawData = window.atob(base64)
+    const outputArray = new Uint8Array(rawData.length)
+
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i)
+    }
+    return outputArray
+  } catch (error) {
+    console.error('VAPID公開キーのデコードエラー:', error)
+    throw new Error('VAPID公開キーの形式が正しくありません')
+  }
+}
+
 interface UseNotificationManagerProps {
   initialSettings?: NotificationSettings
   updateSettingsOnServer?: (settings: NotificationSettings & {
@@ -140,27 +161,6 @@ export function useNotificationManager({ initialSettings, updateSettingsOnServer
   // 設定を状態に保存（サーバー同期は各API呼び出しで行う）
   const saveSettings = (newSettings: NotificationSettings) => {
     setSettings(newSettings)
-  }
-
-  // Base64文字列をUint8Arrayに変換
-  function urlBase64ToUint8Array(base64String: string) {
-    try {
-      const padding = "=".repeat((4 - (base64String.length % 4)) % 4)
-      const base64 = (base64String + padding)
-        .replace(/-/g, "+")
-        .replace(/_/g, "/")
-
-      const rawData = window.atob(base64)
-      const outputArray = new Uint8Array(rawData.length)
-
-      for (let i = 0; i < rawData.length; ++i) {
-        outputArray[i] = rawData.charCodeAt(i)
-      }
-      return outputArray
-    } catch (error) {
-      console.error('VAPID公開キーのデコードエラー:', error)
-      throw new Error('VAPID公開キーの形式が正しくありません')
-    }
   }
 
   // 通知の購読
