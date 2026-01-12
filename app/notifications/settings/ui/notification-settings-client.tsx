@@ -12,6 +12,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Bell, Clock, Tag, AlertCircle, Smartphone, Trash2, ArrowDown } from "lucide-react"
 
+// Service Worker ready をタイムアウト付きで取得（iOS PWA でハングするケース対策）
+const getServiceWorkerRegistrationWithTimeout = async (timeoutMs = 7000) => {
+  return await Promise.race([
+    navigator.serviceWorker.ready,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Service Worker ready がタイムアウトしました')), timeoutMs)
+    ),
+  ])
+}
+
+// 汎用タイムアウトラッパー
+const withTimeout = async <T,>(promise: Promise<T>, ms: number, label: string) => {
+  return Promise.race<T>([
+    promise,
+    new Promise<never>((_, reject) => setTimeout(() => reject(new Error(`${label} がタイムアウトしました (${ms}ms)`)), ms)),
+  ])
+}
+
 interface NotificationSettingsClientProps {
   className?: string
   initialSettings: NotificationSettings
@@ -165,7 +183,7 @@ export function NotificationSettingsClient({
         }
         
         // Service Workerの準備
-        const registration = await navigator.serviceWorker.ready
+        const registration = await getServiceWorkerRegistrationWithTimeout()
 
         // iOS PWA などで PushManager が隠れている／無効な場合に即座に通知
         if (!registration.pushManager) {
@@ -182,17 +200,25 @@ export function NotificationSettingsClient({
         }
 
         // 新しい購読を作成
-        currentSubscription = await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          // Safari(iOS)でも失敗しないようパディング付きでデコード
-          applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
-        })
+        currentSubscription = await withTimeout(
+          registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            // Safari(iOS)でも失敗しないようパディング付きでデコード
+            applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+          }),
+          8000,
+          "Push購読作成"
+        )
         
         // useNotificationManagerの状態も更新
         setSubscription(currentSubscription)
       }
       
-      const success = await handleSettingsUpdate(newSettings, action, currentSubscription || undefined)
+      const success = await withTimeout(
+        handleSettingsUpdate(newSettings, action, currentSubscription || undefined),
+        8000,
+        "設定更新"
+      )
       if (!success) {
         setSuccessMessage(null)
         return
