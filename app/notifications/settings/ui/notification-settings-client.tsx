@@ -152,6 +152,11 @@ export function NotificationSettingsClient({
       let currentSubscription = subscription
       if (action === 'subscribe' && !currentSubscription) {
         // 通知許可を要求
+        if (typeof Notification === "undefined") {
+          setError("このブラウザでは通知APIが利用できません")
+          return
+        }
+
         const permission = await Notification.requestPermission()
         if (permission !== "granted") {
           setError("通知の許可が得られませんでした")
@@ -161,6 +166,13 @@ export function NotificationSettingsClient({
         
         // Service Workerの準備
         const registration = await navigator.serviceWorker.ready
+
+        // iOS PWA などで PushManager が隠れている／無効な場合に即座に通知
+        if (!registration.pushManager) {
+          setError("Push API を利用できません。iOSの場合はホーム画面に追加済みか、OSの通知設定を確認してください。")
+          setSuccessMessage(null)
+          return
+        }
         
         // VAPID公開キーの存在チェック
         const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
