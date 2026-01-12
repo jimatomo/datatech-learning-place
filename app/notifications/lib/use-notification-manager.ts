@@ -149,13 +149,37 @@ export function useNotificationManager({ initialSettings, updateSettingsOnServer
   }
 
   useEffect(() => {
-    if ("serviceWorker" in navigator && "PushManager" in window) {
-      setIsSupported(true)
-      // Service Workerの登録を遅延実行してUIブロックを防ぐ
+    const detectSupport = async () => {
+      if (!("serviceWorker" in navigator)) {
+        setIsSupported(false)
+        return
+      }
+
+      // まずはService Workerを登録（既存があれば再利用）
       setTimeout(() => {
         registerServiceWorker()
       }, 0)
+
+      try {
+        const registration = await navigator.serviceWorker.ready
+        // iOS PWA では window.PushManager が無い環境があるため、registration.pushManager を優先確認
+        if (registration?.pushManager) {
+          setIsSupported(true)
+          return
+        }
+      } catch (e) {
+        console.warn('Push対応判定中にエラー:', e)
+      }
+
+      // フォールバック: グローバルにPushManagerが露出しているか確認
+      if ("PushManager" in window) {
+        setIsSupported(true)
+      } else {
+        setIsSupported(false)
+      }
     }
+
+    detectSupport()
   }, []) // 初回マウント時のみ実行
 
   // 設定を状態に保存（サーバー同期は各API呼び出しで行う）
