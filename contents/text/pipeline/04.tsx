@@ -99,35 +99,67 @@ cat dbt_project.yml`}
 
         <CodeBlock
           code={`-- Snowflakeにログインして、以下のSQLを実行
--- サンプルデータベースとスキーマの作成
-CREATE DATABASE IF NOT EXISTS RAW;
-CREATE SCHEMA IF NOT EXISTS RAW.PUBLIC;
+use role dbt_role;
+
+-- スキーマの作成
+CREATE SCHEMA IF NOT EXISTS dbt_tutorial.personal_finance;
 
 -- 銀行取引テーブル
-CREATE OR REPLACE TABLE RAW.PUBLIC.BANK_TRANSACTIONS (
-    "日付" DATE, "摘要" STRING, "摘要内容" STRING, "支払い金額" NUMBER,
-    "預かり金額" NUMBER, "差引残高" NUMBER, "メモ" STRING,
-    "未資金化区分" STRING, "入払区分" STRING
+CREATE OR REPLACE TABLE dbt_tutorial.personal_finance.bank_transactions (
+  "日付" STRING,  -- 後で日付に変換します
+  "摘要" STRING,
+  "摘要内容" STRING,
+  "支払い金額" STRING,  -- 後で数値に変換します
+  "預かり金額" STRING,  -- 後で数値に変換します
+  "差引残高" STRING,  -- 後で数値に変換します
+  "メモ" STRING,
+  "未資金化区分" STRING,
+  "入払区分" STRING
 );
 
 -- クレジットカード決済テーブル
-CREATE OR REPLACE TABLE RAW.PUBLIC.CREDIT_CARD_TRANSACTIONS (
-    "日付" DATE, "利用先" STRING, "利用者" STRING, "支払方法" STRING, "不明1" STRING,
-    "支払月" STRING, "利用金額" NUMBER, "支払総額" NUMBER, "不明2" STRING, "不明3" STRING,
-    "不明4" STRING, "不明5" STRING, "不明6" STRING
+CREATE OR REPLACE TABLE dbt_tutorial.personal_finance.credit_card_transactions (
+  transaction_date STRING,  -- 後で日付に変換します
+  store STRING,
+  card_holder STRING,
+  payment_method STRING,
+  extra_field_1 STRING,
+  billing_month STRING,
+  amount STRING,  -- 後で数値に変換します
+  total_amount STRING,  -- 後で数値に変換します
+  extra_field_2 STRING,
+  extra_field_3 STRING,
+  extra_field_4 STRING,
+  extra_field_5 STRING,
+  extra_field_6 STRING
 );
 
 -- Suica利用履歴テーブル
-CREATE OR REPLACE TABLE RAW.PUBLIC.SUICA_TRANSACTIONS (
-    "日付" STRING, "種別" STRING, "入場駅" STRING, "退場駅" STRING,
-    "残高" NUMBER, "利用額" NUMBER
+CREATE OR REPLACE TABLE dbt_tutorial.personal_finance.suica_transactions (
+  "月" STRING,
+  "日" STRING,
+  "種別1" STRING,
+  "利用駅1" STRING,
+  "種別2" STRING,
+  "利用駅2" STRING,
+  "残高" STRING,  -- 後で数値に変換します
+  "入金・利用額" STRING  -- 後で数値に変換します
 );
 
 -- 家計簿アプリデータテーブル
-CREATE OR REPLACE TABLE RAW.PUBLIC.KAKEIBO_TRANSACTIONS (
-    "日付" DATE, "方法" STRING, "カテゴリ" STRING, "カテゴリの内訳" STRING,
-    "支払元" STRING, "入金先" STRING, "品目" STRING, "メモ" STRING, "お店" STRING,
-    "通貨" STRING, "収入" NUMBER, "支出" NUMBER
+CREATE OR REPLACE TABLE dbt_tutorial.personal_finance.kakeibo_transactions (
+  "日付" STRING,  -- 後で日付に変換します
+  "方法" STRING,
+  "カテゴリ" STRING,
+  "カテゴリの内訳" STRING,
+  "支払元" STRING,
+  "入金先" STRING,
+  "品目" STRING,
+  "メモ" STRING,
+  "お店" STRING,
+  "通貨" STRING,
+  "収入" STRING,  -- 後で数値に変換します
+  "支出" STRING  -- 後で数値に変換します
 );`}
           title="サンプルテーブル作成"
           showLineNumbers={true}
@@ -158,8 +190,8 @@ version: 2
 sources:
   - name: personal_finance
     description: "個人の金融取引に関する生データ"
-    database: RAW
-    schema: PUBLIC
+    database: dbt_tutorial
+    schema: personal_finance
     tables:
       - name: bank_transactions
         description: "銀行の入出金データ"
@@ -188,34 +220,44 @@ EOF`}
 cat > models/staging/personal_finance/stg_bank_transactions.sql << 'EOF'
 select
     "日付" as transaction_date,
-    "摘要" as transaction_category,
-    "摘要内容" as description,
+    "摘要" as description,
+    "摘要内容" as transaction_category,
     "支払い金額" as payment_amount,
     "預かり金額" as deposit_amount,
-    "差引残高" as balance
+    "差引残高" as balance,
+    "未資金化区分" as uncapitalized_flag,
+    "入払区分" as deposit_flag
 from {{ source('personal_finance', 'bank_transactions') }}
 EOF
 
 # クレジットカード決済ステージングモデル
 cat > models/staging/personal_finance/stg_credit_card_transactions.sql << 'EOF'
 select
-    "日付" as transaction_date,
-    "利用先" as store,
-    "支払方法" as payment_method,
-    "利用金額" as amount
+    transaction_date,
+    store,
+    payment_method,
+    amount,
+    total_amount,
+    extra_field_1,
+    extra_field_2,
+    extra_field_3,
+    extra_field_4,
+    extra_field_5,
+    extra_field_6
 from {{ source('personal_finance', 'credit_card_transactions') }}
 EOF
 
 # Suica利用履歴ステージングモデル
 cat > models/staging/personal_finance/stg_suica_transactions.sql << 'EOF'
--- Suicaデータは年に情報が含まれていないため、ここでは2025年と仮定します。
 select
-    to_date('2025/' || "日付", 'YYYY/MM/DD') as transaction_date,
-    "種別" as transaction_type,
-    "入場駅" as entry_station,
-    "退場駅" as exit_station,
+    -- Suicaデータは年に情報が含まれていないため、ここでは2025年と仮定します。
+    to_date('2025/' || "月" || '/' || "日", 'YYYY/MM/DD') as transaction_date,
+    "種別1" as transaction_type,
+    "利用駅1" as entry_station,
+    "種別2" as transaction_type_2,
+    "利用駅2" as transaction_station_2,
     "残高" as balance,
-    "利用額" as amount
+    "入金・利用額" as amount
 from {{ source('personal_finance', 'suica_transactions') }}
 EOF
 
