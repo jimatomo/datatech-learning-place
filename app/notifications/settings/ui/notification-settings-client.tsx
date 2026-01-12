@@ -25,6 +25,15 @@ export function NotificationSettingsClient({
   userId,
   updateSettingsOnServer
 }: NotificationSettingsClientProps) {
+  const toErrorMessage = (err: unknown) => {
+    if (err instanceof Error) return err.message
+    try {
+      return JSON.stringify(err)
+    } catch {
+      return String(err)
+    }
+  }
+
   const {
     isSupported,
     subscription,
@@ -37,6 +46,7 @@ export function NotificationSettingsClient({
   } = useNotificationManager({ initialSettings })
 
   const [isLoading, setIsLoading] = useState(false)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [isGuideVisible, setIsGuideVisible] = useState(false)
   const [isGuideHoverActive, setIsGuideHoverActive] = useState(false)
   const guideEffectInitialized = useRef(false)
@@ -127,6 +137,7 @@ export function NotificationSettingsClient({
   const handleToggle = async (enabled: boolean) => {
     setIsLoading(true)
     setError(null)
+    setSuccessMessage(null)
     
     const newSettings: NotificationSettings = {
       ...settings,
@@ -144,6 +155,7 @@ export function NotificationSettingsClient({
         const permission = await Notification.requestPermission()
         if (permission !== "granted") {
           setError("通知の許可が得られませんでした")
+          setSuccessMessage(null)
           setIsLoading(false)
           return
         }
@@ -154,7 +166,8 @@ export function NotificationSettingsClient({
         // VAPID公開キーの存在チェック
         const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
         if (!vapidPublicKey) {
-          throw new Error('VAPID公開キーが設定されていません')
+          setSuccessMessage(null)
+          throw new Error('VAPID公開キーが設定されていません (NEXT_PUBLIC_VAPID_PUBLIC_KEY)')
         }
 
         // 新しい購読を作成
@@ -168,7 +181,8 @@ export function NotificationSettingsClient({
         setSubscription(currentSubscription)
       } catch (error) {
         console.error('購読作成エラー:', error)
-        setError("通知の購読に失敗しました")
+        setError(`通知の購読に失敗しました: ${toErrorMessage(error)}`)
+        setSuccessMessage(null)
         setIsLoading(false)
         return
       }
@@ -176,10 +190,13 @@ export function NotificationSettingsClient({
     
     const success = await handleSettingsUpdate(newSettings, action, currentSubscription || undefined)
     if (!success) {
+      setSuccessMessage(null)
       setIsLoading(false)
       return
     }
     
+    // 成功時メッセージ
+    setSuccessMessage(enabled ? "プッシュ通知を有効にしました" : "プッシュ通知を無効にしました")
     setIsLoading(false)
   }
 
@@ -417,6 +434,12 @@ export function NotificationSettingsClient({
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        {successMessage && !error && (
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{successMessage}</AlertDescription>
           </Alert>
         )}
 
