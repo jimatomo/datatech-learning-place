@@ -13,7 +13,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Bell, Clock, Tag, AlertCircle, Smartphone, Trash2, ArrowDown } from "lucide-react"
 
 // Service Worker を確実に active まで待つ（ready が返らないケース対策）
-const getServiceWorkerRegistrationWithTimeout = async (timeoutMs = 8000) => {
+const getServiceWorkerRegistrationWithTimeout = async (timeoutMs = 30000) => {
   const ensureActive = (registration: ServiceWorkerRegistration) => {
     if (registration.active) return Promise.resolve(registration)
     const sw = registration.installing || registration.waiting
@@ -50,7 +50,7 @@ const getServiceWorkerRegistrationWithTimeout = async (timeoutMs = 8000) => {
       return await ensureActive(registration)
     })(),
     new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('Service Worker ready がタイムアウトしました')), timeoutMs)
+      setTimeout(() => reject(new Error(`Service Worker の準備がタイムアウトしました (${timeoutMs}ms)`)), timeoutMs)
     ),
   ])
 }
@@ -239,7 +239,7 @@ export function NotificationSettingsClient({
             // Safari(iOS)でも失敗しないようパディング付きでデコード
             applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
           }),
-          8000,
+          20000,
           "Push購読作成"
         )
         

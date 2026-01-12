@@ -6,10 +6,39 @@ declare const self: ServiceWorkerGlobalScope & {
   __SW_MANIFEST: Array<{ url: string; revision?: string | null }>;
 };
 
+/**
+ * iOS Safari(PWA) は Service Worker の install/precache が重いと
+ * activated まで時間がかかり、`navigator.serviceWorker.ready` や
+ * 「SW ready待ち」のUIがタイムアウトしやすい。
+ *
+ * そのため precache 対象は「PWA成立に必要な最小限」に絞り、
+ * それ以外（大量の Next chunk 等）は runtimeCaching に任せる。
+ */
+const PRECACHE_ALLOWLIST: RegExp[] = [
+  // App entry
+  /^\/$/,
+  // Manifest (Next が /manifest.webmanifest として配信)
+  /^\/manifest\.webmanifest$/,
+  // Icons / meta
+  /^\/favicon\.ico$/,
+  /^\/browserconfig\.xml$/,
+  /^\/icon-.*\.png$/,
+  /^\/icon-square\.png$/,
+  /^\/logo\.png$/,
+  // custom push/badge logic
+  /^\/custom-sw\.js$/,
+  // Keep lightweight Next static metadata (optional but helps)
+  /^\/_next\/static\/[^/]+\/_buildManifest\.js$/,
+  /^\/_next\/static\/[^/]+\/_ssgManifest\.js$/,
+  /^\/_next\/static\/css\/.*\.css$/,
+];
+
+const shouldPrecache = (url: string) => PRECACHE_ALLOWLIST.some((re) => re.test(url));
+
 // `public/custom-sw.js` にあるプッシュ通知/バッジ/通知履歴ロジックを引き続き使う
 // （Service Worker は同一 scope に1つしか置けないため、PWAキャッシュSWに統合する）
 const serwist = new Serwist({
-  precacheEntries: self.__SW_MANIFEST,
+  precacheEntries: (self.__SW_MANIFEST || []).filter((entry) => shouldPrecache(entry.url)),
   precacheOptions: {
     // next-pwa の `ignoreURLParametersMatching: []` 相当
     ignoreURLParametersMatching: [],
