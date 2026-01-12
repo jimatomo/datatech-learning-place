@@ -14,7 +14,8 @@ export type ServiceWorkerDiagnostics = {
 }
 
 const getSWState = (sw: ServiceWorker | null | undefined) => sw?.state
-const getScriptURL = (sw: ServiceWorker | null | undefined) => (sw as any)?.scriptURL as string | undefined
+// ServiceWorker#scriptURL は標準プロパティ。Safari向けにも optional chaining で安全に読む
+const getScriptURL = (sw: ServiceWorker | null | undefined) => sw?.scriptURL
 
 export const formatServiceWorkerDiagnostics = (d: ServiceWorkerDiagnostics) => {
   const r = d.registration
@@ -91,9 +92,9 @@ export async function getUsableServiceWorkerRegistration(opts?: {
   // まずは scope を明示して取得（Safariで getRegistration() の挙動差が出ることがあるため）
   let registration: ServiceWorkerRegistration | null = null
   try {
-    registration = await navigator.serviceWorker.getRegistration(scope)
+    registration = (await navigator.serviceWorker.getRegistration(scope)) ?? null
   } catch {
-    registration = await navigator.serviceWorker.getRegistration()
+    registration = (await navigator.serviceWorker.getRegistration()) ?? null
   }
 
   // 無ければ明示的に登録
@@ -147,7 +148,7 @@ export async function getUsableServiceWorkerRegistration(opts?: {
       if (registration?.active) return registration
       await sleep(200)
       // registration オブジェクトが古い可能性があるので取り直し
-      registration = await navigator.serviceWorker.getRegistration(scope)
+      registration = (await navigator.serviceWorker.getRegistration(scope)) ?? null
     }
     await throwTimeout(registration)
     // unreachable
