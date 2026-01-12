@@ -138,25 +138,24 @@ export function NotificationSettingsClient({
     setIsLoading(true)
     setError(null)
     setSuccessMessage(null)
-    
-    const newSettings: NotificationSettings = {
-      ...settings,
-      enabled
-    }
-    
-    // 通知設定が無い状態で初回に通知を有効にする場合は、subscribeアクションを使用
-    const action = enabled && (!settings.enabled && settings.selectedTags.length === 0) ? 'subscribe' : 'update'
-    
-    // subscribeアクションの場合は、現在のsubscriptionまたは新しく作成する
-    let currentSubscription = subscription
-    if (action === 'subscribe' && !currentSubscription) {
-      try {
+
+    try {
+      const newSettings: NotificationSettings = {
+        ...settings,
+        enabled
+      }
+      
+      // 通知設定が無い状態で初回に通知を有効にする場合は、subscribeアクションを使用
+      const action = enabled && (!settings.enabled && settings.selectedTags.length === 0) ? 'subscribe' : 'update'
+      
+      // subscribeアクションの場合は、現在のsubscriptionまたは新しく作成する
+      let currentSubscription = subscription
+      if (action === 'subscribe' && !currentSubscription) {
         // 通知許可を要求
         const permission = await Notification.requestPermission()
         if (permission !== "granted") {
           setError("通知の許可が得られませんでした")
           setSuccessMessage(null)
-          setIsLoading(false)
           return
         }
         
@@ -179,25 +178,24 @@ export function NotificationSettingsClient({
         
         // useNotificationManagerの状態も更新
         setSubscription(currentSubscription)
-      } catch (error) {
-        console.error('購読作成エラー:', error)
-        setError(`通知の購読に失敗しました: ${toErrorMessage(error)}`)
+      }
+      
+      const success = await handleSettingsUpdate(newSettings, action, currentSubscription || undefined)
+      if (!success) {
         setSuccessMessage(null)
-        setIsLoading(false)
         return
       }
-    }
-    
-    const success = await handleSettingsUpdate(newSettings, action, currentSubscription || undefined)
-    if (!success) {
+      
+      // 成功時メッセージ
+      setSuccessMessage(enabled ? "プッシュ通知を有効にしました" : "プッシュ通知を無効にしました")
+    } catch (error) {
+      console.error('通知設定切り替えエラー:', error)
+      setError(`通知設定の切り替えに失敗しました: ${toErrorMessage(error)}`)
       setSuccessMessage(null)
+    } finally {
+      // どこで失敗してもUI操作を再開できるようにする
       setIsLoading(false)
-      return
     }
-    
-    // 成功時メッセージ
-    setSuccessMessage(enabled ? "プッシュ通知を有効にしました" : "プッシュ通知を無効にしました")
-    setIsLoading(false)
   }
 
   const handleTagToggle = async (tag: string, checked: boolean) => {
