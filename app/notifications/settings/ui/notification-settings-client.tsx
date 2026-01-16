@@ -230,19 +230,42 @@ export function NotificationSettingsClient({
           throw new Error('VAPID公開キーが設定されていません (NEXT_PUBLIC_VAPID_PUBLIC_KEY)')
         }
 
-        // 新しい購読を作成
-        currentSubscription = await withTimeout(
-          registration.pushManager.subscribe({
-            userVisibleOnly: true,
-            // Safari(iOS)でも失敗しないようパディング付きでデコード
-            applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
-          }),
-          20000,
-          "Push購読作成"
-        )
-        
-        // useNotificationManagerの状態も更新
-        setSubscription(currentSubscription)
+        // Safari PWA では既存の購読がある場合、再度 subscribe() を呼ぶと
+        // ハングすることがあるため、先に既存の購読を確認する
+        try {
+          const existingSubscription = await withTimeout(
+            registration.pushManager.getSubscription(),
+            5000,
+            "既存購読確認"
+          )
+          if (existingSubscription) {
+            console.log("既存のPush購読を再利用します")
+            currentSubscription = existingSubscription
+            setSubscription(currentSubscription)
+          }
+        } catch (e) {
+          // 既存購読の確認に失敗した場合はログを出力して続行
+          console.warn("既存購読の確認に失敗しました:", e)
+        }
+
+        // 既存の購読がない場合のみ新規作成
+        if (!currentSubscription) {
+          // 新しい購読を作成
+          // Safari PWA では subscribe() が長時間ブロックする可能性があるため、
+          // タイムアウトを15秒に設定（従来は20秒）
+          currentSubscription = await withTimeout(
+            registration.pushManager.subscribe({
+              userVisibleOnly: true,
+              // Safari(iOS)でも失敗しないようパディング付きでデコード
+              applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+            }),
+            15000,
+            "Push購読作成"
+          )
+          
+          // useNotificationManagerの状態も更新
+          setSubscription(currentSubscription)
+        }
       }
       
       const success = await withTimeout(

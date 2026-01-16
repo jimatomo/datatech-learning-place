@@ -168,6 +168,16 @@ export function useNotificationManager({ initialSettings, updateSettingsOnServer
     setSettings(newSettings)
   }
 
+  // タイムアウト付きPromiseラッパー
+  const withTimeout = <T,>(promise: Promise<T>, ms: number, label: string): Promise<T> => {
+    return Promise.race([
+      promise,
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error(`${label} がタイムアウトしました (${ms}ms)`)), ms)
+      ),
+    ])
+  }
+
   // 通知の購読
   const subscribeToPush = async () => {
     try {
@@ -186,10 +196,30 @@ export function useNotificationManager({ initialSettings, updateSettingsOnServer
       // Service Worker の準備
       const registration = await getUsableServiceWorkerRegistration({ timeoutMs: 30000, swUrl: "/sw.js", scope: "/" })
 
-      const sub = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
-      })
+      // Safari PWA では既存の購読がある場合、再度 subscribe() を呼ぶとハングすることがあるため、
+      // 先に既存の購読を確認する
+      let sub: PushSubscription | null = null
+      try {
+        sub = await withTimeout(
+          registration.pushManager.getSubscription(),
+          5000,
+          "既存購読確認"
+        )
+      } catch (e) {
+        console.warn("既存購読の確認に失敗しました:", e)
+      }
+
+      // 既存の購読がない場合のみ新規作成
+      if (!sub) {
+        sub = await withTimeout(
+          registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+          }),
+          15000,
+          "Push購読作成"
+        )
+      }
       setSubscription(sub)
 
       // サーバーサイドでの処理に統一するため、ここでは状態のみ更新
