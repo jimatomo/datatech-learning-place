@@ -11,30 +11,9 @@ declare const self: ServiceWorkerGlobalScope & {
  * activated まで時間がかかり、`navigator.serviceWorker.ready` や
  * 「SW ready待ち」のUIがタイムアウトしやすい。
  *
- * そのため precache 対象は「PWA成立に必要な最小限」に絞り、
- * それ以外（大量の Next chunk 等）は runtimeCaching に任せる。
- *
- * また、Safari PWA では importScripts がブロックして installing 状態のまま
- * 進まないことがあるため、push通知ロジックは直接このファイルに記述する。
+ * Safari PWA での push 通知登録を確実に動作させるため、
+ * precache は完全に無効化し、runtimeCaching のみを使用する。
  */
-const PRECACHE_ALLOWLIST: RegExp[] = [
-  // App entry
-  /^\/$/,
-  // Manifest (Next が /manifest.webmanifest として配信)
-  /^\/manifest\.webmanifest$/,
-  // Icons / meta
-  /^\/favicon\.ico$/,
-  /^\/browserconfig\.xml$/,
-  /^\/icon-.*\.png$/,
-  /^\/icon-square\.png$/,
-  /^\/logo\.png$/,
-  // Keep lightweight Next static metadata (optional but helps)
-  /^\/_next\/static\/[^/]+\/_buildManifest\.js$/,
-  /^\/_next\/static\/[^/]+\/_ssgManifest\.js$/,
-  /^\/_next\/static\/css\/.*\.css$/,
-];
-
-const shouldPrecache = (url: string) => PRECACHE_ALLOWLIST.some((re) => re.test(url));
 
 // ============================================
 // Push通知/バッジ/通知履歴ロジック
@@ -436,16 +415,14 @@ self.addEventListener('message', function(event: ExtendableMessageEvent) {
 // ============================================
 
 const serwist = new Serwist({
-  precacheEntries: (self.__SW_MANIFEST || []).filter((entry) => shouldPrecache(entry.url)),
+  // Safari PWA での問題を回避するため、precache を完全に無効化
+  // precache があると install イベントが長時間かかり、active にならないことがある
+  precacheEntries: [],
   precacheOptions: {
-    // next-pwa の `ignoreURLParametersMatching: []` 相当
-    ignoreURLParametersMatching: [],
     cleanupOutdatedCaches: true,
   },
   skipWaiting: true,
   clientsClaim: true,
-  // Safari PWA では importScripts がブロックすることがあるため、
-  // push通知ロジックは上記に直接記述
   runtimeCaching: [
     {
       matcher: "/",

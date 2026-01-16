@@ -28,14 +28,26 @@ const isStandalonePwa = () => {
   return Boolean(isStandaloneDisplay || iOSStandalone)
 }
 
-const requestNotificationPermission = async () => {
+const requestNotificationPermission = async (): Promise<{ permission: NotificationPermission; message?: string }> => {
   if (typeof Notification === "undefined") {
     throw new Error("このブラウザでは通知APIが利用できません")
   }
 
-  if (Notification.permission === "granted") return "granted"
-  if (Notification.permission === "denied") return "denied"
+  const currentPermission = Notification.permission
+  console.log("現在の通知許可状態:", currentPermission)
 
+  if (currentPermission === "granted") {
+    return { permission: "granted" }
+  }
+  
+  if (currentPermission === "denied") {
+    return { 
+      permission: "denied",
+      message: "通知が拒否されています。iOSの場合: 設定アプリ → 通知 → このアプリ で許可を有効にしてください。"
+    }
+  }
+
+  // permission === "default" の場合、許可をリクエスト
   const permissionPromise = new Promise<NotificationPermission>((resolve, reject) => {
     try {
       const requestFn = Notification.requestPermission as unknown as (
@@ -51,11 +63,13 @@ const requestNotificationPermission = async () => {
   })
 
   try {
-    return await withTimeout(permissionPromise, 10000, "通知許可")
+    const result = await withTimeout(permissionPromise, 10000, "通知許可")
+    console.log("通知許可リクエスト結果:", result)
+    return { permission: result }
   } catch (error) {
     if (error instanceof Error && error.message.includes("タイムアウト")) {
       const standaloneHint = isStandalonePwa()
-        ? ""
+        ? "通知許可ダイアログが表示されませんでした。iOSの設定アプリでこのアプリの通知を確認してください。"
         : "通知許可はアプリとしてインストールした状態でのみ有効です。ホーム画面/ドックに追加してから再度お試しください。"
       throw new Error(`通知許可のリクエストが応答しませんでした。${standaloneHint}`)
     }
@@ -203,12 +217,17 @@ export function NotificationSettingsClient({
       let currentSubscription = subscription
       if (action === 'subscribe' && !currentSubscription) {
         // 通知許可を要求
-        const permission = await requestNotificationPermission()
-        if (permission !== "granted") {
-          const standaloneHint = isStandalonePwa()
-            ? "通知が拒否されている場合は、OS/ブラウザの通知設定で許可を有効にしてください。"
-            : "通知許可はアプリとしてインストールした状態でのみ有効です。ホーム画面/ドックに追加してから再度お試しください。"
-          setError(`通知の許可が得られませんでした。${standaloneHint}`)
+        const permissionResult = await requestNotificationPermission()
+        if (permissionResult.permission !== "granted") {
+          // denied の場合は詳細なメッセージを表示
+          if (permissionResult.message) {
+            setError(permissionResult.message)
+          } else {
+            const standaloneHint = isStandalonePwa()
+              ? "通知が拒否されている場合は、OS/ブラウザの通知設定で許可を有効にしてください。"
+              : "通知許可はアプリとしてインストールした状態でのみ有効です。ホーム画面/ドックに追加してから再度お試しください。"
+            setError(`通知の許可が得られませんでした。${standaloneHint}`)
+          }
           setSuccessMessage(null)
           return
         }

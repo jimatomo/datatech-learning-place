@@ -125,42 +125,10 @@ export async function getUsableServiceWorkerRegistration(opts?: {
     }
   }
 
-  // Safari PWA では active を待たずに pushManager が使えるケースがある。
-  // まず registration に pushManager があるか確認し、あればすぐに返す。
-  // これにより、Service Worker のインストールが完了しなくても通知登録が可能になる。
-  if (registration.pushManager) {
-    // active がある場合は即座に返す
-    if (registration.active) {
-      console.log("Service Worker is active, returning registration")
-      return registration
-    }
-    
-    // active がない場合でも、短時間（最大10秒）だけ待ってみる
-    // Safari PWA では installing のまま進まないことがあるため、
-    // 長時間待たずに registration を返す
-    const quickWaitDeadline = Math.min(start + 10000, deadline)
-    
-    while (Date.now() < quickWaitDeadline) {
-      // registration オブジェクトが古い可能性があるので毎回取り直し
-      registration = (await navigator.serviceWorker.getRegistration(scope)) ?? null
-      if (registration?.active) {
-        console.log("Service Worker became active")
-        return registration
-      }
-      await sleep(500)
-    }
-    
-    // 10秒待っても active にならない場合、installing/waiting 状態でも
-    // pushManager があれば registration を返す
-    // Safari PWA では installing 状態でも pushManager.subscribe() が動作することがある
-    if (registration?.pushManager) {
-      console.warn(
-        "Service Worker is not active yet, but pushManager is available. " +
-        "Attempting to use registration in current state:",
-        buildDiagnostics(registration)
-      )
-      return registration
-    }
+  // active がある場合は即座に返す
+  if (registration.active) {
+    console.log("Service Worker is active, returning registration")
+    return registration
   }
 
   // pushManager がない場合は、従来通り active を待つ
@@ -219,17 +187,10 @@ export async function getUsableServiceWorkerRegistration(opts?: {
       await sleep(200)
     }
     
-    // タイムアウトしたが、registration があれば最後の手段として返す
-    if (registration) {
-      console.warn(
-        "Service Worker の準備がタイムアウトしましたが、registration を返します:",
-        buildDiagnostics(registration)
-      )
-      return registration
-    }
-    
+    // タイムアウト時のエラーメッセージを構築
     const diag = formatServiceWorkerDiagnostics(buildDiagnostics(registration))
-    throw new Error(`Service Worker の準備がタイムアウトしました (${timeoutMs}ms)\n${diag}`)
+    const hint = "Safari PWA の場合: 設定アプリ → Safari → 詳細 → Webサイトデータ から該当サイトのデータを削除し、PWAを再インストールしてください。"
+    throw new Error(`Service Worker の準備がタイムアウトしました (${timeoutMs}ms)\n${hint}\n${diag}`)
   }
 
   // update を試みる（Safariで古いSWが残るケースの回避）
