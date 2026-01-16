@@ -79,8 +79,11 @@ const withTimeout = <T>(promise: Promise<T>, ms: number, label: string): Promise
  * - SW更新が失敗すると installing が `redundant` になり、activated を待つだけだと永久待ちになる。
  * - Safari PWA では statechange イベントが発火しないケースがあるため、
  *   statechange 待機にもタイムアウトを設定し、ポーリングにフォールバックする。
+ * - Safari PWA では Service Worker のインストールが完了しない（installing のまま）ケースがあるため、
+ *   一定時間待っても active にならない場合は、installing/waiting 状態の registration でも
+ *   PushManager が利用可能なら返す。
  *
- * この関数は "PushManager を使える Registration（active もしくは activated まで到達）" を返す。
+ * この関数は "PushManager を使える Registration" を返す。
  */
 export async function getUsableServiceWorkerRegistration(opts?: {
   timeoutMs?: number
@@ -99,11 +102,6 @@ export async function getUsableServiceWorkerRegistration(opts?: {
   const deadline = start + timeoutMs
 
   const getRemainingTime = () => Math.max(0, deadline - Date.now())
-
-  const throwTimeout = async (registration?: ServiceWorkerRegistration | null) => {
-    const diag = formatServiceWorkerDiagnostics(buildDiagnostics(registration))
-    throw new Error(`Service Worker の準備がタイムアウトしました (${timeoutMs}ms)\n${diag}`)
-  }
 
   // まずは scope を明示して取得（Safariで getRegistration() の挙動差が出ることがあるため）
   let registration: ServiceWorkerRegistration | null = null
@@ -127,10 +125,47 @@ export async function getUsableServiceWorkerRegistration(opts?: {
     }
   }
 
-  // ここから「使える（activeがいる）か」をポーリング＋イベントで待つ
-  // Safariでは controller が付くのを待つとハングするので、active を優先して返す。
+  // Safari PWA では active を待たずに pushManager が使えるケースがある。
+  // まず registration に pushManager があるか確認し、あればすぐに返す。
+  // これにより、Service Worker のインストールが完了しなくても通知登録が可能になる。
+  if (registration.pushManager) {
+    // active がある場合は即座に返す
+    if (registration.active) {
+      console.log("Service Worker is active, returning registration")
+      return registration
+    }
+    
+    // active がない場合でも、短時間（最大10秒）だけ待ってみる
+    // Safari PWA では installing のまま進まないことがあるため、
+    // 長時間待たずに registration を返す
+    const quickWaitDeadline = Math.min(start + 10000, deadline)
+    
+    while (Date.now() < quickWaitDeadline) {
+      // registration オブジェクトが古い可能性があるので毎回取り直し
+      registration = (await navigator.serviceWorker.getRegistration(scope)) ?? null
+      if (registration?.active) {
+        console.log("Service Worker became active")
+        return registration
+      }
+      await sleep(500)
+    }
+    
+    // 10秒待っても active にならない場合、installing/waiting 状態でも
+    // pushManager があれば registration を返す
+    // Safari PWA では installing 状態でも pushManager.subscribe() が動作することがある
+    if (registration?.pushManager) {
+      console.warn(
+        "Service Worker is not active yet, but pushManager is available. " +
+        "Attempting to use registration in current state:",
+        buildDiagnostics(registration)
+      )
+      return registration
+    }
+  }
+
+  // pushManager がない場合は、従来通り active を待つ
   const ensureActiveOrActivated = async () => {
-    // 既に active があればそれでOK（PushManager利用は controller 必須ではない）
+    // 既に active があればそれでOK
     if (registration?.active) return registration
 
     // installing/waiting があれば statechange を監視
@@ -177,30 +212,39 @@ export async function getUsableServiceWorkerRegistration(opts?: {
     }
 
     // active が付くまでポーリングで待つ
-    // Safari PWA では statechange イベントが発火しないことがあるため、
-    // ポーリングが主な手段となる
     while (Date.now() < deadline) {
       // registration オブジェクトが古い可能性があるので毎回取り直し
       registration = (await navigator.serviceWorker.getRegistration(scope)) ?? null
       if (registration?.active) return registration
       await sleep(200)
     }
-    await throwTimeout(registration)
-    // unreachable
-    return registration!
+    
+    // タイムアウトしたが、registration があれば最後の手段として返す
+    if (registration) {
+      console.warn(
+        "Service Worker の準備がタイムアウトしましたが、registration を返します:",
+        buildDiagnostics(registration)
+      )
+      return registration
+    }
+    
+    const diag = formatServiceWorkerDiagnostics(buildDiagnostics(registration))
+    throw new Error(`Service Worker の準備がタイムアウトしました (${timeoutMs}ms)\n${diag}`)
   }
 
   // update を試みる（Safariで古いSWが残るケースの回避）
   // ただし Safari PWA では update() が長時間ブロックすることがあるため、
   // 短いタイムアウトを設定する
-  try {
-    await withTimeout(
-      registration.update(),
-      Math.min(3000, getRemainingTime()),
-      "Service Worker update"
-    )
-  } catch {
-    // update未対応/失敗/タイムアウトは致命ではないので無視
+  if (registration) {
+    try {
+      await withTimeout(
+        registration.update(),
+        Math.min(3000, getRemainingTime()),
+        "Service Worker update"
+      )
+    } catch {
+      // update未対応/失敗/タイムアウトは致命ではないので無視
+    }
   }
 
   try {

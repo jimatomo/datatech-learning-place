@@ -84,7 +84,7 @@ export function useNotificationManager({ initialSettings, updateSettingsOnServer
       let registration = existingRegistration
       
       if (!existingRegistration) {
-        // Serwist が生成するメインSW（custom-sw.js を importScripts で取り込んでいる）を登録
+        // Serwist が生成するメインSW（push通知ロジックを直接統合）を登録
         registration = await navigator.serviceWorker.register("/sw.js", {
           scope: "/",
           updateViaCache: "none",
