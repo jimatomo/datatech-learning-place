@@ -12,8 +12,17 @@ declare const self: ServiceWorkerGlobalScope & {
  * 「SW ready待ち」のUIがタイムアウトしやすい。
  *
  * Safari PWA での push 通知登録を確実に動作させるため、
- * precache は完全に無効化し、runtimeCaching のみを使用する。
+ * precache は最小限（manifestのみ）に絞り、runtimeCaching に任せる。
  */
+
+// precache は manifest.webmanifest のみに限定（Safari PWA対策）
+// すべてのエントリを除外して、install イベントを最速で完了させる
+const PRECACHE_ALLOWLIST: RegExp[] = [
+  // manifest のみ（PWA認識に必要）
+  /^\/manifest\.webmanifest$/,
+];
+
+const shouldPrecache = (url: string) => PRECACHE_ALLOWLIST.some((re) => re.test(url));
 
 // ============================================
 // Push通知/バッジ/通知履歴ロジック
@@ -415,10 +424,11 @@ self.addEventListener('message', function(event: ExtendableMessageEvent) {
 // ============================================
 
 const serwist = new Serwist({
-  // Safari PWA での問題を回避するため、precache を完全に無効化
-  // precache があると install イベントが長時間かかり、active にならないことがある
-  precacheEntries: [],
+  // Safari PWA での問題を回避するため、precache は最小限に
+  // manifest.webmanifest のみをprecacheして、install イベントを高速化
+  precacheEntries: (self.__SW_MANIFEST || []).filter((entry) => shouldPrecache(entry.url)),
   precacheOptions: {
+    ignoreURLParametersMatching: [],
     cleanupOutdatedCaches: true,
   },
   skipWaiting: true,
