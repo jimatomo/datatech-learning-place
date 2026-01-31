@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build:search-index": "tsx scripts/build-search-index.ts",
-    "build": "npm run build:search-index && next build",
+    "build": "npm run build:search-index && next build --webpack",
     "start": "next start",
     "lint": "next lint"
   },
@@ -15,7 +15,7 @@
     "@aws-sdk/client-dynamodb": "^3.726.1",
     "@aws-sdk/lib-dynamodb": "^3.726.1",
     "@aws-sdk/util-dynamodb": "^3.726.1",
-    "@next/third-parties": "15.5.9",
+    "@next/third-parties": "^16.1.0",
     "@orama/orama": "^3.0.0",
     "@radix-ui/react-accordion": "^1.2.2",
     "@radix-ui/react-avatar": "^1.1.2",
@@ -42,7 +42,7 @@
     "cmdk": "^1.1.1",
     "kuromoji": "^0.1.2",
     "lucide-react": "^0.469.0",
-    "next": "15.5.9",
+    "next": "^16.1.6",
     "next-themes": "^0.4.4",
     "nextjs-toploader": "^3.7.15",
     "node-cron": "^4.2.1",
@@ -58,6 +58,7 @@
   "overrides": {
     "glob@>=10.2.0 <10.5.0": "10.5.0",
     "glob@>=11.0.0 <11.1.0": "11.1.0",
+    "fast-xml-parser": ">=5.3.4",
     "@serwist/build": {
       "source-map": "0.7.6"
     }

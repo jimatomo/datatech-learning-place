@@ -5,6 +5,8 @@ import withSerwist from "@serwist/next";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
+  // Serwist が webpack 設定を注入するため、Turbopack 利用時は空設定でエラーを解消
+  turbopack: {},
   env: {
     // Auth0 SDK v4 (client) が参照するルートを、このアプリの /api/auth/* に合わせる
     NEXT_PUBLIC_PROFILE_ROUTE: '/api/auth/profile',
