@@ -19,6 +19,8 @@ const nextConfig = {
         hostname: 'datatech-learning-place.net',
       },
     ],
+    // CloudFrontがクエリ文字列を扱えない構成のため最適化を無効化
+    unoptimized: true,
   },
   // Server Actionsのセキュリティ設定
   experimental: {
