@@ -218,16 +218,72 @@ EOF`}
         <CodeBlock
           code={`# 銀行取引ステージングモデル
 cat > models/staging/personal_finance/stg_bank_transactions.sql << 'EOF'
-select
-    "日付" as transaction_date,
-    "摘要" as description,
-    "摘要内容" as transaction_category,
-    "支払い金額" as payment_amount,
-    "預かり金額" as deposit_amount,
-    "差引残高" as balance,
-    "未資金化区分" as uncapitalized_flag,
-    "入払区分" as deposit_flag
-from {{ source('personal_finance', 'bank_transactions') }}
+{{
+    config(
+        materialized='table'
+    )
+}}
+
+with
+
+-- カラム名を標準化
+_rename_cols as (
+    select
+        "日付" as transaction_date,
+        "摘要" as description,
+        "摘要内容" as transaction_category,
+        "支払い金額" as payment_amount,
+        "預かり金額" as deposit_amount,
+        "差引残高" as balance,
+        "未資金化区分" as uncapitalized_flag,
+        "入払区分" as deposit_flag
+    from {{ source('personal_finance', 'bank_transactions') }}
+),
+
+-- 空文字をnullに置き換える
+_null_if as (
+    select
+        transaction_date,
+        description,
+        nullif(transaction_category, '') as transaction_category,
+        nullif(payment_amount, '') as payment_amount,
+        nullif(deposit_amount, '') as deposit_amount,
+        balance as balance,
+        nullif(uncapitalized_flag, '') as uncapitalized_flag,
+        deposit_flag as deposit_flag
+    from _rename_cols
+),
+
+-- データ型を整える
+_transform_data_type as (
+    select
+        to_date(transaction_date, 'YYYY/MM/DD') as transaction_date,
+        description,
+        transaction_category,
+        to_number(payment_amount, '999,999,999,999') as payment_amount,
+        to_number(deposit_amount, '999,999,999,999') as deposit_amount,
+        to_number(balance, '999,999,999,999') as balance,
+        uncapitalized_flag,
+        deposit_flag
+    from _null_if
+),
+
+-- 最終調整
+final as (
+    select
+        transaction_date,
+        description,
+        transaction_category,
+        payment_amount,
+        deposit_amount,
+        balance,
+        uncapitalized_flag,
+        deposit_flag
+    from _transform_data_type
+    order by 1
+)
+
+select * from final
 EOF
 
 # クレジットカード決済ステージングモデル
@@ -319,7 +375,9 @@ suica as (
         case
             when transaction_type = '物販' then '物販'
             when transaction_type = 'ﾊﾞｽ等' then 'バス等利用'
-            when entry_station is not null then entry_station || ' -> ' || exit_station
+            when entry_station is not null and transaction_station_2 is not null
+              then entry_station || ' -> ' || transaction_station_2
+            when entry_station is not null then entry_station
             else transaction_type
         end as description,
         '交通費' as category
@@ -423,10 +481,10 @@ dbt docs serve`}
           code={`-- Snowflakeで以下のクエリを実行して結果を確認
 
 -- 全取引ファクトテーブルの確認
-SELECT * FROM dbt_tutorial.fct_transactions ORDER BY transaction_date DESC LIMIT 10;
+SELECT * FROM dbt_tutorial.my.fct_transactions ORDER BY transaction_date DESC LIMIT 10;
 
 -- 月次財務サマリの確認
-SELECT * FROM dbt_tutorial.monthly_summary ORDER BY year_month, source;`}
+SELECT * FROM dbt_tutorial.my.monthly_summary ORDER BY year_month, source;`}
           title="結果確認クエリ"
           showLineNumbers={true}
           maxLines={15}
