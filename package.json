@@ -58,7 +58,9 @@
   "overrides": {
     "glob@>=10.2.0 <10.5.0": "10.5.0",
     "glob@>=11.0.0 <11.1.0": "11.1.0",
-    "fast-xml-parser": "5.3.6",
+    "fast-xml-parser": "5.3.8",
+    "minimatch": "9.0.7",
+    "serialize-javascript": "7.0.3",
     "ajv": "8.18.0",
     "webpack": "5.104.1",
     "@serwist/build": {
