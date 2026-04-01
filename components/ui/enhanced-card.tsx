@@ -7,9 +7,10 @@ interface EnhancedCardProps {
   description: string
   imageSrc: string
   href: string
+  loading?: "lazy" | "eager"
 }
 
-export function EnhancedCard({ title, description, imageSrc, href }: EnhancedCardProps) {
+export function EnhancedCard({ title, description, imageSrc, href, loading = "lazy" }: EnhancedCardProps) {
   return (
     <Link href={href} className="group block">
       <Card className="
@@ -69,7 +70,10 @@ export function EnhancedCard({ title, description, imageSrc, href }: EnhancedCar
                 alt={title} 
                 width={384} 
                 height={216}
+                loading={loading}
                 className="
+                  h-auto
+                  w-full
                   rounded-lg
                 "
               />

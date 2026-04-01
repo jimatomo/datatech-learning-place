@@ -23,7 +23,13 @@ export function ContentCard({ title, description, imageSrc, href }: ContentCardP
             <p>
               {description}
             </p>
-            <Image src={imageSrc} alt={title} width={384} height={216} />
+            <Image
+              src={imageSrc}
+              alt={title}
+              width={384}
+              height={216}
+              className="h-auto w-full"
+            />
           </div>
         </CardContent>
       </Card>

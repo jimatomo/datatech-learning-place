@@ -58,12 +58,14 @@ export default function Home() {
             description="データエンジニアリングのクイズ"
             imageSrc="https://datatech-learning-place.net/logo/quiz_card.jpg"
             href="/quiz"
+            loading="eager"
           />
           <EnhancedCard 
             title="Text"
             description="データエンジニアリングのテキスト"
             imageSrc="https://datatech-learning-place.net/logo/book.png"
             href="/text"
+            loading="eager"
           />
         </div>
         <p className="text-sm md:text-base pt-2">
