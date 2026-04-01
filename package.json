@@ -42,7 +42,7 @@
     "cmdk": "^1.1.1",
     "kuromoji": "^0.1.2",
     "lucide-react": "^0.469.0",
-    "next": "^16.1.6",
+    "next": "^16.1.7",
     "next-themes": "^0.4.4",
     "nextjs-toploader": "^3.7.15",
     "node-cron": "^4.2.1",
@@ -58,14 +58,18 @@
   "overrides": {
     "glob@>=10.2.0 <10.5.0": "10.5.0",
     "glob@>=11.0.0 <11.1.0": "11.1.0",
-    "fast-xml-parser": "5.3.8",
+    "fast-xml-parser": "5.5.7",
     "minimatch": "9.0.7",
-    "serialize-javascript": "7.0.3",
+    "serialize-javascript": "7.0.5",
     "ajv": "8.18.0",
     "webpack": "5.104.1",
     "@serwist/build": {
       "source-map": "0.7.6"
-    }
+    },
+    "flatted": "^3.4.2",
+    "undici": "^7.24.0",
+    "picomatch": "^4.0.4",
+    "brace-expansion": "^5.0.5"
   },
   "devDependencies": {
     "@types/dompurify": "^3.0.5",
