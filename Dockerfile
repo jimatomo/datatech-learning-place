@@ -1,10 +1,12 @@
-FROM public.ecr.aws/docker/library/node:20-slim as builder
+FROM public.ecr.aws/docker/library/node:22-slim AS builder
 WORKDIR /app
+ENV NEXT_TELEMETRY_DISABLED=1 NPM_CONFIG_UPDATE_NOTIFIER=false
 COPY . .
 RUN npm ci && npm run build
 
 # runner
-FROM public.ecr.aws/docker/library/node:20-slim as runner
+FROM public.ecr.aws/docker/library/node:22-slim AS runner
+ARG DEBIAN_FRONTEND=noninteractive
 
 # Healthcheckのためにcurlをインストール
 RUN apt-get update && \
@@ -12,7 +14,7 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-ENV PORT=3000 NODE_ENV=production
+ENV PORT=3000 NODE_ENV=production NEXT_TELEMETRY_DISABLED=1
 
 WORKDIR /app
 COPY --from=builder /app/package.json ./package.json
@@ -51,4 +53,4 @@ ENV TRANSFORMERS_CACHE=/tmp/cache/transformers
 
 USER node
 
-CMD exec ./run.sh
+CMD ["./run.sh"]

@@ -29,12 +29,23 @@ const nextConfig = {
         'datatech-learning-place.net',
         'uccqrxjd84.execute-api.ap-northeast-1.amazonaws.com',
         // 環境変数から追加のオリジンを取得
-        ...(process.env.SERVER_ACTIONS_ALLOWED_ORIGINS 
+        ...(process.env.SERVER_ACTIONS_ALLOWED_ORIGINS
           ? process.env.SERVER_ACTIONS_ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
           : []
         )
       ],
     },
+  },
+  webpack: (config) => {
+    config.ignoreWarnings = [
+      ...(config.ignoreWarnings ?? []),
+      {
+        module: /@auth0\/nextjs-auth0\/dist\/utils\/dpopUtils\.js$/,
+        message: /Critical dependency: the request of a dependency is an expression/,
+      },
+    ];
+
+    return config;
   },
 };
 
