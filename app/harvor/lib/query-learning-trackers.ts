@@ -10,6 +10,9 @@ export async function queryLearningTrackers() {
   // ユーザー情報を取得
   const session = await auth0.getSession()
   const userId = session?.user?.sub
+  if (!userId) {
+    return null;
+  }
 
   // ユーザーの学習トラッカーを取得
   try {

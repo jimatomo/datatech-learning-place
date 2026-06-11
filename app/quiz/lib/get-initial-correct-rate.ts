@@ -16,6 +16,10 @@ export async function getInitialCorrectRate(quizId: string) {
 
     return result;
   } catch (error) {
+    if (error instanceof Error && error.name === 'CredentialsProviderError') {
+      return null;
+    }
+
     console.error("Failed to get initial correct rate:", error);
     return null;
   }
