@@ -61,7 +61,7 @@
     "fast-xml-parser": "5.7.2",
     "onnxruntime-web": "1.25.1",
     "postcss": "$postcss",
-    "protobufjs": "8.2.0",
+    "protobufjs": "8.6.5",
     "minimatch": "9.0.7",
     "serialize-javascript": "7.0.5",
     "ajv": "8.18.0",
