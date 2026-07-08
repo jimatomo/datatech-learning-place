@@ -24,6 +24,12 @@ import {
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import Link from "next/link"
 
 // 検索結果の型
@@ -118,109 +124,81 @@ export function SearchDialog() {
   const [results, setResults] = React.useState<SearchResult[]>([])
   const [isLoading, setIsLoading] = React.useState(false)
   const [hasSearched, setHasSearched] = React.useState(false)
+  const [searchError, setSearchError] = React.useState<string | null>(null)
   // 最新の検索リクエストIDを追跡（abortされたリクエストが状態を更新しないようにするため）
   const searchRequestIdRef = React.useRef(0)
-  // 検索APIのウォームアップ（セッション中1回だけ）
-  const warmupStatusRef = React.useRef<'idle' | 'in_flight' | 'done'>('idle')
+  const searchAbortControllerRef = React.useRef<AbortController | null>(null)
 
-  // ダイアログを開いたタイミングで検索APIをウォームアップ
-  React.useEffect(() => {
-    if (!open) return
-    if (warmupStatusRef.current !== 'idle') return
-
-    warmupStatusRef.current = 'in_flight'
-    const abortController = new AbortController()
-
-    fetch(`/api/search?warmup=1`, { signal: abortController.signal })
-      .then((res) => {
-        if (res.ok) {
-          warmupStatusRef.current = 'done'
-          return
-        }
-        // 失敗時は次回開いたときに再トライできるようにする
-        warmupStatusRef.current = 'idle'
-      })
-      .catch((error) => {
-        // AbortErrorは無視（ダイアログの開閉による正常なキャンセル）
-        if (error instanceof Error && error.name === 'AbortError') {
-          warmupStatusRef.current = 'idle'
-          return
-        }
-        warmupStatusRef.current = 'idle'
-        console.warn('Search warmup failed:', error)
-      })
-
-    return () => {
-      abortController.abort()
-    }
-  }, [open])
-
-  // 検索のデバウンス（AbortControllerでin-flightリクエストをキャンセル）
-  React.useEffect(() => {
-    if (!query.trim()) {
+  const handleSearch = React.useCallback(async () => {
+    const normalizedQuery = query.trim()
+    if (normalizedQuery.length < 2) {
       // リクエストIDをインクリメントして、in-flightリクエストのコールバックを無効化
       searchRequestIdRef.current++
+      searchAbortControllerRef.current?.abort()
       setResults([])
       setHasSearched(false)
+      setSearchError(null)
       setIsLoading(false) // クエリが空の場合はローディング状態を解除
       return
     }
 
+    searchAbortControllerRef.current?.abort()
     const abortController = new AbortController()
+    searchAbortControllerRef.current = abortController
     // このリクエストの一意IDを生成
     const currentRequestId = ++searchRequestIdRef.current
 
-    const timer = setTimeout(async () => {
-      // このリクエストが最新でない場合は何もしない
+    setIsLoading(true)
+    setSearchError(null)
+    try {
+      const response = await fetch(
+        `/api/search?q=${encodeURIComponent(normalizedQuery)}&type=hybrid&limit=20`,
+        { signal: abortController.signal }
+      )
+      // リクエストがabortされた場合は結果を更新しない
       if (currentRequestId !== searchRequestIdRef.current) {
         return
       }
-      setIsLoading(true)
-      try {
-        const response = await fetch(
-          `/api/search?q=${encodeURIComponent(query)}&type=hybrid&limit=20`,
-          { signal: abortController.signal }
-        )
-        // リクエストがabortされた場合は結果を更新しない
-        if (currentRequestId !== searchRequestIdRef.current) {
-          return
-        }
-        if (response.ok) {
-          const data: SearchResponse = await response.json()
-          setResults(data.results)
-        } else {
-          // エラー時は結果をクリア
-          setResults([])
-          console.error("Search API error:", response.status, response.statusText)
-        }
-      } catch (error) {
-        // AbortErrorは無視（クエリ変更による正常なキャンセル）
-        if (error instanceof Error && error.name === 'AbortError') {
-          return
-        }
-        // リクエストがabortされた場合は結果を更新しない
-        if (currentRequestId !== searchRequestIdRef.current) {
-          return
-        }
-        // ネットワークエラー時も結果をクリア
+      if (response.ok) {
+        const data: SearchResponse = await response.json()
+        setResults(data.results)
+      } else {
+        // エラー時は結果をクリア
         setResults([])
-        console.error("Search error:", error)
-      } finally {
-        // このリクエストが最新の場合のみローディング状態を更新
-        if (currentRequestId === searchRequestIdRef.current) {
-          setIsLoading(false)
-          setHasSearched(true)
-        }
+        setSearchError(
+          response.status === 401
+            ? "検索機能を利用するにはサインインが必要です"
+            : "検索に失敗しました。時間をおいて再度お試しください。"
+        )
+        console.error("Search API error:", response.status, response.statusText)
       }
-    }, 300) // 300ms デバウンス
-
-    return () => {
-      clearTimeout(timer)
-      abortController.abort()
-      // クリーンアップ時はローディング状態を更新しない
-      // （新しいリクエストが開始されている可能性があるため）
+    } catch (error) {
+      // AbortErrorは無視（新しい検索による正常なキャンセル）
+      if (error instanceof Error && error.name === 'AbortError') {
+        return
+      }
+      // リクエストがabortされた場合は結果を更新しない
+      if (currentRequestId !== searchRequestIdRef.current) {
+        return
+      }
+      // ネットワークエラー時も結果をクリア
+      setResults([])
+      setSearchError("検索に失敗しました。ネットワーク状態を確認して再度お試しください。")
+      console.error("Search error:", error)
+    } finally {
+      // このリクエストが最新の場合のみローディング状態を更新
+      if (currentRequestId === searchRequestIdRef.current) {
+        setIsLoading(false)
+        setHasSearched(true)
+      }
     }
   }, [query])
+
+  React.useEffect(() => {
+    return () => {
+      searchAbortControllerRef.current?.abort()
+    }
+  }, [])
 
   // 結果選択時の処理
   const handleSelect = (url: string) => {
@@ -239,9 +217,13 @@ export function SearchDialog() {
   const handleOpenChange = (open: boolean) => {
     setOpen(open)
     if (!open) {
+      searchRequestIdRef.current++
+      searchAbortControllerRef.current?.abort()
       setQuery("")
       setResults([])
       setHasSearched(false)
+      setSearchError(null)
+      setIsLoading(false)
     }
   }
 
@@ -271,13 +253,57 @@ export function SearchDialog() {
         <CommandInput
           placeholder="クイズやテキストを検索..."
           value={query}
-          onValueChange={setQuery}
+          hideLeadingIcon
+          onValueChange={(value) => {
+            searchRequestIdRef.current++
+            searchAbortControllerRef.current?.abort()
+            setQuery(value)
+            setResults([])
+            setHasSearched(false)
+            setSearchError(null)
+            setIsLoading(false)
+          }}
+          action={
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="secondary"
+                    aria-label="検索を実行"
+                    className="h-8 w-8 rounded-md"
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={handleSearch}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault()
+                        handleSearch()
+                      }
+                    }}
+                    disabled={isLoading || query.trim().length < 2}
+                  >
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Search className="h-4 w-4" />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>検索を実行</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          }
         />
         <CommandList className="max-h-[calc(100dvh-12rem)] md:max-h-[400px]">
           {isLoading ? (
             <div className="flex items-center justify-center py-6">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
               <span className="ml-2 text-sm text-muted-foreground">検索中...</span>
+            </div>
+          ) : searchError ? (
+            <div className="py-6 text-center text-sm text-destructive">
+              {searchError}
             </div>
           ) : hasSearched && results.length === 0 ? (
             <CommandEmpty>
@@ -384,7 +410,3 @@ export function SearchCommand() {
     </Button>
   )
 }
-
-
-
-

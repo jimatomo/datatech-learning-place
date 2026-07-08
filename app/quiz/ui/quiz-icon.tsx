@@ -7,11 +7,17 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 // ユーザが精化しているかどうかで表示を変えるアイコン
 export function QuizIcon({ quizId }: { quizId: string }) {
   const [isCorrect, setIsCorrect] = useState(false)
-  const { user } = useUser()
+  const { user, isLoading } = useUser()
   const userId = user?.sub ?? ''
 
   // ログイン済みユーザーの場合のみクイズ結果を取得
   useEffect(() => {
+    if (isLoading) return
+    if (!userId) {
+      setIsCorrect(false)
+      return
+    }
+
     const fetchInitialData = async () => {
       try {
         // クイズ結果の取得
@@ -25,7 +31,7 @@ export function QuizIcon({ quizId }: { quizId: string }) {
     }
 
     fetchInitialData()
-  }, [userId, quizId])
+  }, [isLoading, userId, quizId])
 
   return (
     <>

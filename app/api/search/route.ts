@@ -1,7 +1,13 @@
-import { getSearchClient, search, vectorSearch, hybridSearch, type SearchOptions, type SearchResponse } from '@/lib/search/orama-client';
 import { auth0 } from '@/lib/auth0';
-import { getEmbeddingPipeline } from '@/lib/search/embedder';
 import { serverWarmState } from '@/lib/search/warm-state';
+import {
+  getLexicalSearchIndex,
+  search,
+  vectorSearch,
+  hybridSearch,
+  type SearchOptions,
+  type SearchResponse,
+} from '@/lib/search-lite/client';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,40 +39,14 @@ export async function GET(request: Request) {
     const tagsParam = searchParams.get('tags');
     const minScoreParam = searchParams.get('minScore');
 
-    // ウォームアップ（検索は実行せず、初回コストが高い初期化だけ行う）
+    // ウォームアップ（検索は実行せず、インデックスJSONだけロードする）
     if (warmup) {
-      // 既にロード済みなら、warmup自体をスキップ（より快適に）
-      if (serverWarmState.searchClient && serverWarmState.embedding) {
+      if (serverWarmState.searchIndex) {
         return Response.json({ ok: true, skipped: true });
       }
 
-      const tasks: Promise<unknown>[] = [];
-
-      if (!serverWarmState.searchClient) {
-        tasks.push(
-          getSearchClient().then(() => {
-            serverWarmState.searchClient = true;
-          })
-        );
-      }
-
-      if (!serverWarmState.embedding) {
-        tasks.push(
-          getEmbeddingPipeline()
-            .then(() => {
-              serverWarmState.embedding = true;
-            })
-            .catch((error) => {
-              // 失敗しても検索自体は後でリトライできるため握りつぶす
-              console.warn('Embedding warmup failed:', error);
-              return null;
-            })
-        );
-      }
-
-      if (tasks.length > 0) {
-        await Promise.all(tasks);
-      }
+      getLexicalSearchIndex();
+      serverWarmState.searchIndex = true;
 
       return Response.json({
         ok: true,
@@ -142,12 +122,7 @@ export async function GET(request: Request) {
         break;
     }
 
-    // 検索が成功した＝少なくとも検索クライアントはロード済み
-    serverWarmState.searchClient = true;
-    // vector/hybridはembeddingモデルを必ず使うため、成功時点でロード済み扱い
-    if (searchType !== 'fulltext') {
-      serverWarmState.embedding = true;
-    }
+    serverWarmState.searchIndex = true;
 
     // レスポンスの整形（contentは長いので短縮）
     const formattedResults = searchResponse.results.map(result => ({
@@ -179,4 +154,3 @@ export async function GET(request: Request) {
     );
   }
 }
-

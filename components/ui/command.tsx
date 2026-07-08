@@ -54,12 +54,17 @@ const CommandDialog = ({ children, title = "検索", ...props }: CommandDialogPr
   )
 }
 
+type CommandInputProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> & {
+  action?: React.ReactNode
+  hideLeadingIcon?: boolean
+}
+
 const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
->(({ className, ...props }, ref) => (
+  CommandInputProps
+>(({ className, action, hideLeadingIcon = false, ...props }, ref) => (
   <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
-    <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+    {!hideLeadingIcon && <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />}
     <CommandPrimitive.Input
       ref={ref}
       className={cn(
@@ -68,6 +73,7 @@ const CommandInput = React.forwardRef<
       )}
       {...props}
     />
+    {action ? <div className="ml-2 mr-10 flex shrink-0 items-center">{action}</div> : null}
   </div>
 ))
 

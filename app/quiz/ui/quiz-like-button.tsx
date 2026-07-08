@@ -18,10 +18,12 @@ export default function QuizLikeButton({ quizId }: QuizLikeButtonProps) {
   const [liked, setLiked] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [likeCount, setLikeCount] = useState(0)
-  const { user } = useUser()
+  const { user, isLoading: isUserLoading } = useUser()
   const userId = user?.sub ?? ''
 
   useEffect(() => {
+    if (isUserLoading) return
+
     const fetchInitialData = async () => {
       try {
         // いいね数の取得
@@ -43,7 +45,7 @@ export default function QuizLikeButton({ quizId }: QuizLikeButtonProps) {
     }
 
     fetchInitialData()
-  }, [quizId, userId])
+  }, [isUserLoading, quizId, userId])
 
   const handleLikeClick = async () => {
     if (!user) return
