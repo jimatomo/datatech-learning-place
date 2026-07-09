@@ -12,6 +12,9 @@ RUN pnpm run build
 FROM public.ecr.aws/docker/library/node:24-slim@sha256:cb4e8f7c443347358b7875e717c29e27bf9befc8f5a26cf18af3c3dec80e58c5 AS runner
 ARG DEBIAN_FRONTEND=noninteractive
 
+# Lambda Function URL originで同じimageを使えるようにする。
+COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:1.0.1 /lambda-adapter /opt/extensions/lambda-adapter
+
 # Healthcheckのためにcurlをインストール
 RUN apt-get update && \
     apt-get install -y curl && \
