@@ -15,8 +15,7 @@ jobs:
     timeout-minutes: 30
     env:
       ECR_REPOSITORY: production/datatech-learing-place
-      ECS_CLUSTER: dtlp_prod_common
-      ECS_SERVICE: dtlp_prod_nextjs_app
+      LAMBDA_FUNCTION_NAME: dtlp_prod_nextjs_app
       S3_STATIC_ASSETS_URI: s3://dtlp-prod-static-assets/_next/
 
     steps:
@@ -64,6 +63,8 @@ jobs:
         run: |
           rm -f .env.production.local
 
-      - name: Deploy to ECS
+      - name: Deploy to Lambda
         run: |
-          aws ecs update-service --cluster ${{ env.ECS_CLUSTER }} --service ${{ env.ECS_SERVICE }} --force-new-deployment
+          image_uri="${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}"
+          aws lambda update-function-code --function-name "${{ env.LAMBDA_FUNCTION_NAME }}" --image-uri "$image_uri"
+          aws lambda wait function-updated --function-name "${{ env.LAMBDA_FUNCTION_NAME }}"
