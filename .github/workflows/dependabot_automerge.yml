@@ -1,0 +1,60 @@
+name: Dependabot auto-merge
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  enable-auto-merge:
+    name: Enable auto-merge for patch updates
+    if: >-
+      github.repository == 'jimatomo/datatech-learning-place' &&
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      github.event.pull_request.base.ref == 'main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    steps:
+      # This privileged workflow deliberately never checks out or executes PR code.
+      - name: Fetch verified Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@d7267f607e9d3fb96fc2fbe83e0af444713e90b7 # v3.1.0
+        with:
+          github-token: ${{ github.token }}
+
+      - name: Verify changed files
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        shell: bash
+        run: |
+          while IFS= read -r path; do
+            case "$path" in
+              package.json|pnpm-lock.yaml|Dockerfile|.github/workflows/*.yml|.github/workflows/*.yaml)
+                ;;
+              *)
+                echo "Unexpected file in a Dependabot PR: $path" >&2
+                exit 1
+                ;;
+            esac
+          done < <(gh pr view "$PR_URL" --json files --jq '.files[].path')
+
+      - name: Enable auto-merge
+        if: steps.metadata.outputs.update-type == 'version-update:semver-patch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: gh pr merge --auto --squash "$PR_URL"
+
+      - name: Record manual review requirement
+        if: steps.metadata.outputs.update-type != 'version-update:semver-patch'
+        env:
+          UPDATE_TYPE: ${{ steps.metadata.outputs.update-type }}
+        run: echo "Auto-merge skipped because this is a ${UPDATE_TYPE} update." >> "$GITHUB_STEP_SUMMARY"
