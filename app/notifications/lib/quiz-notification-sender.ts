@@ -10,12 +10,27 @@ import {
 import { getQuizFiles } from '@/app/quiz/lib/get-files'
 import { getPathInfos } from '@/app/quiz/lib/get-path-info'
 
-// VAPIDの設定
-webpush.setVapidDetails(
-  "mailto:support@datatech-learning-place.net",
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
-)
+let vapidConfigured = false
+
+function configureWebPush(): void {
+  if (vapidConfigured) {
+    return
+  }
+
+  const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+  const privateKey = process.env.VAPID_PRIVATE_KEY
+
+  if (!publicKey || !privateKey) {
+    throw new Error("VAPIDの公開鍵または秘密鍵が設定されていません")
+  }
+
+  webpush.setVapidDetails(
+    "mailto:support@datatech-learning-place.net",
+    publicKey,
+    privateKey
+  )
+  vapidConfigured = true
+}
 
 export interface QuizNotificationRequest {
   quizTitle: string
@@ -48,6 +63,8 @@ export async function sendQuizNotification(params: QuizNotificationRequest): Pro
   if (!quizTitle || !quizTags || !quizDate || !quizPath) {
     throw new Error("quizTitle, quizTags, quizDate, quizPath は必須です")
   }
+
+  configureWebPush()
 
   // 現在の時刻に一番近い10分間隔の時間を生成する
   const currentTime = getJSTNow()

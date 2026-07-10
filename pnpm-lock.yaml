@@ -129,6 +129,9 @@ importers:
         specifier: ^3.6.7
         version: 3.6.7
     devDependencies:
+      '@eslint/eslintrc':
+        specifier: 3.3.5
+        version: 3.3.5
       '@types/node':
         specifier: ^20
         version: 20.19.43

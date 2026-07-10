@@ -9,9 +9,16 @@ updates:
       timezone: "Asia/Tokyo"
     open-pull-requests-limit: 5
     groups:
-      app-dependencies:
+      app-patch:
         patterns:
           - "*"
+        update-types:
+          - "patch"
+      app-minor:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -21,6 +28,12 @@ updates:
       time: "09:00"
       timezone: "Asia/Tokyo"
     open-pull-requests-limit: 5
+    groups:
+      actions-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "patch"
 
   - package-ecosystem: "docker"
     directory: "/"
@@ -30,3 +43,9 @@ updates:
       time: "09:00"
       timezone: "Asia/Tokyo"
     open-pull-requests-limit: 5
+    groups:
+      docker-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "patch"
