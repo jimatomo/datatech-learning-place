@@ -4,6 +4,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
+import { QuizOptionsSkeleton } from "@/app/quiz/ui/quiz-options-skeleton"
 
 interface QuizRadioGroupProps {
   options: { [key: number]: string };
@@ -31,6 +32,10 @@ export function QuizRadioGroup({
     setSelectedAnswer(value);
     onSelect(Number(value));
   };
+
+  if (randomizedOptions.length === 0) {
+    return <QuizOptionsSkeleton count={Object.keys(options).length} />
+  }
 
   return (
     <RadioGroup value={selectedAnswer} onValueChange={handleSelect} className="flex flex-col gap-3 w-full max-w-xl">

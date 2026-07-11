@@ -4,6 +4,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
+import { QuizOptionsSkeleton } from "@/app/quiz/ui/quiz-options-skeleton"
 
 // 並べ替えの処理
 function shuffle<T>(array: T[]): T[] {
@@ -59,6 +60,10 @@ export function QuizCheckboxGroup({
     
     setSelectedAnswers(newSelectedAnswers);
     onSelect(newSelectedAnswers);
+  }
+
+  if (randomizedOptions.length === 0) {
+    return <QuizOptionsSkeleton count={Object.keys(options).length} />
   }
 
   return (
