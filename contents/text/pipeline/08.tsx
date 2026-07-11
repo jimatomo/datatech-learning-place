@@ -1,6 +1,7 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { CodeBlock } from "@/components/ui/code-block"
 import { ListOrderedIcon, TrendingUpIcon, ShieldCheckIcon } from "lucide-react"
+import Link from "next/link"
 
 
 export default function TextContents() {
@@ -599,9 +600,9 @@ dbt run --dry-run`}
       {/* ページネーション */}
       <div className="mt-8 flex justify-between items-center">
         <div className="w-1/3">
-          <a href="/text/pipeline/07" className="inline-flex items-center gap-2 p-2 px-4 font-semibold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+          <Link href="/text/pipeline/07" className="inline-flex items-center gap-2 p-2 px-4 font-semibold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
             Back
-          </a>
+          </Link>
         </div>
         <div className="w-1/3 text-center">
           <span className="text-sm text-gray-500">Chapter 8 / 8</span>
@@ -613,4 +614,3 @@ dbt run --dry-run`}
     </div>
   );
 }
-

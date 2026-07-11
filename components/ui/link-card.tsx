@@ -40,7 +40,6 @@ export const LinkCard = ({ url, ogps }: LinkCardProps) => {
     <div className="w-fit hover:scale-[1.02] transition rounded-xl shadow-lg">
       <Link rel="noopener noreferrer" href={localOgps.href ?? "/" } target="_blank">
         <div className="flex flex-col md:flex-row w-full">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           {localOgps.image && localOgps.image !== "/no-image.png" && (
             <img
               src={localOgps.image}
@@ -126,7 +125,6 @@ export const LinkCardWithoutLink = ({ url, ogps }: LinkCardProps) => {
   return (
     <div className="w-fit transition rounded-xl shadow-lg">
       <div className="flex flex-col md:flex-row w-full">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         {localOgps.image && localOgps.image !== "/no-image.png" && (
           <img
             src={localOgps.image}

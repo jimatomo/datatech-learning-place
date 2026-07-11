@@ -1,6 +1,7 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { CodeBlock } from "@/components/ui/code-block"
 import { CheckCircleIcon, ListOrderedIcon, DatabaseIcon } from "lucide-react"
+import Link from "next/link"
 
 
 export default function TextContents() {
@@ -506,20 +507,19 @@ SELECT * FROM dbt_tutorial.my.monthly_summary ORDER BY year_month, source;`}
       {/* ページネーション */}
       <div className="mt-8 flex justify-between items-center">
         <div className="w-1/3">
-          <a href="/text/pipeline/03" className="inline-flex items-center gap-2 p-2 px-4 font-semibold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+          <Link href="/text/pipeline/03" className="inline-flex items-center gap-2 p-2 px-4 font-semibold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
             Back
-          </a>
+          </Link>
         </div>
         <div className="w-1/3 text-center">
           <span className="text-sm text-gray-500">Chapter 4 / 8</span>
         </div>
         <div className="w-1/3 text-right">
-          <a href="/text/pipeline/05" className="inline-flex items-center gap-2 p-2 px-4 font-semibold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+          <Link href="/text/pipeline/05" className="inline-flex items-center gap-2 p-2 px-4 font-semibold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
             Next
-          </a>
+          </Link>
         </div>
       </div>
     </div>
   );
 }
-

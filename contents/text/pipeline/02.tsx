@@ -2,6 +2,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { CodeBlock } from "@/components/ui/code-block"
 import { ZoomableImage } from "@/components/ui/image-zoom"
 import { ExternalLinkIcon, CheckCircleIcon, ListOrderedIcon } from "lucide-react"
+import Link from "next/link"
 
 // サンプルデータのベースURL
 const BASE_URL = "https://datatech-learning-place.net";
@@ -394,19 +395,19 @@ DROP SCHEMA dbt_tutorial.dbt_test;`}
       {/* ページネーション */}
       <div className="mt-8 flex justify-between items-center">
         <div className="w-1/3">
-          <a href="/text/pipeline/01" className="inline-flex items-center gap-2 p-2 px-4 font-semibold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+          <Link href="/text/pipeline/01" className="inline-flex items-center gap-2 p-2 px-4 font-semibold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
             Back
-          </a>
+          </Link>
         </div>
         <div className="w-1/3 text-center">
-          <a href="/text/pipeline" className="inline-flex items-center gap-2 p-2 px-4 font-semibold text-white bg-gray-600 rounded-lg shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition">
+          <Link href="/text/pipeline" className="inline-flex items-center gap-2 p-2 px-4 font-semibold text-white bg-gray-600 rounded-lg shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition">
             Top
-          </a>
+          </Link>
         </div>
         <div className="w-1/3 text-right">
-          <a href="/text/pipeline/03" className="inline-flex items-center gap-2 p-2 px-4 font-semibold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+          <Link href="/text/pipeline/03" className="inline-flex items-center gap-2 p-2 px-4 font-semibold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
             Next
-          </a>
+          </Link>
         </div>
       </div>
     </div>

@@ -2,7 +2,7 @@ FROM public.ecr.aws/docker/library/node:26-slim@sha256:ffc78385a788964bb3cbab5e4
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1 PNPM_HOME=/pnpm
 ENV PATH="${PNPM_HOME}:${PATH}"
-RUN corepack enable && corepack prepare pnpm@11.9.0 --activate
+RUN npm install --global pnpm@11.9.0
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 COPY . .
