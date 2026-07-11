@@ -196,7 +196,7 @@ export function AppSidebar() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     side="top"
-                    className="w-[--radix-popper-anchor-width]"
+                    className="w-[var(--radix-popper-anchor-width)]"
                   >
                     {footerItems.map((item) => (
                       <DropdownMenuItem key={item.title} asChild>

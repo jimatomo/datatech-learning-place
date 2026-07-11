@@ -397,7 +397,7 @@ export function SearchCommand() {
   return (
     <Button
       variant="outline"
-      className="relative h-9 w-full justify-start rounded-md bg-muted/50 text-sm font-normal text-muted-foreground shadow-none sm:pr-12 lg:w-60 mt-4 mb-0"
+      className="relative h-9 w-full justify-start rounded-md bg-muted/50 text-sm font-normal text-muted-foreground shadow-none sm:pr-12 mt-4 mb-0"
       onClick={handleOpenSearch}
       disabled={isUserLoading}
     >
