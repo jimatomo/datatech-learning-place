@@ -47,14 +47,19 @@ jobs:
           done < <(gh pr view "$PR_URL" --json files --jq '.files[].path')
 
       - name: Enable auto-merge
-        if: steps.metadata.outputs.update-type == 'version-update:semver-patch'
+        if: >-
+          steps.metadata.outputs.update-type == 'version-update:semver-patch' &&
+          steps.metadata.outputs.package-ecosystem != 'github_actions'
         env:
           GH_TOKEN: ${{ github.token }}
           PR_URL: ${{ github.event.pull_request.html_url }}
         run: gh pr merge --auto --merge "$PR_URL"
 
       - name: Record manual review requirement
-        if: steps.metadata.outputs.update-type != 'version-update:semver-patch'
+        if: >-
+          steps.metadata.outputs.update-type != 'version-update:semver-patch' ||
+          steps.metadata.outputs.package-ecosystem == 'github_actions'
         env:
+          PACKAGE_ECOSYSTEM: ${{ steps.metadata.outputs.package-ecosystem }}
           UPDATE_TYPE: ${{ steps.metadata.outputs.update-type }}
-        run: echo "Auto-merge skipped because this is a ${UPDATE_TYPE} update." >> "$GITHUB_STEP_SUMMARY"
+        run: echo "Auto-merge skipped for ${PACKAGE_ECOSYSTEM} ${UPDATE_TYPE}." >> "$GITHUB_STEP_SUMMARY"
