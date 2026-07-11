@@ -1,6 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import "tw-animate-css";
+@config "../tailwind.config.ts";
 
 body {
   font-family: 'Noto Sans JP', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo, Arial, sans-serif;
@@ -125,4 +125,3 @@ body {
     @apply bg-background text-foreground;
   }
 }
-
