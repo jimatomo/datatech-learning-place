@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { QuizRadioGroup } from "@/app/quiz/ui/quiz-content-form-radio-group";
 import { QuizCheckboxGroup } from "@/app/quiz/ui/quiz-content-form-checkbox-group";
@@ -9,9 +10,11 @@ export interface QuizFormProps {
   options: { [key: number]: string };
   answers: number[];
   quizId: string;
+  explanation?: string;
+  explanationJsx?: ReactNode;
 }
 
-export function QuizForm({ options, answers, quizId }: QuizFormProps) {
+export function QuizForm({ options, answers, quizId, explanation, explanationJsx }: QuizFormProps) {
   const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
   const [key, setKey] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState<number[]>([]);
@@ -62,6 +65,8 @@ export function QuizForm({ options, answers, quizId }: QuizFormProps) {
         quizId={quizId}
         answer_count={answers.length}
         selectedOptions={selectedOptions}
+        explanation={explanation}
+        explanationJsx={explanationJsx}
         onReset={handleReset}
         onMarkAnswer={handleMarkAnswer}
       />

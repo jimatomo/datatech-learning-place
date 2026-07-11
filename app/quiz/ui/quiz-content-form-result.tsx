@@ -4,14 +4,14 @@ import React from 'react';
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { useReward } from 'react-rewards';
-import { Quiz } from '@/contents/quiz';
-import { getQuizById } from '@/app/quiz/lib/get-quiz-by-id';
 import { Loader2 } from "lucide-react"
 
 interface QuizResultProps {
   quizId: string;
   answer_count: number;
   selectedOptions: number[];
+  explanation?: string;
+  explanationJsx?: React.ReactNode;
   onReset: () => void;
   onMarkAnswer: (correctAnswers: number[]) => void;
 }
@@ -20,6 +20,8 @@ export function QuizResult({
   quizId,
   answer_count,
   selectedOptions,
+  explanation,
+  explanationJsx,
   onReset,
   onMarkAnswer,
 }: QuizResultProps) {
@@ -27,8 +29,6 @@ export function QuizResult({
   const [result, setResult] = useState<{
     isCorrect: boolean;
   } | null>(null)
-  const [explanation, setExplanation] = useState<string | null>(null)
-  const [explanationJsx, setExplanationJsx] = useState<React.ReactNode | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
   const { reward, isAnimating } = useReward('rewardId', 'confetti');
@@ -46,23 +46,23 @@ export function QuizResult({
           selectedOptions,
         }),
       });
+      if (!response.ok) {
+        throw new Error(`Failed to check answer: ${response.status}`);
+      }
       const data = await response.json();
       setResult(data);
       setShowResult(true);
-      setIsLoading(false)
 
       if (data.isCorrect) {
         reward();
       }
 
-      const quiz : Quiz = await getQuizById(quizId)
-      setExplanation(quiz.getExplanation() || null)
-      setExplanationJsx(quiz.getExplanationJsx())
-
       onMarkAnswer(data.correctAnswers)
 
     } catch (error) {
       console.error('Error checking answer:', error);
+    } finally {
+      setIsLoading(false)
     }
   }
 

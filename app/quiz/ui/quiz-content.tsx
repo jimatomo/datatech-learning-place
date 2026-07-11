@@ -78,6 +78,8 @@ export async function QuizContent({ quiz, folderId }: { quiz: Quiz, folderId: st
         options={quiz.getOptions()}
         answers={quiz.getAnswers()}
         quizId={quiz.getId()}
+        explanation={quiz.getExplanation()}
+        explanationJsx={quiz.getExplanationJsx()}
       />
 
       {/* 参考文献 */}
