@@ -57,7 +57,8 @@ export function ChartAnswerdCount({
         >
           <RadialBarChart
             data={chartData}
-            endAngle={180}
+            startAngle={180}
+            endAngle={0}
             innerRadius={95}
             outerRadius={135}
             cy="90%"
