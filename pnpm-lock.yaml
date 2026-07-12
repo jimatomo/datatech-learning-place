@@ -74,6 +74,9 @@ importers:
       '@radix-ui/react-visually-hidden':
         specifier: ^1.2.4
         version: 1.2.7(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@rudderstack/analytics-js':
+        specifier: ^3.31.4
+        version: 3.31.4
       '@serwist/next':
         specifier: ^9.3.0
         version: 9.5.11(next@16.2.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)(typescript@5.9.3)
@@ -1423,6 +1426,9 @@ packages:
 
   '@rtsao/scc@1.1.0':
     resolution: {integrity: sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==}
+
+  '@rudderstack/analytics-js@3.31.4':
+    resolution: {integrity: sha512-dqjdzUwstrKem+wbQyadvr7BnCEhmczFaZ3NIrlkaErVXMO51FnUG1DC3YdCrybLsxi4/ys+wbs3p5TcQZ60hg==}
 
   '@rushstack/eslint-patch@1.16.1':
     resolution: {integrity: sha512-TvZbIpeKqGQQ7X0zSCvPH9riMSFQFSggnfBjFZ1mEoILW+UuXCKwOoPcgjMwiUtRqFZ8jWhPJc4um14vC6I4ag==}
@@ -4677,6 +4683,8 @@ snapshots:
       react-redux: 9.3.0(@types/react@19.2.17)(react@19.2.7)(redux@5.0.1)
 
   '@rtsao/scc@1.1.0': {}
+
+  '@rudderstack/analytics-js@3.31.4': {}
 
   '@rushstack/eslint-patch@1.16.1': {}
 
