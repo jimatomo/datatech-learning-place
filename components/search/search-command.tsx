@@ -319,6 +319,16 @@ export function SearchDialog() {
             setSearchError(null)
             setIsLoading(false)
           }}
+          onKeyDown={(event) => {
+            if (event.key !== "Enter") return
+            // IME変換確定のEnterは無視する
+            if (event.nativeEvent.isComposing) return
+            // 検索結果がある場合は cmdk の結果選択に任せる
+            if (hasSearched && results.length > 0) return
+
+            event.preventDefault()
+            void handleSearch()
+          }}
           action={
             <TooltipProvider>
               <Tooltip>
