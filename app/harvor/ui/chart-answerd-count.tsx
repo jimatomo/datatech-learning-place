@@ -50,18 +50,17 @@ export function ChartAnswerdCount({
         <CardTitle>Quiz Progress</CardTitle>
         <CardDescription>正答済みクイズの数</CardDescription>
       </CardHeader>
-      <CardContent className="flex items-center justify-center pb-0">
+      <CardContent className="flex items-center pb-4">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square w-full max-w-[300px]"
+          className="mx-auto aspect-[2/1.35] w-full max-w-[300px]"
         >
           <RadialBarChart
             data={chartData}
-            startAngle={180}
-            endAngle={0}
-            innerRadius={120}
-            outerRadius={220}
-            cy="70%"
+            endAngle={180}
+            innerRadius={95}
+            outerRadius={135}
+            cy="90%"
           >
             <ChartTooltip
               cursor={false}
@@ -75,14 +74,14 @@ export function ChartAnswerdCount({
                       <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle">
                         <tspan
                           x={viewBox.cx}
-                          y={(viewBox.cy || 0) - 16}
+                          y={(viewBox.cy || 0) - 24}
                           className="fill-foreground text-xl font-bold"
                         >
                           {answered_count.toLocaleString()}/{totalQuizCount.toLocaleString()}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
-                          y={(viewBox.cy || 0) + 4}
+                          y={(viewBox.cy || 0) - 6}
                           className="fill-muted-foreground"
                         >
                           quizzes
