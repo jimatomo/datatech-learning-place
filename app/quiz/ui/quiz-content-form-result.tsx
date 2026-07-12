@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { useReward } from 'react-rewards';
 import { Loader2 } from "lucide-react"
+import { usePathname } from 'next/navigation';
+import { useUser } from '@auth0/nextjs-auth0/client';
+import { handleTrackEvent } from '@/app/lib/frontend_event_api';
 
 interface QuizResultProps {
   quizId: string;
@@ -25,6 +28,9 @@ export function QuizResult({
   onReset,
   onMarkAnswer,
 }: QuizResultProps) {
+  const pathname = usePathname();
+  const { user } = useUser();
+  const attemptCount = React.useRef(0);
   const [showResult, setShowResult] = useState(false)
   const [result, setResult] = useState<{
     isCorrect: boolean;
@@ -34,6 +40,7 @@ export function QuizResult({
   const { reward, isAnimating } = useReward('rewardId', 'confetti');
 
   const handleShowResult = async () => {
+    const startedAt = performance.now();
     setIsLoading(true)
     try {
       const response = await fetch('/api/check-answer', {
@@ -52,6 +59,20 @@ export function QuizResult({
       const data = await response.json();
       setResult(data);
       setShowResult(true);
+      attemptCount.current += 1;
+
+      void handleTrackEvent({
+        user_id: user?.sub?.toString() ?? '',
+        path: pathname,
+        event_name: 'quiz_completed',
+        properties: {
+          quiz_id: quizId,
+          is_correct: data.isCorrect,
+          attempt_number: attemptCount.current,
+          selected_option_count: selectedOptions.length,
+          response_time_ms: Math.round(performance.now() - startedAt),
+        },
+      });
 
       if (data.isCorrect) {
         reward();

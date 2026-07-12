@@ -31,6 +31,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import Link from "next/link"
+import { handleTrackEvent, trackLoginStarted } from "@/app/lib/frontend_event_api"
 
 // 検索結果の型
 interface SearchResult {
@@ -120,6 +121,7 @@ export function SearchDialog() {
   const pathname = usePathname()
   const { open, setOpen, showLoginDialog, setShowLoginDialog } = useSearchDialog()
   const { isMobile, setOpenMobile } = useSidebar()
+  const { user } = useUser()
   const [query, setQuery] = React.useState("")
   const [results, setResults] = React.useState<SearchResult[]>([])
   const [isLoading, setIsLoading] = React.useState(false)
@@ -150,6 +152,7 @@ export function SearchDialog() {
 
     setIsLoading(true)
     setSearchError(null)
+    const startedAt = performance.now()
     try {
       const response = await fetch(
         `/api/search?q=${encodeURIComponent(normalizedQuery)}&type=hybrid&limit=20`,
@@ -162,6 +165,20 @@ export function SearchDialog() {
       if (response.ok) {
         const data: SearchResponse = await response.json()
         setResults(data.results)
+        void handleTrackEvent({
+          user_id: user?.sub?.toString() ?? '',
+          path: pathname,
+          event_name: 'search_performed',
+          properties: {
+            query: normalizedQuery,
+            result_count: data.total,
+            quiz_result_count: data.results.filter(result => result.type === 'quiz').length,
+            text_result_count: data.results.filter(result => result.type === 'text').length,
+            search_type: data.searchType,
+            status: 'succeeded',
+            response_time_ms: Math.round(performance.now() - startedAt),
+          },
+        })
       } else {
         // エラー時は結果をクリア
         setResults([])
@@ -171,6 +188,18 @@ export function SearchDialog() {
             : "検索に失敗しました。時間をおいて再度お試しください。"
         )
         console.error("Search API error:", response.status, response.statusText)
+        void handleTrackEvent({
+          user_id: user?.sub?.toString() ?? '',
+          path: pathname,
+          event_name: 'search_performed',
+          properties: {
+            query: normalizedQuery,
+            result_count: 0,
+            status: 'failed',
+            http_status: response.status,
+            response_time_ms: Math.round(performance.now() - startedAt),
+          },
+        })
       }
     } catch (error) {
       // AbortErrorは無視（新しい検索による正常なキャンセル）
@@ -185,6 +214,18 @@ export function SearchDialog() {
       setResults([])
       setSearchError("検索に失敗しました。ネットワーク状態を確認して再度お試しください。")
       console.error("Search error:", error)
+      void handleTrackEvent({
+        user_id: user?.sub?.toString() ?? '',
+        path: pathname,
+        event_name: 'search_performed',
+        properties: {
+          query: normalizedQuery,
+          result_count: 0,
+          status: 'failed',
+          error_type: 'network_error',
+          response_time_ms: Math.round(performance.now() - startedAt),
+        },
+      })
     } finally {
       // このリクエストが最新の場合のみローディング状態を更新
       if (currentRequestId === searchRequestIdRef.current) {
@@ -192,7 +233,7 @@ export function SearchDialog() {
         setHasSearched(true)
       }
     }
-  }, [query])
+  }, [pathname, query, user])
 
   React.useEffect(() => {
     return () => {
@@ -201,7 +242,19 @@ export function SearchDialog() {
   }, [])
 
   // 結果選択時の処理
-  const handleSelect = (url: string) => {
+  const handleSelect = (result: SearchResult) => {
+    void handleTrackEvent({
+      user_id: user?.sub?.toString() ?? '',
+      path: pathname,
+      event_name: 'search_result_clicked',
+      properties: {
+        query: query.trim(),
+        result_id: result.id,
+        result_type: result.type,
+        result_url: result.url,
+        result_rank: results.findIndex(item => item.id === result.id) + 1,
+      },
+    })
     // モバイルの時は、検索から遷移したタイミングで左ナビ（Sheet）も閉じる
     if (isMobile) {
       setOpenMobile(false)
@@ -210,7 +263,7 @@ export function SearchDialog() {
     setQuery("")
     setResults([])
     setHasSearched(false)
-    router.push(url)
+    router.push(result.url)
   }
 
   // ダイアログが閉じられた時のリセット
@@ -244,7 +297,10 @@ export function SearchDialog() {
             </DialogDescription>
           </DialogHeader>
           <Button asChild>
-            <a href={`/api/auth/login?returnTo=${pathname}`}>サインイン（無料）</a>
+            <a
+              href={`/api/auth/login?returnTo=${pathname}`}
+              onClick={() => void trackLoginStarted({ source: 'search_dialog', path: pathname })}
+            >サインイン（無料）</a>
           </Button>
         </DialogContent>
       </Dialog>
@@ -317,7 +373,7 @@ export function SearchDialog() {
                     <CommandItem
                       key={result.id}
                       value={result.id}
-                      onSelect={() => handleSelect(result.url)}
+                      onSelect={() => handleSelect(result)}
                       className="flex flex-col items-start gap-1 py-3"
                     >
                       <div className="flex w-full items-center gap-2">
@@ -357,7 +413,7 @@ export function SearchDialog() {
                     <CommandItem
                       key={result.id}
                       value={result.id}
-                      onSelect={() => handleSelect(result.url)}
+                      onSelect={() => handleSelect(result)}
                       className="flex flex-col items-start gap-1 py-3"
                     >
                       <div className="flex w-full items-center gap-2">

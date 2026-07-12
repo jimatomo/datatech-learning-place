@@ -21,6 +21,7 @@ import ConsentManager from "@/components/ConsentManager"
 import { PWAInstallPrompt } from "@/components/pwa-install-prompt"
 import { NotificationHandler } from "@/components/actions/notification-handler"
 import { SearchDialogProvider, SearchDialog } from "@/components/search/search-command"
+import { AnalyticsTracker } from "@/components/analytics-tracker"
 
 export const metadata: Metadata = {
   title: "Datatech Learning Place",
@@ -73,6 +74,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <Auth0Provider>
       <body>
+        <AnalyticsTracker />
         <ConsentManager />
         <ThemeProvider
           attribute="class"
