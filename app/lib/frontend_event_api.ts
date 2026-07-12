@@ -1,7 +1,13 @@
+import { RudderAnalytics } from '@rudderstack/analytics-js/bundled';
+
 const ANONYMOUS_ID_KEY = 'dtlp:analytics:anonymous-id';
 const SESSION_KEY = 'dtlp:analytics:session';
 const LOGIN_ATTEMPT_KEY = 'dtlp:analytics:login-attempt';
 const SESSION_TIMEOUT_MS = 30 * 60 * 1000;
+
+const RUDDERSTACK_DATA_PLANE_PATH = '/events';
+const RUDDERSTACK_WRITE_KEY =
+  process.env.NEXT_PUBLIC_RUDDERSTACK_WRITE_KEY ?? 'dtlp-frontend';
 
 type SessionState = {
   id: string;
@@ -13,6 +19,8 @@ type LoginAttempt = {
   path: string;
   startedAt: string;
 };
+
+let analytics: RudderAnalytics | undefined;
 
 const createId = () => {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -57,43 +65,36 @@ const getSession = (now: number) => {
   }
 };
 
-export const sendEventPostRequest = async (data?: unknown) => {
-  try {
-    // ローカル環境の場合はリクエストをスキップ
-    if (process.env.NODE_ENV === 'development') {
-      const request_body = JSON.stringify(data);
-      console.log('Skipping event post in development environment:', request_body);
-      return true;
-    }
-
-    const request_body = JSON.stringify(data);
-
-    const response = await fetch('/events', {
-      method: 'POST',
-      keepalive: true,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      // オプショナルな data 引数を受け取り、body に設定
-      body: request_body,
-    });
-
-    if (!response.ok) {
-      console.error('Failed to post event:', response.status, response.statusText);
-      const errorData = await response.text();
-      console.error('Error details:', errorData);
-      // エラーオブジェクトやメッセージを返すなど、より詳細なエラーハンドリングも可能
-      throw new Error(`Failed to post event: ${response.statusText}`);
-    }
-
-    return true; // 成功したことを示す値を返す例
-
-  } catch (error) {
-    console.error('Error posting event:', error);
-    // エラーを再スローするか、特定の値を返す
-    throw error; // 呼び出し元でエラーを処理できるように再スロー
+const getAnalytics = () => {
+  if (typeof window === 'undefined') {
+    return undefined;
   }
-}; 
+
+  if (!analytics) {
+    analytics = new RudderAnalytics();
+    analytics.load(
+      RUDDERSTACK_WRITE_KEY,
+      `${window.location.origin}${RUDDERSTACK_DATA_PLANE_PATH}`,
+      {
+        // This deployment only uses RudderStack's event envelope and delivery
+        // queue. Routing continues to be handled by the existing Firehose.
+        getSourceConfig: () => ({
+          source: {
+            id: 'dtlp-browser',
+            name: 'Datatech Learning Place browser',
+            enabled: true,
+            workspaceId: 'dtlp',
+            config: {},
+            destinations: [],
+          },
+        }),
+        loadIntegration: false,
+      },
+    );
+  }
+
+  return analytics;
+};
 
 export const handleTrackEvent = async ({
   user_id,
@@ -108,23 +109,39 @@ export const handleTrackEvent = async ({
 }) => {
   const now = Date.now();
   const session = getSession(now);
-  const eventData = {
-    user_id,
-    path,
-    event_name,
-    properties: {
-      ...properties,
-      analytics_schema_version: 1,
-      anonymous_id: getAnonymousId(),
-      session_id: session.id,
-      is_session_start: session.isNew,
-      client_event_id: createId(),
-      client_event_at: new Date(now).toISOString(),
-    },
+  const enrichedProperties = {
+    ...properties,
+    analytics_schema_version: 1,
+    anonymous_id: getAnonymousId(),
+    session_id: session.id,
+    is_session_start: session.isNew,
+    client_event_id: createId(),
+    client_event_at: new Date(now).toISOString(),
   };
 
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Skipping event post in development environment:', {
+      user_id,
+      path,
+      event_name,
+      properties: enrichedProperties,
+    });
+    return true;
+  }
+
+  const rudderAnalytics = getAnalytics();
+  if (!rudderAnalytics) {
+    return false;
+  }
+
   try {
-    await sendEventPostRequest(eventData);
+    rudderAnalytics.track(event_name, {
+      ...enrichedProperties,
+      // Keep these fields in the event properties so the ingestion Lambda can
+      // preserve the existing event_data contract used after Firehose.
+      user_id,
+      path,
+    });
     return true;
   } catch (error) {
     console.error(`Error tracking event '${event_name}':`, error);
