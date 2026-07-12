@@ -24,6 +24,8 @@ export function QuizForm({ options, answers, quizId, explanation, explanationJsx
   const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
   const [key, setKey] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState<number[]>([]);
+  const answerCount = answers.length;
+  const optionCount = Object.keys(options).length;
 
   useEffect(() => {
     if (isLoading || startedQuizId.current === quizId) return;
@@ -35,11 +37,11 @@ export function QuizForm({ options, answers, quizId, explanation, explanationJsx
       event_name: 'quiz_started',
       properties: {
         quiz_id: quizId,
-        answer_count: answers.length,
-        option_count: Object.keys(options).length,
+        answer_count: answerCount,
+        option_count: optionCount,
       },
     });
-  }, [answers.length, isLoading, options, pathname, quizId, user]);
+  }, [answerCount, isLoading, optionCount, pathname, quizId, user]);
   const handleSelect = (values: number | number[]) => {
     if (Array.isArray(values)) {
       setSelectedOptions(values);
