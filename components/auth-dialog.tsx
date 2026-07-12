@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { usePathname } from 'next/navigation';
-import { handleTrackEvent } from '@/app/lib/frontend_event_api';
+import { handleTrackEvent, trackLoginStarted } from '@/app/lib/frontend_event_api';
 import { getClientInfo } from '@/app/lib/client_info';
 
 const AUTH_DIALOG_DISMISS_KEY = 'auth-dialog-dismissed-at';
@@ -40,6 +40,7 @@ export function AuthDialog() {
 
   const handleLoginClick = async () => {
     const clientInfo = getClientInfo();
+    void trackLoginStarted({ source: 'auth_dialog', path: pathname });
     await handleTrackEvent({
       user_id: 'guest',
       event_name: 'click_login_dialog_button',

@@ -44,7 +44,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 import { useUser } from '@auth0/nextjs-auth0/client';
 
-import { handleTrackEvent } from '@/app/lib/frontend_event_api';
+import { handleTrackEvent, trackLoginStarted } from '@/app/lib/frontend_event_api';
 
 
 // Menu items.
@@ -104,6 +104,10 @@ export function AppSidebar() {
   // 画面サイズが小さい時のみサイドバーを閉じる関数
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     const clickedPath = e.currentTarget.getAttribute('href') ?? '';
+
+    if (clickedPath.startsWith('/api/auth/login')) {
+      void trackLoginStarted({ source: 'sidebar', path: pathname });
+    }
     
     // イベントトラッキングを非同期で実行してUIをブロックしない
     setTimeout(async () => {
