@@ -16,7 +16,6 @@ import NextTopLoader from 'nextjs-toploader';
 
 import { Auth0Provider } from '@auth0/nextjs-auth0';
 import { AuthStatus } from "@/components/auth-status"
-import { AuthDialog } from "@/components/auth-dialog"
 import ConsentManager from "@/components/ConsentManager"
 import { PWAInstallPrompt } from "@/components/pwa-install-prompt"
 import { NotificationHandler } from "@/components/actions/notification-handler"
@@ -103,7 +102,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                     <ModeToggle />
                   </div>
                   <AuthStatus />
-                  <AuthDialog />
                 </div>
                 <div className="px-6 py-2 flex flex-col xl:flex-row gap-4">
                   <div className="w-full flex-1">

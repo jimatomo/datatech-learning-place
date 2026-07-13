@@ -24,7 +24,7 @@
 | イベント | 発火条件 | 主な固有プロパティ |
 | --- | --- | --- |
 | `page_view` | 初回表示およびNext.jsのパス遷移 | `page_title`, `previous_path`, `referrer`, `utm_source`, `utm_medium`, `utm_campaign` |
-| `login_started` | サインインリンクのクリック | `source`（`header` / `sidebar` / `auth_dialog` / `search_dialog`） |
+| `login_started` | サインインリンクのクリック | `source`（`header` / `sidebar` / `search_dialog`）。未ログイン促しはヘッダー Sign in 直下の吹き出しで、ログイン導線はヘッダーボタンのみ |
 | `login_succeeded` | 当サイトから開始したAuth0認証から1時間以内に復帰 | `source`, `return_path`, `login_started_at`, `login_duration_ms` |
 | `search_performed` | 検索APIの成功または失敗 | `query`, `result_count`, 種別ごとの件数, `status`, `response_time_ms` |
 | `search_result_clicked` | 検索結果を選択 | `query`, `result_id`, `result_type`, `result_url`, `result_rank` |
