@@ -72,7 +72,7 @@ rg -m 1 -o 'title: "([^"]+)"' -r '$1' contents/quiz/ -g '*.tsx' --sort path | ta
 ## Step 4: クイズファイルの作成
 
 - `contents/quiz/YYYY/MM/DD.tsx` に作成する。テンプレート・タグ・スタイル・解説の書き方はすべて `contents/quiz/AGENTS.md` に従う。
-- **author（AI生成時）**: AIが主体で作成したクイズは、人が単独で書いたものと区別できるよう `jimatomo with <モデル名>` 形式にする（例: `jimatomo with Composer`）。`author_url` は従来どおり `https://github.com/jimatomo` でよい。使用中のモデル名が分からない場合はユーザーに確認する。
+- **author（AI生成時）**: AIが主体で作成したクイズは、人が単独で書いたものと区別できるよう `jimatomo with <モデル名>` 形式にする（例: `jimatomo with Composer`）。`author_url` は従来どおり `https://github.com/jimatomo` でよい。**モデル名は推測しない。** 使用中のモデル名が分からない・確信が持てない場合は、ファイル作成前にユーザーへ確認し、正しい表記が分かるまで author を仮決めしない。
 - `created_at` / `updated_at` は対象日付（Step 1で確定した日付）を設定する。
 - 新規タグが必要な場合のみ `app/quiz/lib/tags.ts` に追加する（同一コミットに含める）。
 
