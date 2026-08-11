@@ -106,7 +106,8 @@ function QuizExplanation() {
 - `created_at` and `updated_at` should match on first publish; only change `updated_at` on edits.
 
 ## Quiz Authoring Guidelines
-- Prefer multi-choice formats that minimise the number of selections. With four options, ask for the single incorrect choice; with five options, choose the smaller set between correct and incorrect answers.
+- Prefer multi-choice formats that minimise the number of selections. With four options, the default baseline is to ask for the single incorrect choice; with five options, choose the smaller set between correct and incorrect answers.
+- Keep "select the incorrect statement" as the default because it efficiently tests whether the reader can spot a false claim among plausible truths. Occasionally vary the format (for example a single correct choice, a scenario-based selection, or a result prediction) when that variation creates a clearer hook and higher learning value for the topic—such as comparing strategies, predicting a query result, or choosing the right tool for a concrete situation. Do not vary every quiz for its own sake; within a multi-day batch, avoid making every question the same incorrect-one pattern when at least one topic would benefit from variety.
 - Question JSX must be concise and explicit. When multiple answers are expected, state "Select all that apply".
 - Use `<strong className="text-green-600">correct statements</strong>` when asking for correct answers, and `<strong className="text-red-600">incorrect statements</strong>` (or the literal string "誤っているもの") when asking for wrong answers.
 - Options:
