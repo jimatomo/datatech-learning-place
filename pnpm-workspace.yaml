@@ -22,3 +22,5 @@ overrides:
   undici: 7.29.0
   js-yaml: 4.3.1
   "nanoid@>=3.0.0 <3.3.17": 3.3.18
+  protobufjs: 8.7.2
+  browserslist: 4.28.8
