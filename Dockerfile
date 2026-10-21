@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/node:26-slim@sha256:715e55e4b84e4bb0ff48e49b398a848f08e55daed8eb6a0ea1839ae53bc57583 AS builder
+FROM public.ecr.aws/docker/library/node:26-slim@sha256:4ebb5ace66f15a24c14c492e01a8beeed4fddf970a856109f5126e703e5fe503 AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1 PNPM_HOME=/pnpm
 ENV PATH="${PNPM_HOME}:${PATH}"
@@ -9,7 +9,7 @@ COPY . .
 RUN pnpm run build
 
 # runner
-FROM public.ecr.aws/docker/library/node:26-slim@sha256:715e55e4b84e4bb0ff48e49b398a848f08e55daed8eb6a0ea1839ae53bc57583 AS runner
+FROM public.ecr.aws/docker/library/node:26-slim@sha256:4ebb5ace66f15a24c14c492e01a8beeed4fddf970a856109f5126e703e5fe503 AS runner
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Lambda Function URL originで同じimageを使えるようにする。
