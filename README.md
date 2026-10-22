@@ -25,7 +25,7 @@ https://datatech-learning-place.net/
 
 ### 開発環境
 
-- ローカル: Docker Desktop + Dev Container
+- ローカル: Node.js 26
 - AWSの権限（Identity Center）を利用できるようにすると、バックエンドのデータの取り扱いができるようになります。
 - 認証するためにはAuth0関係の環境変数が書かれている.env.localファイルが必要です。
 
